@@ -6,7 +6,7 @@ Use the installed `git-collaboration` skill in `/git-merge-approved-force` mode.
 
 Run the skill's read-only PR/MR command preflight for the specific PR/MR first. This dedicated command waives the live non-author approving-reviewer gate. Continue only when the authenticated user is the author or a current assignee. If neither matches, classify `MERGE_NOT_AUTHORIZED`, perform no merge-side write, and state that the author or an assignee must invoke this command for the same PR/MR. Do not suggest self-assignment as a bypass.
 
-The PR/MR must still be owned, open, not draft, free of conflicts, have required CI success or an explicit acceptable explanation, have blocking discussions resolved, and match the exact current head. Then track relevant non-blocking follow-ups when required, merge through the forge with the exact-head SHA, and read back the result.
+The PR/MR must still be owned, open, not draft, free of conflicts, have required CI success or an explicit acceptable explanation, have blocking discussions resolved, and match the exact current head. Then track relevant non-blocking follow-ups when required and merge through the forge with the exact-head SHA. The merge command result is the read-back. One confirm view only when it omits merged state.
 
 If branch protection rejects the merge, report the forge error. Use GitHub `--admin` only when the same invocation also contains `admin`.
 

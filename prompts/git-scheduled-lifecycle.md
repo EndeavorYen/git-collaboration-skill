@@ -16,7 +16,7 @@ Perform only the scheduled lifecycle capability boundary:
 - conflict repair for PRs/MRs owned by or assigned to the authenticated user; and
 - focused revision for PRs/MRs owned by or assigned to the authenticated user.
 
-Before every forge or branch write, reload the configured project allowlist and re-resolve the candidate's stable project ID and canonical URL; refresh the live PR/MR state and rerun the skill's PR/MR command preflight. Do not use a stale snapshot to authorize a write.
+Before every forge or branch write, reload the configured project allowlist and re-resolve the candidate's stable project ID and canonical URL. Obey **Forge budget**: one new PR/MR snapshot, then rerun the skill's PR/MR command preflight. Do not use a stale snapshot to authorize a write. Do not issue a call per field.
 
 For strict review, run the skill's structured file review with `open-code-review-delegate` on the current head. OCR Step 7 Fix stays off. Treat any new behavior or behavior change without automated tests as blocking. The only exception is reproducible alternative validation with evidence proportionate to risk.
 

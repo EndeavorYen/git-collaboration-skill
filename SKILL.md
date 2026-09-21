@@ -16,9 +16,39 @@ Resolve the forge before any write. The request URL wins, then `git remote -v`:
 | `github.com`, GitHub Enterprise host, `gh` repo | GitHub | `gh` | Pull request |
 | `gitlab.com`, other GitLab host, `glab` repo | GitLab | `glab` | Merge request |
 
-If both remotes exist and the request has no URL, ask which forge to use. Load `references/github.md` or `references/gitlab.md` for CLI and approval APIs. This file owns the workflow; those files own forge-specific commands.
+If both remotes exist and the request has no URL, ask which forge to use. Load only the matching forge reference (`references/github.md` or `references/gitlab.md`) for the one-snapshot commands. This file owns the workflow, including **Forge budget** and **Context budget**; those files own forge-specific commands.
 
 In this skill, **PR/MR** means the current forge's change request. Commands below use `/git-*`. Treat `/gitlab-*` and `/github-*` aliases, plus a pasted GitHub or GitLab URL, as the same mode.
+
+## Forge budget
+
+The forge is the mailbox for issue and PR/MR state. The local checkout is the codebase. Every `gh` invocation, `glab` invocation, forge REST call, and GitHub or GitLab MCP call counts. Use one client: `gh` on GitHub, `glab` on GitLab. Do not also query that object through MCP.
+
+A **snapshot** is one read whose payload already contains every forge field that mode needs. Reuse a snapshot already in this conversation when the user has not said that object changed.
+
+1. Resolve the authenticated user once per invocation and reuse that id. Skip a separate auth-status call when the user endpoint or the snapshot already returns the login. Skip a repo-metadata call when the URL or `git remote -v` already names the project.
+2. Read each issue or PR/MR once. The command or commands named together in the matching forge reference are that snapshot, not a menu of extra calls. Do not add a call for a field that snapshot already contains.
+3. After the snapshot, inspect code, history, diffs, tests, and repo instructions in the local checkout. `git fetch` of the one ref you will check out is allowed; do not fetch again to re-read files. If this checkout is the wrong repo or lacks the cited paths, stop and name the missing path.
+4. Draft, classify, and implement from that snapshot plus the checkout. Do not re-query the forge between those steps. Do not read repository files, blame, or trees through the forge.
+5. A write is one call. The write response is the read-back when it contains the new comment id, SHA, or state. Confirm with one view only when that response omits a field the stop condition requires. Do not reload comments or files after a successful write.
+6. One more full snapshot is allowed immediately before a forge write that depends on the current head, approval, or mergeability, and before each write in an aggressive or scheduled run. That snapshot replaces the earlier one. It is still one call.
+
+Triage lists stay lists. One metadata list per relationship. Classify from that payload. Open one trimmed snapshot only for an item you are about to write, or the one item the user named.
+
+Download one failed job log when a verdict or a fix depends on that log. Keep the failing command and the error lines. Discard the rest of the log. Do not list or download jobs whose conclusions are already in the snapshot.
+
+Related PRs/MRs come from links already in the snapshot. Do not search the forge for them unless the user asked whether a PR/MR exists and the snapshot has no link.
+
+## Context budget
+
+Forge budget limits how often you call the forge. Context budget limits what those calls, and the local reads, put into the conversation. One unfiltered PR/MR or issue payload is enough to blow the context window.
+
+- Run the snapshot command in the forge reference with its `--jq` or `jq` pipe. If the filter errors, fix the filter once. Do not rerun without it, and do not page through raw JSON.
+- The issue or PR/MR body stays whole. A comment or review body stays whole when it contains `git-plan-issue`, `git-plan-issue-dissent`, or `git-force-review`, or when it is the latest one. Every other body keeps author, time, id, and the first 400 characters. Also keep review commit OID, discussion resolved state, and commit author login, name, and email. Empty login is not a missing author when name or email is present.
+- List calls return metadata only: number, title, state, updated time, author, assignees, url, and for a PR/MR also draft, `reviewDecision`, mergeable, and head SHA. No comment bodies, review bodies, or check logs.
+- Do not paste the snapshot, this skill, or source listings into the reply, the posted comment, or the pre-submit subagent. The subagent gets the submit range and the contract. The reply reports the decision fields the mode requires.
+- Search, then open the matching symbol and its test. Do not read a directory, a whole unrelated file, or both forge references into context. Load `references/scheduled-automation.md` only for a scheduled mode.
+- Reuse the trimmed snapshot already in this conversation. Do not re-read it back into context to "be sure."
 
 ## Task Mode Decision
 
@@ -66,12 +96,12 @@ Use these global prompt commands when available. They intentionally do not defin
 
 ## PR/MR Command Preflight
 
-Every PR/MR-scoped command starts with a read-only live-state preflight. Requested command does not override live conflict, draft, CI, discussion, or mergeability state. Dedicated `*-force` commands are the exception named in **Explicit force**. Do not edit code, create commits, push, post comments, request review, resolve discussions, approve, or merge until the PR/MR is classified and the requested command is valid for that state.
+Every PR/MR-scoped command starts with one read-only snapshot, as **Forge budget** defines. Requested command does not override live conflict, draft, CI, discussion, or mergeability state. Dedicated `*-force` commands are the exception named in **Explicit force**. Do not edit code, create commits, push, post comments, request review, resolve discussions, approve, or merge until the PR/MR is classified and the requested command is valid for that state.
 
-Refresh at least:
+The snapshot covers:
 
 - PR/MR state, draft status, current head SHA, source/target branches, author, assignees, requested reviewers, and current user relationship; resolve the authenticated forge user and compare stable user IDs or usernames rather than display names
-- the full commit list from the forge, not only the tip; record whether any commit author or committer matches the authenticated user
+- commit SHAs and authors from the trimmed snapshot, not commit message bodies; record whether any commit author or committer matches the authenticated user
 - live approval evidence from the forge (see `references/github.md` / `references/gitlab.md`); use branch-protection or approval-rule counts only as supporting evidence
 - latest pipeline/checks and required jobs, conflict and mergeability state, and whether blocking discussions are resolved
 - all unresolved discussions, latest non-system reviewer comments, latest author replies, and whether feedback was addressed by a later commit
@@ -195,7 +225,7 @@ Issue descriptions should include background/problem, impact, expected behavior,
 
 ## Markdown Descriptions
 
-Never create issue/PR/MR descriptions by embedding literal `\n` in a quoted shell string. Use a heredoc or a file so the forge receives real newlines. After creating or bulk-updating issues, spot-check rendering and verify there are no literal backslash-n sequences.
+Never create issue/PR/MR descriptions by embedding literal `\n` in a quoted shell string. Use a heredoc or a file so the forge receives real newlines. Spot-check the write response body for literal backslash-n sequences. Do not view the issue again for that check.
 
 ## Cross-Repo Dependencies
 
@@ -248,7 +278,7 @@ OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local
 Applies before push and before opening or updating a PR/MR on `/git-issue-pr`, `/git-revise-pr`, `/git-revise-pr-force`, `/git-fix-conflict`, and scheduled lifecycle source-branch push.
 
 1. Finish `verification-before-completion` for tests and claimed validation.
-2. Dispatch a fresh subagent through `requesting-code-review`. That reviewer runs `open-code-review-delegate` on the intended submit range.
+2. Dispatch a fresh subagent through `requesting-code-review`. That reviewer runs `open-code-review-delegate` on the intended submit range. Pass the range and the contract, not this skill and not the forge snapshot.
 3. Critical and High findings are submit blockers until each is fixed in the tree or waived.
 4. A waiver is valid only when the **human in this conversation** names the path, the issue, and a reason. **Blanket ship language is not a waiver.** The agent does not waive. Unattended scheduled runs have no human in the conversation, so they cannot waive.
 5. Record each waiver in the commit body or PR/MR description.
@@ -273,7 +303,7 @@ When the user asks to review a GitHub or GitLab PR/MR, treat that as permission 
 
 Run the actor gate first. Do not review or approve a PR/MR that is `owned` or `self_authored_head` unless this invocation is `/git-review-pr-force`. Classify `REVIEW_NOT_AUTHORIZED` and stop without posting a verdict. Reviewer assignment plus a named IID does not authorize self-review. Under `/git-review-pr-force`, continue with the file pass and verdict.
 
-For `review again`, restart from live state instead of continuing from the old verdict. If there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
+For `review again`, take one new snapshot instead of continuing from the old verdict. If there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
 
 Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree. Do not push review-only branches.
 
@@ -314,22 +344,22 @@ A regex tripwire on an install or deploy command is not package-manager or runti
 
 Approval rules:
 
-- Never approve from stale state. Re-fetch the PR/MR and approve only the latest reviewed head SHA.
+- Never approve from a snapshot taken before the file pass. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
 - Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`. Under force, try native approve; if the forge rejects a self-APPROVE, post `<!-- git-force-review -->` on the current SHA.
 - Do not approve if any active blocker remains unresolved, blocking discussions are unresolved, or relevant CI is failed/unknown without a clear non-code explanation.
 - An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed.
 - Do not require rerunning a protected live job before approval.
 
-For re-review, fetch the newest head SHA, discussions, approvals, and pipeline again. Verify each previously posted blocker against the current code or CI evidence before resolving it or approving. Do not resolve a blocker based only on the author's explanation.
+For re-review, take one new snapshot of head SHA, discussions, approvals, and pipeline. Verify each previously posted blocker against the local checkout of that SHA, or against CI evidence already in the snapshot, before resolving it or approving. Do not resolve a blocker based only on the author's explanation.
 
 When the PR/MR claims to fix a named failed job or issue, also walk that job's remaining path. Checking previously posted blockers is not enough to approve.
 
-1. Always reread the claimed failed job's actual error from the job log, not only the author's reply.
+1. Download the claimed failed job's log once. Keep the failing command and the error lines, then walk the script locally. Do not keep the rest of the log.
 2. From the failing line, walk the remaining job script and its adjacent layers.
 3. If the new commit changed only one layer, still check N-1 / N+1 on the same path.
 4. If those adjacent layers of the claimed failed job script have not been walked, must not approve.
 
-After posting blockers or approval, read the PR/MR back and report the forge state: current SHA, pipeline, unresolved blocker count, and whether approval is recorded.
+After posting blockers or approval, the write response is the read-back. Report current SHA, pipeline, unresolved blocker count, and whether approval is recorded. One confirm view only when the write response omits one of those fields.
 
 ## Focused PR/MR Status Workflow
 
@@ -352,9 +382,9 @@ Mode selection (same rules as the `git-triage` prompt):
 
 ### Todo triage workflow
 
-Build a forge-global personal inbox (cross-project). Refresh notifications/todos, PRs/MRs where the user is a reviewer, PRs/MRs where the user is author or assignee, open issues assigned to or authored by the user, and issues with recent non-system participation.
+Build a forge-global personal inbox from metadata lists only: one for notifications or todos, one for PRs/MRs where the user is a reviewer, one for PRs/MRs where the user is author or assignee, and one for open issues assigned to or authored by the user. Context budget defines the fields. Do not request comment or review bodies on a list.
 
-Treat notifications as signals, not conversational source of truth. For each issue candidate, compare non-system human comments chronologically. Another user speaking last is necessary but insufficient to require a reply.
+Treat notifications as signals, not conversational source of truth. Another user speaking last is necessary but insufficient to require a reply. Rank from list fields. If a row still cannot be classified, take one trimmed snapshot of that one item, and only when it is in the top three you might recommend.
 
 Classify into Ready to review, Ready to fix conflicts, Ready to revise, Ready to merge, Merge handoff needed, Ready to reply, Acknowledge or route, No reply needed, Needs semantic review, Ready to implement, Review request needed, and Waiting or blocked. A named foreign conflicted PR/MR is `WRITE_NOT_AUTHORIZED`, not ready to fix.
 
@@ -364,7 +394,7 @@ Report each actionable item with reason, live evidence, remaining gate, and exac
 
 ### Project triage workflow
 
-Scope to the current repository's forge project, or the project URL/path supplied in arguments. Apply the same relationship model inside the selected project. Include sibling repositories only when repo-local instructions identify them or the user asks.
+Scope to the current repository's forge project, or the project URL/path supplied in arguments. One metadata PR/MR list and one metadata issue list. Do not open each row. Apply the same relationship model inside the selected project. Include sibling repositories only when repo-local instructions identify them or the user asks.
 
 Add hygiene buckets **Needs reviewer** and **Needs assignee**. Do not auto-assign. Prefer `/git-request-review` when the user owns the PR/MR; otherwise report who should request review. For issues that are otherwise implementable, mention `/git-issue-pr` only after ownership is clear.
 
@@ -380,7 +410,7 @@ Use this when the user invokes `/git-triage run` (aliases `aggressive` / `execut
 4. **Assignee hygiene (early):** for open PRs/MRs where the authenticated user is the **author** and **empty assignees**, set assignee to the authenticated user. Do not assign yourself on PRs/MRs you did not author. Do not replace an existing non-empty assignee list.
 5. Execute the complete lifecycle unless `merge-only`: Ready to review → `/git-review-pr`; owned conflicts → `/git-fix-conflict`; owned revision → `/git-revise-pr`; owned Ready to merge → `/git-merge-approved` (skip when `no-merge`); owned PRs/MRs that already have a reviewer and only need current-head re-request → `/git-request-review`.
 6. **Defer missing-reviewer hygiene to the end.** If the user already specified `reviewer:USERNAME`, assign that reviewer and request review. If no reviewer was specified, list those PRs/MRs and **ask who to assign**. Wait for the user's answer; do not guess.
-7. Before every write, re-run the PR/MR command preflight. Live state overrides the triage snapshot.
+7. Before every write, take one new snapshot and re-run the PR/MR command preflight. Live state overrides the triage list. Do not issue a call per field.
 8. Do not auto-implement issues unless `with-issues` is present.
 9. Prefer isolated worktrees when local checkouts are dirty or belong to another branch/repo.
 10. After the sweep, report each item as done / skipped / waiting with evidence.
@@ -389,13 +419,12 @@ Use this when the user invokes `/git-triage run` (aliases `aggressive` / `execut
 
 Use this only when the user explicitly invokes `/git-reply-issue` or clearly asks to post a response to one exact issue. The write scope is one issue comment on the exact target; do not change code, commits, branches, labels, assignees, issue state, description, links, or any other forge object.
 
-1. Resolve the authenticated forge user and exact project/issue.
-2. Refresh issue state, description, labels, assignees, links, and all non-system comments in chronological order.
-3. Identify the latest material request, the latest material response by the authenticated user, and any later response or state change that superseded it.
+1. Resolve the exact project/issue. Reuse the authenticated user already resolved for this invocation.
+2. Take one issue snapshot: state, description, labels, assignees, links on that payload, marker comments, and the latest non-system comments. The latest body stays whole.
+3. Identify the latest material request, the latest material response by the authenticated user, and any later response or state change that superseded it. Draft from that snapshot and repo-local instructions in the checkout.
 4. Classify the response as a decision, requested information, acknowledgment, routing, or `No reply needed`.
-5. Draft concise text grounded in live issue evidence and repo-local instructions.
-6. Post one issue comment only when a material unanswered request remains.
-7. After posting, read the issue back and report the new comment id/time, current state, assignees, and remaining owner or blocker.
+5. Post one issue comment only when a material unanswered request remains.
+6. The write response is the read-back. Report the new comment id/time, current state, assignees, and remaining owner or blocker from that response and the snapshot. Do not view the issue again when the response includes the comment id.
 
 Do not post a duplicate response. Ambiguous product decisions stop with a draft and a request for user direction; write nothing.
 
@@ -403,9 +432,9 @@ Do not post a duplicate response. Ambiguous product decisions stop with a draft 
 
 Use this when the user explicitly invokes `/git-plan-issue` or clearly asks to analyze one issue and post an implementation brief. The write scope is one issue comment on the exact target; do not change code, commits, branches, labels, assignees, issue state, description, links, or any other forge object.
 
-1. Resolve the authenticated forge user and exact project/issue.
-2. Refresh the issue state, description, labels, assignees, links, related PRs/MRs, and all non-system comments in chronological order.
-3. Read repo-local instructions and inspect the relevant current code until the brief can name concrete files, behavior, and tests.
+1. Resolve the exact project/issue. Reuse the authenticated user already resolved for this invocation.
+2. Take one issue snapshot: state, description, labels, assignees, links already on that payload, marker comments, and the latest non-system comments. The latest body stays whole. Do not search for related PRs/MRs.
+3. Read repo-local instructions and inspect the relevant code in the local checkout until the brief can name concrete files, symbols, behavior, and tests. Search, then open those symbols. Do not paste source into the brief or the reply. Stay on Forge budget steps 3 and 4 and on Context budget. Do not read repository files through the forge.
 4. Classify whether a current implementation brief is still needed. A current brief exists when a comment contains `<!-- git-plan-issue -->` and later comments have not changed Goal, Recommended change, Out of scope, or Acceptance criteria. A current brief is still needed when none exists, later comments changed those fields, or the user asked to re-plan.
 5. Draft one issue comment using this recipe, in the issue language or the repo's documented language:
 
@@ -426,7 +455,7 @@ Use this when the user explicitly invokes `/git-plan-issue` or clearly asks to a
 
 The brief is a proposal. `/git-issue-pr` follows it when the implementer agrees, or posts a `<!-- git-plan-issue-dissent -->` and waits for a human decision.
 
-6. Post one issue comment only when the issue is open, a current brief is still needed, and the draft is grounded in the inspected code. After posting, read the issue back and report the new comment id and timestamp, current issue state, and `/git-issue-pr` with the exact issue URL.
+6. Post one issue comment only when the issue is open, a current brief is still needed, and the draft is grounded in the inspected checkout. The write response is the read-back. Report the new comment id and timestamp, current issue state from the snapshot, and `/git-issue-pr` with the exact issue URL. Do not view the issue again when the response includes the comment id.
 
 Do not post a duplicate brief. Do not implement, open a PR/MR, or guess a product decision. If the issue is closed, a current brief already exists and the user did not ask to re-plan, an open PR/MR already covers the issue and the user did not ask to re-plan, or the evidence is too thin for a grounded brief, perform no write and report the evidence plus the exact wait or next action.
 
@@ -434,7 +463,7 @@ Do not post a duplicate brief. Do not implement, open a PR/MR, or guess a produc
 
 Use this when the task is to fix or implement a GitHub or GitLab issue.
 
-1. Read repo-local instructions, inspect local status, and refresh the issue from the forge: state, description, labels, assignees, links, related PRs/MRs, and all non-system comments in chronological order.
+1. Read repo-local instructions, inspect local status, and take one issue snapshot: state, description, labels, assignees, links on that payload, marker comments, and the latest non-system comments. The latest body stays whole. Related PRs/MRs are only those links. Then inspect the local checkout. Do not read the issue again while implementing.
 2. If the issue has assignees and the authenticated user is not among them, stop without implementing or posting a dissent. Unassigned issues may be implemented.
 3. Collect the current proposal from that live evidence. If a current comment contains `<!-- git-plan-issue -->` and later comments have not superseded its Goal / Recommended change / Out of scope / Acceptance criteria, that comment is the current brief. Otherwise the issue description plus later material comments that change requirements is the proposal. A `<!-- git-plan-issue-dissent -->` stays unresolved until a human decision or a newer brief supersedes it. A human decision is a later non-system comment, a newer `<!-- git-plan-issue -->` brief, or explicit direction in this invocation that selects the original brief, the posted alternative, or a third way. The invoking user's explicit choice is final.
 4. If an unresolved dissent exists and this invocation carries no human decision, perform no code edit and post no duplicate dissent. Report the dissent comment id and wait.
@@ -461,7 +490,7 @@ Use this when the task is to fix or implement a GitHub or GitLab issue.
 12. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived.
 13. Push the branch and open or update a PR/MR targeting the development branch when this is part of the issue workflow.
 14. Keep the PR/MR description current: summary, issue link, validation evidence, known limitations, reviewer/assignee metadata when available, and any pre-submit waivers.
-15. Read the PR/MR back and report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state.
+15. The create or update response is the read-back. Report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state. One confirm view only when that response omits iid, URL, or head SHA.
 
 Do not merge the PR/MR unless the user separately asks for that merge and the merge gate below passes.
 
@@ -470,14 +499,14 @@ Do not merge the PR/MR unless the user separately asks for that merge and the me
 Use this when addressing reviewer feedback on a PR/MR you authored or are maintaining.
 
 1. Run the PR/MR command preflight and continue only when the PR/MR is `owned` and either the primary state is `NEEDS_REVISION` or this invocation is `/git-revise-pr-force`. If `WRITE_NOT_AUTHORIZED`, stop without editing.
-2. Refresh the PR/MR, discussions, latest reviewer comments, source branch, target branch, head SHA, and pipeline.
-3. Identify which comments are blocking, which are non-blocking, and which need a separate tracker.
+2. Use the preflight snapshot as the PR/MR record: discussions, latest reviewer comments, source branch, target branch, head SHA, and pipeline. Do not snapshot it again before the push.
+3. Identify which comments are blocking, which are non-blocking, and which need a separate tracker. Inspect the source branch in the local checkout.
 4. Work on the source branch in a clean checkout or isolated worktree if the main checkout has unrelated changes.
 5. Implement focused fixes and add or update tests for behavior changes.
 6. Commit on the PR/MR branch, preserving unrelated user work. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived. Then push.
 7. Reply to reviewer threads with what changed and validation evidence. Resolve a thread only after the new code actually addresses it.
 8. Update the description when validation evidence, known limitations, or issue mappings changed.
-9. Read back the head, pipeline, unresolved discussions, and reviewer state.
+9. The push and thread-reply responses are the read-back for head, pipeline, unresolved discussions, and reviewer state. One confirm view only when those responses omit the new head SHA.
 
 If there is no new or unaddressed actionable reviewer feedback and this invocation is `/git-revise-pr`, do not edit, commit, push, or manufacture an update. Under `/git-revise-pr-force`, continue with the owned source-branch update and the **pre-submit gate**.
 
@@ -489,7 +518,7 @@ Use this when the user invokes `/git-request-review` or explicitly asks to reque
 
 1. Run the PR/MR command preflight and continue only when the primary state is `REVIEW_REQUEST_NEEDED` and the PR/MR is `owned`.
 2. Identify the reviewer from an explicit user username, a reviewer already requested on the PR/MR, or CODEOWNERS only as a list to present. If it is ambiguous, stop and ask who to assign instead of guessing. Never invent a reviewer. Do not request yourself as reviewer of a PR/MR you own or have commits on.
-3. Prefer the forge's native request-review operation. Then read back reviewer assignment, current head SHA, approval state, and discussions.
+3. Prefer the forge's native request-review operation. The write response is the read-back for reviewer assignment, current head SHA, approval state, and discussions. One confirm view only when that response omits the reviewer or the head SHA.
 
 Do not change code or merge. Do not send a duplicate request when a current-head request is already pending.
 
@@ -498,14 +527,14 @@ Do not change code or merge. Do not send a duplicate request when a current-head
 Use this when the user asks to fix a conflict or invokes `/git-fix-conflict`.
 
 1. Run the PR/MR command preflight and continue only when the primary state is `CONFLICTED` and the PR/MR is `owned`. If `WRITE_NOT_AUTHORIZED`, stop without changing the branch even when the user named this PR/MR.
-2. Read repo-local instructions, inspect `git status --short --branch`, and refresh the PR/MR from the forge.
+2. Read repo-local instructions, inspect `git status --short --branch`, and use the preflight snapshot as the PR/MR record. Do not snapshot it again before the push.
 3. Confirm the write boundary is only the source branch.
 4. Work in a clean checkout or isolated worktree when the main checkout has unrelated changes.
 5. Check out the source branch tracking origin. Prefer a non-rewriting merge of the target branch into the source branch unless repo-local instructions explicitly prefer rebase.
 6. Resolve conflict markers deliberately by preserving the PR/MR intent and current target-branch behavior.
 7. Run focused tests, formatters, builds, or generation checks proportional to the conflicted areas.
 8. Commit with the repo's normal style. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived. Then push the source branch.
-9. Read back the new head SHA, conflict and mergeability state, pipeline, unresolved discussions, and reviewer state.
+9. The push response is the read-back for the new head SHA. One confirm view only when it omits head SHA, conflict or mergeability state, pipeline, unresolved discussions, or reviewer state. Bundle any missing fields into that one view.
 
 After resolving conflicts, still do not merge until live approval reports an approving reviewer on the current head, or the user separately invokes `/git-merge-approved-force`.
 
@@ -517,9 +546,9 @@ Before merging:
 
 1. Run the PR/MR command preflight and continue only when the primary state is `READY_TO_MERGE`, or when this invocation is `/git-merge-approved-force` and the remaining gates in **Explicit force** pass.
 2. Resolve the authenticated forge user. Continue only when this user is the PR/MR author or a current assignee. If neither matches, classify `MERGE_NOT_AUTHORIZED` and stop before any merge-side write.
-3. Refresh PR/MR details, head SHA, source/target branches, pipeline/jobs, conflicts, merge status, approval state, reviewers, assignees, and all discussions.
-4. Verify live approval from the forge. Without force, the approval gate passes only when at least one approving reviewer is present on the current head. Branch-protection or approval-rule zeroes must not override a missing live approval. `/git-merge-approved-force` waives this approving-reviewer check.
-5. Read the latest reviewer comments for relevant non-blocking suggestions. Duplicate-check and create/link follow-up issues before the merge when repo-local instructions require tracking.
+3. The preflight snapshot is the merge gate when no forge write has happened since it. If a follow-up issue was created after that snapshot, replace it with one snapshot immediately before the merge. Do not take both by habit. Duplicate-check follow-up issues with one search only when you are about to create one.
+4. Verify live approval from that snapshot. Without force, the approval gate passes only when at least one approving reviewer is present on the current head. Branch-protection or approval-rule zeroes must not override a missing live approval. `/git-merge-approved-force` waives this approving-reviewer check.
+5. From that snapshot, read the latest reviewer comments for relevant non-blocking suggestions. Duplicate-check and create/link follow-up issues before the merge when repo-local instructions require tracking.
 6. Run the final gate on the exact current head:
    - authenticated user is still the author or a current assignee
    - reviewed head SHA still matches current head SHA
@@ -528,7 +557,7 @@ Before merging:
    - live approval is present for the current head, or this invocation is `/git-merge-approved-force`
    - without force, every approving reviewer has no author or committer commits on the current PR/MR
    - no conflicts or merge status blockers remain
-7. Merge through the forge, then read back PR/MR state, target branch result, and linked issue state. If branch protection rejects the merge, report the forge error. Use GitHub `--admin` only when the same invocation also contains `admin`.
+7. Merge through the forge. The merge command result is the read-back of PR/MR state. One confirm view only when that result omits merged state or the target SHA. If branch protection rejects the merge, report the forge error. Use GitHub `--admin` only when the same invocation also contains `admin`.
 
 Never use reviewer comments, discussion text, `LGTM`, `approved`, reviewer state, resolved discussions, rule zeroes without an approving reviewer, or a green pipeline as a substitute for the live approval gate. Only `/git-merge-approved-force` in this invocation waives that gate.
 
@@ -545,7 +574,7 @@ If the actor gate fails, stop and identify the author and current assignees. Sta
 
 For failing CI:
 
-- Inspect pipeline/check details first.
+- Use check conclusions already in the snapshot. Download one log for the failing job, keep the failing command and the error lines, and drop the rest.
 - Distinguish forge-native jobs from external providers.
 - Summarize failure context before implementing fixes.
 - Do not install forge tooling with system package managers unless the user asks.

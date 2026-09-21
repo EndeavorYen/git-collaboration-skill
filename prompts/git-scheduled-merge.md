@@ -8,7 +8,7 @@ Load and validate `.git-scheduled-automation.yml` from the repository root, or a
 
 Consider only current merge candidates from allowlisted projects. Ignore stale candidates and anything outside the configured scope.
 
-Before every write, refresh the canonical allowlist identity by reloading the project allowlist and re-resolving the candidate's stable project ID and canonical URL; refresh live PR/MR state and rerun the skill's PR/MR command preflight.
+Before every write, reload the project allowlist and re-resolve the candidate's stable project ID and canonical URL. Obey **Forge budget**: one new PR/MR snapshot, then rerun the skill's PR/MR command preflight. Do not issue a call per field.
 
 The sole permitted write is the merge delegated exclusively to `git-merge-approved`. Never post comments, change labels, or perform preparatory writes. Scheduled approved merge does not inherit force.
 

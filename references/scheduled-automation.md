@@ -69,7 +69,7 @@ Post a concrete blocking finding when the evidence is insufficient. Do not appro
 
 ## Per-write allowlist and live-state preflight
 
-Before every forge or branch write, reload the configured project allowlist and re-resolve the candidate's stable project ID and canonical URL. Then refresh the PR/MR and rerun the main skill's PR/MR command preflight. Refresh at least the current head, actor relationship, live approval, pipeline and required jobs, discussions, draft state, conflicts, mergeability, source and target branches, and assignment state.
+Before every forge or branch write, reload the configured project allowlist and re-resolve the candidate's stable project ID and canonical URL. Then take one Forge-budget snapshot of the PR/MR and rerun the main skill's PR/MR command preflight. That one payload covers the current head, actor relationship, live approval, pipeline and required jobs, discussions, draft state, conflicts, mergeability, source and target branches, and assignment state. Do not issue a call per field.
 
 A triage snapshot never authorizes a write. If live state differs, skip or reroute only within the current scheduled mode's capability boundary. Validation belongs to the exact head being written; evidence for an earlier head is stale.
 
