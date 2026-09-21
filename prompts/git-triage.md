@@ -41,9 +41,9 @@ Keep the workflow read-only unless the user explicitly chooses a follow-up
 action. Do not auto-assign issues or PRs/MRs, and never suggest self-assignment only
 to unlock merge.
 
-Build issue candidates from pending notifications plus open issues assigned to the authenticated user, open issues authored by the user, and issues where the user recently participated through a non-system issue comment. Include directly addressed or mentioned issue todos. Treat notifications as signals rather than conversational source of truth, and state pagination or timebox limits.
+Obey **Forge budget** and **Context budget**. Build candidates from metadata lists only: pending notifications, open issues assigned to the authenticated user, and open issues authored by the user. One list per relationship. Do not request comment or review bodies on a list. Include directly addressed or mentioned issue todos. Treat notifications as signals rather than conversational source of truth, and state pagination or timebox limits.
 
-For each candidate compare non-system human comments chronologically. The fact that another user spoke last is necessary but insufficient: classify **Ready to reply**, **Acknowledge or route**, **No reply needed**, or **Needs semantic review** from the latest material request, later user response, state changes, and explicit ownership.
+Rank from those list fields. Another user speaking last is necessary but insufficient for **Ready to reply**, **Acknowledge or route**, **No reply needed**, or **Needs semantic review**. Take one trimmed snapshot only for a top-three row that still cannot be classified.
 
 Then run the matching workflow section in `git-collaboration`:
 

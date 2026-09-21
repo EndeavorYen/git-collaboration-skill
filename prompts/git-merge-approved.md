@@ -4,7 +4,7 @@ description: Merge a specific approved GitHub PR or GitLab MR after live final g
 
 Use the installed `git-collaboration` skill in "Merge approved PR/MR" mode. Detect the forge from the URL or remotes, then load `references/github.md` or `references/gitlab.md`.
 
-Run the skill's read-only PR/MR command preflight for the specific PR/MR first. Merge only when its primary state is `READY_TO_MERGE`. Then track relevant non-blocking follow-ups when required, perform the final exact-head gate, merge through the forge, and read back the result.
+Run the skill's read-only PR/MR command preflight for the specific PR/MR first. Merge only when its primary state is `READY_TO_MERGE`. Then track relevant non-blocking follow-ups when required, perform the final exact-head gate on one snapshot, and merge through the forge. The merge command result is the read-back. One confirm view only when it omits merged state.
 
 This command is also the merge step used by `/git-triage run` for owned ready-to-merge PRs/MRs unless `no-merge` was requested. `/git-triage run` does not inherit force.
 

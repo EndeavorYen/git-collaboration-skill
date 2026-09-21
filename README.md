@@ -9,6 +9,7 @@ accounts, or a default reviewer.
 ## What it does
 
 - Detects GitHub vs GitLab from the request URL, then from `git remote`.
+- Reads each issue or PR/MR once, trimmed to the fields that decide the next action, then plans and edits from the local checkout.
 - Reviews, revises, conflict-repairs, and merges PRs/MRs under live actor gates.
 - Dedicated `/git-review-pr-force`, `/git-revise-pr-force`, and `/git-merge-approved-force` for solo self-review, owned iteration without `NEEDS_REVISION`, and second-person-approval waiver. Triage and scheduled runs do not inherit force.
 - Uses `open-code-review-delegate` for the file-by-file pass. `/git-review-pr` maps findings onto forge comments. Push and open/update PR/MR run a fail-closed pre-submit gate via a fresh `requesting-code-review` subagent.

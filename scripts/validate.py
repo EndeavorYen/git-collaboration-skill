@@ -72,6 +72,11 @@ SKILL_PHRASES = [
     "<!-- git-force-review -->",
     "Solo override",
     "does not inherit force",
+    "Forge budget",
+    "Context budget",
+    "local checkout",
+    "write response is the read-back",
+    "Do not read repository files",
 ]
 
 PROMPT_PHRASES = {
@@ -81,7 +86,7 @@ PROMPT_PHRASES = {
         "REVIEW_NOT_AUTHORIZED",
     ],
     "git-issue-pr.md": [
-        "all non-system notes",
+        "latest non-system notes",
         "<!-- git-plan-issue -->",
         "<!-- git-plan-issue-dissent -->",
         "material disagreement",
@@ -94,6 +99,8 @@ PROMPT_PHRASES = {
         "The brief is a proposal",
         "<!-- git-plan-issue -->",
         "/git-issue-pr",
+        "local checkout",
+        "Forge budget",
     ],
     "git-request-review.md": [
         "Never invent a reviewer",
@@ -248,7 +255,7 @@ def validate_forge_references() -> None:
     gitlab = ROOT / "references" / "gitlab.md"
     if github.exists():
         text = github.read_text(encoding="utf-8")
-        for phrase in ("gh pr", "gh issue", "reviewDecision", "requested_reviewers", "--admin"):
+        for phrase in ("gh pr", "gh issue", "reviewDecision", "requested_reviewers", "--admin", "--jq"):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
     if gitlab.exists():

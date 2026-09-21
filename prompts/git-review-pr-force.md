@@ -8,7 +8,7 @@ This dedicated command waives the review actor gate (`owned`, `self_authored_hea
 
 If the forge rejects a self-APPROVE, post a current-head comment that starts with `<!-- git-force-review -->` and names the SHA. Native approval remains absent. `/git-review-pr-force` does not merge.
 
-On re-review of a claimed failed job or issue: reread that job's actual error and walk the remaining job script plus adjacent layers. Checking previously posted blockers is not enough to approve. If those adjacent layers have not been walked, must not approve.
+On re-review of a claimed failed job or issue: download that job log once, then walk the remaining job script plus adjacent layers locally. Checking previously posted blockers is not enough to approve. If those adjacent layers have not been walked, must not approve.
 
 PR/MR pipeline green is not claimed live job green. An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed. Do not require rerunning a protected live job before approval.
 
