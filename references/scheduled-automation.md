@@ -57,7 +57,7 @@ After configuration, identity, access, and allowlist checks, enumerate and class
 
 Scheduled lifecycle may only review or approve, revise an owned-or-assigned source branch, repair its conflicts, validate, commit, and push that source branch. It never merges, implements issues, changes target branches, broadens PR/MR scope, or performs assignment writes.
 
-A source-branch push still requires the main skill's **pre-submit gate**: a fresh `open-code-review-delegate` file pass on the intended submit range. Unattended runs **cannot waive** Critical/High. Leftover unwaived Critical/High, a failed file pass, or missing `ocr` means do not push; record `failed` or `waiting` with the findings.
+A source-branch push still requires the main skill's **pre-submit gate**: a fresh `open-code-review-delegate` file pass on the intended submit range. Unattended runs cannot waive Critical/High. Leftover unwaived Critical/High, a failed file pass, or missing `ocr` means do not push; record `failed` or `waiting` with the findings.
 
 ## Strict review and required test gate
 

@@ -61,6 +61,8 @@ SKILL_PHRASES = [
     "fresh subagent",
     "human in this conversation",
     "Blanket ship language is not a waiver",
+    "Critical and High findings are submit blockers",
+    "do not push, do not open or update the PR/MR",
 ]
 
 PROMPT_PHRASES = {
@@ -76,6 +78,7 @@ PROMPT_PHRASES = {
         "human decision",
         "pre-submit gate",
         "open-code-review-delegate",
+        "Stop before push if Critical/High remain unfixed and unwaived",
     ],
     "git-plan-issue.md": [
         "The brief is a proposal",
@@ -94,15 +97,18 @@ PROMPT_PHRASES = {
     "git-revise-pr.md": [
         "pre-submit gate",
         "open-code-review-delegate",
+        "Stop before push if Critical/High remain unfixed and unwaived",
     ],
     "git-fix-conflict.md": [
         "pre-submit gate",
         "open-code-review-delegate",
+        "Stop before push if Critical/High remain unfixed and unwaived",
     ],
     "git-scheduled-lifecycle.md": [
         "open-code-review-delegate",
         "pre-submit gate",
-        "cannot waive",
+        "cannot waive Critical/High",
+        "do not push",
     ],
     "git-merge-approved.md": [
         "approving reviewer",
@@ -202,7 +208,8 @@ def validate_scheduled_ocr_gate() -> None:
     for phrase in (
         "pre-submit gate",
         "open-code-review-delegate",
-        "cannot waive",
+        "cannot waive Critical/High",
+        "do not push",
     ):
         if phrase not in text:
             fail(f"references/scheduled-automation.md: missing {phrase!r}")

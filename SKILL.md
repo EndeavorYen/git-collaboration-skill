@@ -416,7 +416,7 @@ Use this when the task is to fix or implement a GitHub or GitLab issue.
 9. Use TDD when practical: add or update a focused failing test first for bug fixes or behavior changes, then implement the smallest reasonable fix.
 10. Validate with the relevant focused tests and broader checks proportional to risk, including the contract's Acceptance criteria.
 11. Commit with a focused conventional-style message and reference the issue.
-12. Run the **pre-submit gate**. Stop before push if it is red.
+12. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived.
 13. Push the branch and open or update a PR/MR targeting the development branch when this is part of the issue workflow.
 14. Keep the PR/MR description current: summary, issue link, validation evidence, known limitations, reviewer/assignee metadata when available, and any pre-submit waivers.
 15. Read the PR/MR back and report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state.
@@ -432,7 +432,7 @@ Use this when addressing reviewer feedback on a PR/MR you authored or are mainta
 3. Identify which comments are blocking, which are non-blocking, and which need a separate tracker.
 4. Work on the source branch in a clean checkout or isolated worktree if the main checkout has unrelated changes.
 5. Implement focused fixes and add or update tests for behavior changes.
-6. Commit on the PR/MR branch, preserving unrelated user work. Run the **pre-submit gate**. Stop before push if it is red. Then push.
+6. Commit on the PR/MR branch, preserving unrelated user work. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived. Then push.
 7. Reply to reviewer threads with what changed and validation evidence. Resolve a thread only after the new code actually addresses it.
 8. Update the description when validation evidence, known limitations, or issue mappings changed.
 9. Read back the head, pipeline, unresolved discussions, and reviewer state.
@@ -462,7 +462,7 @@ Use this when the user asks to fix a conflict or invokes `/git-fix-conflict`.
 5. Check out the source branch tracking origin. Prefer a non-rewriting merge of the target branch into the source branch unless repo-local instructions explicitly prefer rebase.
 6. Resolve conflict markers deliberately by preserving the PR/MR intent and current target-branch behavior.
 7. Run focused tests, formatters, builds, or generation checks proportional to the conflicted areas.
-8. Commit with the repo's normal style. Run the **pre-submit gate**. Stop before push if it is red. Then push the source branch.
+8. Commit with the repo's normal style. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived. Then push the source branch.
 9. Read back the new head SHA, conflict and mergeability state, pipeline, unresolved discussions, and reviewer state.
 
 After resolving conflicts, still do not merge until live approval reports an approving reviewer on the current head.
