@@ -173,6 +173,57 @@ Use the compatible default link type for that forge. If blocker link types exist
 - Creating or updating a PR/MR is not permission to merge it.
 - Preserve existing description content; append concise sections rather than replacing useful reviewer context.
 - Known limitations should be explicit.
+- Opening or updating a PR/MR, and any source-branch push from `/git-issue-pr`, `/git-revise-pr`, `/git-fix-conflict`, or scheduled lifecycle, requires the **pre-submit gate** below.
+
+## Structured file review
+
+**REQUIRED SUB-SKILL:** `open-code-review-delegate` owns preview, rules, diffs, coverage, and finding shape. **REQUIRED SUB-SKILL for pre-submit:** `requesting-code-review` owns dispatching a **fresh subagent** with no implementer history; that reviewer runs `open-code-review-delegate`. This skill owns when to call them, how findings map onto forge comments, and the pre-submit gate.
+
+### File pass
+
+After the actor gate and a current-head checkout (or the intended local submit range):
+
+1. Run `open-code-review-delegate` for the merge-base / target..head range. Include uncommitted files only when they are part of this submit.
+2. Pass the issue brief, acceptance criteria, or PR/MR description with `--background`.
+3. Account for every `reviewable_files` entry as reviewed or skipped with a reason.
+
+Missing `ocr`, failed `preview`/`rule`, or incomplete coverage is a failed file pass.
+
+### `/git-review-pr` mapping
+
+The current reviewer runs the file pass on this checkout after the actor gate. Do not dispatch an implementer-session self-review as a substitute.
+
+| OCR severity | Forge action |
+| --- | --- |
+| critical, high | Blocking inline discussion on the changed line |
+| medium | Blocking when the finding is correctness, security, a broken contract, or missing required validation; otherwise a non-blocking follow-up comment |
+| low | Omit unless thorough-review is on |
+
+OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local workflow stays read-only except forge review writes. OCR findings do not by themselves approve or request changes. Continue CI, evidence-class, remaining-gate, and verdict rules after the file pass. A failed file pass: post no approve; treat the coverage failure as a blocker.
+
+### Pre-submit gate
+
+Applies before push and before opening or updating a PR/MR on `/git-issue-pr`, `/git-revise-pr`, `/git-fix-conflict`, and scheduled lifecycle source-branch push.
+
+1. Finish `verification-before-completion` for tests and claimed validation.
+2. Dispatch a fresh subagent through `requesting-code-review`. That reviewer runs `open-code-review-delegate` on the intended submit range.
+3. Critical and High findings are submit blockers until each is fixed in the tree or waived.
+4. A waiver is valid only when the **human in this conversation** names the path, the issue, and a reason. **Blanket ship language is not a waiver.** The agent does not waive. Unattended scheduled runs have no human in the conversation, so they cannot waive.
+5. Record each waiver in the commit body or PR/MR description.
+6. After fixes, run the file pass again on the new range until no unwaived Critical/High remain.
+7. A failed file pass, leftover unwaived Critical/High, or a missing waiver record → do not push, do not open or update the PR/MR.
+
+Medium and Low do not block submit. Mention them in the PR/MR description when useful.
+
+| Excuse | Reality |
+| --- | --- |
+| "I'll review the diff myself" | File pass is OCR coverage via `open-code-review-delegate`. |
+| "ocr isn't installed, skip review" | Missing `ocr` is a failed file pass. |
+| "Tests passed so the diff is fine" | `verification-before-completion` is not the file pass. |
+| "I'll waive this High finding" | Only the human in this conversation waives, with path + issue + reason. |
+| "Ship it / LGTM" | Blanket ship language is not a waiver. |
+| "I wrote this code, I know it's correct" | Pre-submit uses a fresh subagent. |
+| "Scheduled run, no one to waive, push anyway" | Unattended runs cannot waive; leftover Critical/High stops the push. |
 
 ## Review Workflow
 
@@ -183,6 +234,8 @@ Run the actor gate first. Do not review or approve a PR/MR that is `owned` or `s
 For `review again`, restart from live state instead of continuing from the old verdict. If there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
 
 Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree. Do not push review-only branches.
+
+Run the structured file review pass (`open-code-review-delegate`) on that head, map findings with the `/git-review-pr` mapping, then continue the layers below. OCR Step 7 Fix stays off.
 
 Review in this order:
 
@@ -363,9 +416,10 @@ Use this when the task is to fix or implement a GitHub or GitLab issue.
 9. Use TDD when practical: add or update a focused failing test first for bug fixes or behavior changes, then implement the smallest reasonable fix.
 10. Validate with the relevant focused tests and broader checks proportional to risk, including the contract's Acceptance criteria.
 11. Commit with a focused conventional-style message and reference the issue.
-12. Push the branch and open or update a PR/MR targeting the development branch when this is part of the issue workflow.
-13. Keep the PR/MR description current: summary, issue link, validation evidence, known limitations, reviewer/assignee metadata when available.
-14. Read the PR/MR back and report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state.
+12. Run the **pre-submit gate**. Stop before push if it is red.
+13. Push the branch and open or update a PR/MR targeting the development branch when this is part of the issue workflow.
+14. Keep the PR/MR description current: summary, issue link, validation evidence, known limitations, reviewer/assignee metadata when available, and any pre-submit waivers.
+15. Read the PR/MR back and report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state.
 
 Do not merge the PR/MR unless the user separately asks for that merge and the merge gate below passes.
 
@@ -378,7 +432,7 @@ Use this when addressing reviewer feedback on a PR/MR you authored or are mainta
 3. Identify which comments are blocking, which are non-blocking, and which need a separate tracker.
 4. Work on the source branch in a clean checkout or isolated worktree if the main checkout has unrelated changes.
 5. Implement focused fixes and add or update tests for behavior changes.
-6. Commit and push to the PR/MR branch, preserving unrelated user work.
+6. Commit on the PR/MR branch, preserving unrelated user work. Run the **pre-submit gate**. Stop before push if it is red. Then push.
 7. Reply to reviewer threads with what changed and validation evidence. Resolve a thread only after the new code actually addresses it.
 8. Update the description when validation evidence, known limitations, or issue mappings changed.
 9. Read back the head, pipeline, unresolved discussions, and reviewer state.
@@ -408,7 +462,7 @@ Use this when the user asks to fix a conflict or invokes `/git-fix-conflict`.
 5. Check out the source branch tracking origin. Prefer a non-rewriting merge of the target branch into the source branch unless repo-local instructions explicitly prefer rebase.
 6. Resolve conflict markers deliberately by preserving the PR/MR intent and current target-branch behavior.
 7. Run focused tests, formatters, builds, or generation checks proportional to the conflicted areas.
-8. Commit with the repo's normal style and push the source branch.
+8. Commit with the repo's normal style. Run the **pre-submit gate**. Stop before push if it is red. Then push the source branch.
 9. Read back the new head SHA, conflict and mergeability state, pipeline, unresolved discussions, and reviewer state.
 
 After resolving conflicts, still do not merge until live approval reports an approving reviewer on the current head.

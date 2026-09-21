@@ -55,15 +55,27 @@ SKILL_PHRASES = [
     "/git-review-pr",
     "/git-issue-pr",
     "/git-plan-issue",
+    "open-code-review-delegate",
+    "requesting-code-review",
+    "pre-submit gate",
+    "fresh subagent",
+    "human in this conversation",
+    "Blanket ship language is not a waiver",
 ]
 
 PROMPT_PHRASES = {
+    "git-review-pr.md": [
+        "open-code-review-delegate",
+        "OCR Step 7 Fix stays off",
+    ],
     "git-issue-pr.md": [
         "all non-system notes",
         "<!-- git-plan-issue -->",
         "<!-- git-plan-issue-dissent -->",
         "material disagreement",
         "human decision",
+        "pre-submit gate",
+        "open-code-review-delegate",
     ],
     "git-plan-issue.md": [
         "The brief is a proposal",
@@ -78,6 +90,19 @@ PROMPT_PHRASES = {
         "Never invent a reviewer",
         "ask who to assign",
         "/git-plan-issue",
+    ],
+    "git-revise-pr.md": [
+        "pre-submit gate",
+        "open-code-review-delegate",
+    ],
+    "git-fix-conflict.md": [
+        "pre-submit gate",
+        "open-code-review-delegate",
+    ],
+    "git-scheduled-lifecycle.md": [
+        "open-code-review-delegate",
+        "pre-submit gate",
+        "cannot waive",
     ],
     "git-merge-approved.md": [
         "approving reviewer",
@@ -169,12 +194,27 @@ def validate_forge_references() -> None:
                 fail(f"references/gitlab.md: missing {phrase!r}")
 
 
+def validate_scheduled_ocr_gate() -> None:
+    path = ROOT / "references" / "scheduled-automation.md"
+    if not path.exists():
+        return
+    text = path.read_text(encoding="utf-8")
+    for phrase in (
+        "pre-submit gate",
+        "open-code-review-delegate",
+        "cannot waive",
+    ):
+        if phrase not in text:
+            fail(f"references/scheduled-automation.md: missing {phrase!r}")
+
+
 def main() -> int:
     validate_files_exist()
     validate_no_leaks()
     validate_skill_contract()
     validate_prompts()
     validate_forge_references()
+    validate_scheduled_ocr_gate()
     if ERRORS:
         print("Validation failed:", file=sys.stderr)
         for error in ERRORS:

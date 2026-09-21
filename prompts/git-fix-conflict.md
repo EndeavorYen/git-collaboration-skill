@@ -10,7 +10,7 @@ Otherwise do not change the branch; report the current state and recommend `/git
 
 For a conflicted owned PR/MR, derive the source and target branches, protect unrelated local work, fetch both branches, and resolve the conflict on the source branch. Prefer merging the latest target branch into the source branch unless repo-local instructions explicitly prefer rebase or history rewriting is clearly authorized.
 
-Keep the change scoped to conflict repair and any directly required validation fixes. Inspect conflict markers deliberately, preserve the PR/MR intent and current target-branch behavior, run focused validation, commit, push the source branch, and read the PR/MR back with the new head SHA, conflict/mergeability state, pipeline, discussions, and reviewer state.
+Keep the change scoped to conflict repair and any directly required validation fixes. Inspect conflict markers deliberately, preserve the PR/MR intent and current target-branch behavior, run focused validation, commit, run the skill's **pre-submit gate** (`requesting-code-review` dispatching a fresh subagent that runs `open-code-review-delegate`), stop before push if it is red, then push the source branch, and read the PR/MR back with the new head SHA, conflict/mergeability state, pipeline, discussions, and reviewer state.
 
 Do not merge the PR/MR. After pushing, do not review or approve this PR/MR yourself; recommend `/git-request-review`.
 

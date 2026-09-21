@@ -16,7 +16,9 @@ Perform only the scheduled lifecycle capability boundary:
 
 Before every forge or branch write, reload the configured project allowlist and re-resolve the candidate's stable project ID and canonical URL; refresh the live PR/MR state and rerun the skill's PR/MR command preflight. Do not use a stale snapshot to authorize a write.
 
-For strict review, treat any new behavior or behavior change without automated tests as blocking. The only exception is reproducible alternative validation with evidence proportionate to risk.
+For strict review, run the skill's structured file review with `open-code-review-delegate` on the current head. OCR Step 7 Fix stays off. Treat any new behavior or behavior change without automated tests as blocking. The only exception is reproducible alternative validation with evidence proportionate to risk.
+
+Owned conflict repair and revision still run the skill's **pre-submit gate** before a source-branch push. Unattended runs cannot waive Critical/High.
 
 The runner must never assign reviewers or assignees, never invent a reviewer, never ask a question, never wait for input, and must not merge.
 

@@ -10,7 +10,7 @@ If you agree with Goal, Recommended change, Out of scope, and Acceptance criteri
 
 If there is material disagreement, post one issue comment using the skill's dissent recipe (`<!-- git-plan-issue-dissent -->`), then stop without editing code. If an unresolved dissent already exists and this invocation has no human decision, perform no write and report that the issue is waiting.
 
-Start from the current development branch, create a dedicated feature branch, use TDD when practical, implement the focused fix, validate it against the contract's Acceptance criteria, commit with issue linkage, push, open or update the PR/MR targeting the development branch, then read the PR/MR back from the forge.
+Start from the current development branch, create a dedicated feature branch, use TDD when practical, implement the focused fix, validate it against the contract's Acceptance criteria, commit with issue linkage, then run the skill's **pre-submit gate** (`requesting-code-review` dispatching a fresh subagent that runs `open-code-review-delegate`). Stop before push if Critical/High remain unfixed and unwaived, if the file pass failed, or if `ocr` is missing. Then push, open or update the PR/MR targeting the development branch, then read the PR/MR back from the forge.
 
 If the issue has assignees and the authenticated user is not among them, stop without implementing. Unassigned issues may be implemented. Naming the issue in the prompt does not authorize taking over another person's assigned issue.
 
