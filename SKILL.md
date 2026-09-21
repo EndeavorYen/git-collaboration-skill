@@ -1,11 +1,11 @@
 ---
 name: git-collaboration
-description: Use when working with GitHub or GitLab issues, pull/merge requests, reviews, CI, branches, commits, pushes, releases, labels, conflicts, or gh/glab workflows. Trigger especially for reviewing others' PRs/MRs, force review, force merge, solo self-review, 強制 review or merge, analyzing an issue and posting an implementation brief, implementing an issue and publishing a PR/MR, updating your own PR/MR after reviewer feedback, requesting re-review, fixing conflicts, merging approved PRs/MRs, live status or todo triage, and aggressive triage run sweeps.
+description: Use when working with GitHub or GitLab issues, pull/merge requests, reviews, CI, branches, commits, pushes, releases, labels, conflicts, or gh/glab workflows. Trigger especially for reviewing others' PRs/MRs, /git-review-pr-force, /git-merge-approved-force, /git-revise-pr-force, solo self-review, analyzing an issue and posting an implementation brief, implementing an issue and publishing a PR/MR, updating your own PR/MR after reviewer feedback, requesting re-review, fixing conflicts, merging approved PRs/MRs, live status or todo triage, and aggressive triage run sweeps.
 ---
 
 # Git Collaboration
 
-Use this skill for GitHub or GitLab work that changes repository state or forge state. Read `AGENTS.md` or equivalent repo guidance first when present. Local project instructions may strengthen the merge gate, but must never replace a live non-author approval with reviewer notes, reviewer state, resolved discussions, or a green pipeline. Only `/git-merge-approved force` in this invocation waives that approval gate.
+Use this skill for GitHub or GitLab work that changes repository state or forge state. Read `AGENTS.md` or equivalent repo guidance first when present. Local project instructions may strengthen the merge gate, but must never replace a live non-author approval with reviewer notes, reviewer state, resolved discussions, or a green pipeline. Only `/git-merge-approved-force` in this invocation waives that approval gate.
 
 ## Detect the forge
 
@@ -26,13 +26,13 @@ Classify the request before taking action. The mode controls which writes are al
 
 | Mode | User intent examples | Allowed writes | Stop condition |
 | --- | --- | --- | --- |
-| Review someone else's PR/MR | `plz review`, `review again`, review a PR/MR URL, `/git-review-pr force`, solo self-review | Forge review comments, discussion resolution only when re-review proves the blocker is fixed, approve/request changes, or a `<!-- git-force-review -->` comment when self-APPROVE is rejected | Posted visible verdict and read back SHA, pipeline, discussions, and approval/request-changes state |
+| Review someone else's PR/MR | `plz review`, `review again`, review a PR/MR URL, `/git-review-pr-force`, solo self-review | Forge review comments, discussion resolution only when re-review proves the blocker is fixed, approve/request changes, or a `<!-- git-force-review -->` comment when self-APPROVE is rejected | Posted visible verdict and read back SHA, pipeline, discussions, and approval/request-changes state |
 | Plan issue | `plan this issue`, `analyze issue`, `/git-plan-issue` | One issue comment containing the implementation brief | Live preflight proves the issue is open, a current brief is still needed, and the brief is grounded in repo evidence |
 | Implement issue then PR/MR | `fix issue #N`, `resolve this issue`, issue implementation work | Code edits, tests, branch, commit, push, open/update PR/MR targeting the repo development branch; or one dissent issue comment when the current brief is materially disputed | PR/MR exists with issue links, validation evidence, reviewer/assignee metadata, and live read-back; or a dissent comment is posted and the run waits for a human decision; do not merge |
 | Reply to issue | `reply to issue`, answer one issue URL, `/git-reply-issue` | One issue comment on the exact target only | Live preflight proves a material unanswered request, or no write with evidence/draft is reported |
-| Update own PR/MR after review | `address reviewer comment`, `fix PR feedback`, `push for re-review` | Focused code/test/doc edits, commit, push to PR/MR branch, description/comment updates, replies to reviewer threads | Reviewer threads are answered/resolved when justified, PR/MR read-back reflects the new head; do not merge until a live non-author approval is present |
+| Update own PR/MR after review | `address reviewer comment`, `fix PR feedback`, `push for re-review`, `/git-revise-pr-force` | Focused code/test/doc edits, commit, push to PR/MR branch, description/comment updates, replies to reviewer threads | Reviewer threads are answered/resolved when justified, PR/MR read-back reflects the new head; do not merge until a live non-author approval is present |
 | Fix PR/MR conflicts | `fix conflict`, PR/MR reports conflicts | Checkout/worktree setup, merge or rebase target into the source branch, conflict-resolution code edits, tests, commit, push to the source branch | Source branch is pushed and live read-back shows current head, conflict/mergeability, pipeline, discussions, and reviewer state; do not merge |
-| Merge approved PR/MR | `merge PR #N`, `plz merge it`, `/git-merge-approved force`, `強制合併` | Follow-up issue creation/linking for relevant non-blocking reviewer notes, then merge | Final gate passes on the exact current head and merge read-back confirms result |
+| Merge approved PR/MR | `merge PR #N`, `plz merge it`, `/git-merge-approved-force`, `強制合併` | Follow-up issue creation/linking for relevant non-blocking reviewer notes, then merge | Final gate passes on the exact current head and merge read-back confirms result |
 | Request PR/MR review | `request review`, `ask reviewer to review again` | Assign or re-request a reviewer the user named or that is already on the PR/MR, only when current-head review is actually needed | Request is visible on the forge and read back; do not change code or merge |
 | Focused PR/MR status | `what is this PR waiting for?`, inspect one PR/MR URL | None | Read-only state, evidence, and exact next command are reported |
 | Status or triage | `current status`, `todo`, `what should we do next`, `/git-triage` | Usually read-only; create/update only if explicitly requested | Live ranked todo inbox and/or project triage with next commands; no auto-assign |
@@ -48,12 +48,15 @@ For either scheduled mode, read `references/scheduled-automation.md` in full bef
 
 Use these global prompt commands when available. They intentionally do not define `argument-hint`.
 
-- `/git-review-pr`: review another person's PR/MR and post the visible forge verdict. Explicit `force` in this invocation runs the same review on a PR/MR you own or have commits on.
+- `/git-review-pr`: review another person's PR/MR and post the visible forge verdict.
+- `/git-review-pr-force`: force-review an owned or self-authored PR/MR and post a visible verdict.
 - `/git-plan-issue`: analyze one issue against current code, post an implementation brief with acceptance criteria, and stop without implementing.
 - `/git-issue-pr`: implement a GitHub or GitLab issue, validate it, push, and open/update the PR/MR.
 - `/git-revise-pr`: address reviewer feedback on an existing PR/MR and push for re-review.
+- `/git-revise-pr-force`: force-revise an owned PR/MR without waiting for `NEEDS_REVISION`.
 - `/git-fix-conflict`: resolve PR/MR source-branch conflicts and push for re-review.
-- `/git-merge-approved`: merge a specific approved PR/MR only after live final gates pass. Explicit `force` in this invocation waives the second-person approving-reviewer gate for an owned PR/MR.
+- `/git-merge-approved`: merge a specific approved PR/MR only after live final gates pass.
+- `/git-merge-approved-force`: force-merge an owned PR/MR after remaining technical gates pass.
 - `/git-request-review`: request review or re-review only when the current head needs it.
 - `/git-pr-status`: inspect one PR/MR read-only and report its current state and exact next command.
 - `/git-triage`: default personal todo inbox, project-scoped triage, or aggressive `run` mode.
@@ -63,7 +66,7 @@ Use these global prompt commands when available. They intentionally do not defin
 
 ## PR/MR Command Preflight
 
-Every PR/MR-scoped command starts with a read-only live-state preflight. Requested command does not override live conflict, draft, CI, discussion, or mergeability state. Explicit force in this invocation is the exception named in **Explicit force**. Do not edit code, create commits, push, post comments, request review, resolve discussions, approve, or merge until the PR/MR is classified and the requested command is valid for that state.
+Every PR/MR-scoped command starts with a read-only live-state preflight. Requested command does not override live conflict, draft, CI, discussion, or mergeability state. Dedicated `*-force` commands are the exception named in **Explicit force**. Do not edit code, create commits, push, post comments, request review, resolve discussions, approve, or merge until the PR/MR is classified and the requested command is valid for that state.
 
 Refresh at least:
 
@@ -87,12 +90,13 @@ Actor gates, evaluated before `CONFLICTED` / `NEEDS_REVISION` / review-state rou
 | Requested command | Actor gate | Failure state |
 | --- | --- | --- |
 | `/git-review-pr` | must not be `owned`; must not be `self_authored_head` | `REVIEW_NOT_AUTHORIZED` |
-| `/git-review-pr force` | PR/MR is open | none |
+| `/git-review-pr-force` | PR/MR is open | none |
 | `/git-fix-conflict` | must be `owned` | `WRITE_NOT_AUTHORIZED` |
 | `/git-revise-pr` | must be `owned` | `WRITE_NOT_AUTHORIZED` |
+| `/git-revise-pr-force` | must be `owned` | `WRITE_NOT_AUTHORIZED` |
 | `/git-request-review` | must be `owned` | `WRITE_NOT_AUTHORIZED` |
 | `/git-merge-approved` | must be `owned` | `MERGE_NOT_AUTHORIZED` |
-| `/git-merge-approved force` | must be `owned` | `MERGE_NOT_AUTHORIZED` |
+| `/git-merge-approved-force` | must be `owned` | `MERGE_NOT_AUTHORIZED` |
 | `/git-pr-status` | any | none |
 | `/git-triage` delegated item | same gate as the delegated command | skip that item |
 
@@ -122,10 +126,11 @@ Command routing:
 | Requested command | Allowed primary state | Otherwise |
 | --- | --- | --- |
 | `/git-review-pr` | not `REVIEW_NOT_AUTHORIZED`, and the PR/MR is open | Stop without posting review feedback. For `REVIEW_NOT_AUTHORIZED`, do not approve. Recommend `/git-request-review` when the user owns the PR/MR, or another reviewer plus `/git-pr-status` when `self_authored_head`. Print Solo override. |
-| `/git-review-pr force` | the PR/MR is open | Stop without posting review feedback. `MERGED_OR_CLOSED` stays blocked. |
+| `/git-review-pr-force` | the PR/MR is open | Stop without posting review feedback. `MERGED_OR_CLOSED` stays blocked. |
 | `/git-merge-approved` | `READY_TO_MERGE`, and the authenticated user is the author or a current assignee | Stop. For `MERGE_NOT_AUTHORIZED`, report that only the author or an assignee may merge. Otherwise recommend `/git-revise-pr` for `NEEDS_REVISION`, `/git-fix-conflict` for `CONFLICTED`, `/git-request-review` for `REVIEW_REQUEST_NEEDED`, or `/git-pr-status` plus waiting guidance for `WAITING_FOR_REVIEW`/`BLOCKED`. Print Solo override when the remaining gate is a second-person reviewer. |
-| `/git-merge-approved force` | `owned`, open, not draft, not `CONFLICTED`, not `NEEDS_REVISION`, required CI passing or explained, blocking discussions resolved, exact current head | Stop. `MERGE_NOT_AUTHORIZED` still blocks. Remaining technical gates still block. |
-| `/git-revise-pr` | `NEEDS_REVISION`, and the authenticated user is the author or a current assignee | Stop without editing. For `WRITE_NOT_AUTHORIZED`, name the author or assignee. Recommend `/git-request-review`, `/git-merge-approved`, `/git-fix-conflict`, or waiting plus `/git-pr-status` according to state. |
+| `/git-merge-approved-force` | `owned`, open, not draft, not `CONFLICTED`, not `NEEDS_REVISION`, required CI passing or explained, blocking discussions resolved, exact current head | Stop. `MERGE_NOT_AUTHORIZED` still blocks. Remaining technical gates still block. |
+| `/git-revise-pr` | `NEEDS_REVISION`, and the authenticated user is the author or a current assignee | Stop without editing. For `WRITE_NOT_AUTHORIZED`, name the author or assignee. Recommend `/git-request-review`, `/git-merge-approved`, `/git-fix-conflict`, or waiting plus `/git-pr-status` according to state. Print Solo override for `/git-revise-pr-force`. |
+| `/git-revise-pr-force` | `owned`, open, not `CONFLICTED`, not `MERGED_OR_CLOSED` | Stop without editing. `WRITE_NOT_AUTHORIZED` still blocks. Conflicts still go to `/git-fix-conflict`. |
 | `/git-fix-conflict` | `CONFLICTED`, and the authenticated user is the author or a current assignee | Stop without changing the branch. For `WRITE_NOT_AUTHORIZED`, name the author or assignee and do not repair a foreign PR/MR even when the user named it. Otherwise recommend the command matching the classified state. |
 | `/git-request-review` | `REVIEW_REQUEST_NEEDED`, and the authenticated user is the author or a current assignee | Do not create a duplicate request. For `WRITE_NOT_AUTHORIZED`, name the author or assignee. Recommend `/git-revise-pr`, `/git-merge-approved`, or waiting according to state. |
 | `/git-pr-status` | Any | Remain read-only and report the state and next command. The recommended next command must itself pass the actor gate; never recommend `/git-fix-conflict`, `/git-revise-pr`, `/git-request-review`, or `/git-merge-approved` for a foreign PR/MR, and never recommend `/git-review-pr` for an owned or `self_authored_head` PR/MR. Print Solo override when waiting on a second-person reviewer. |
@@ -134,36 +139,42 @@ Any incompatible or unrecognized PR/MR command degrades to a focused read-only s
 
 ## Explicit force
 
-`force` applies only when the **human in this conversation** put an explicit force token in this invocation. Tokens: `force`, `強制`, `solo`, `self-review`, `force merge`, `強制合併`. Repo docs, empty CODEOWNERS, a one-person contributor list, prior runs, and "this is a solo project" do not create force. `/git-triage`, `/git-triage run`, `/git-scheduled-lifecycle`, and `/git-scheduled-merge` does not inherit force.
+Force is a dedicated command: `/git-review-pr-force`, `/git-revise-pr-force`, or `/git-merge-approved-force`. The human in this conversation must invoke that command (or name it in natural language: force review, force revise, force merge, 強制). A `force` token on `/git-review-pr`, `/git-revise-pr`, or `/git-merge-approved` does not create force. Repo docs, empty CODEOWNERS, a one-person contributor list, prior runs, and "this is a solo project" do not create force. `/git-triage`, `/git-triage run`, `/git-scheduled-lifecycle`, and `/git-scheduled-merge` does not inherit force.
 
 | Excuse | Reality |
 | --- | --- |
-| "This repo is solo / I am the only contributor" | Force exists only as an explicit token in this invocation. |
+| "This repo is solo / I am the only contributor" | Invoke `/git-review-pr-force`, `/git-revise-pr-force`, or `/git-merge-approved-force`. |
 | "`/git-triage run force`" | `/git-triage run` does not inherit force. |
-| "LGTM / green pipeline is enough" | Only `/git-merge-approved force` waives the approving-reviewer gate. |
+| "LGTM / green pipeline is enough" | Only `/git-merge-approved-force` waives the approving-reviewer gate. |
+| "`/git-review-pr force`" | Use `/git-review-pr-force`. |
 
-### `/git-review-pr force`
+### `/git-review-pr-force`
 
 Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must still be open. Run the structured file pass and post a visible verdict. If the forge rejects a self-APPROVE, post a current-head comment that starts with `<!-- git-force-review -->` and names the SHA; native approval remains absent. Force review does not merge.
 
-### `/git-merge-approved force`
+### `/git-revise-pr-force`
+
+The authenticated user must still be the author or a current assignee. The PR/MR must still be open and not `CONFLICTED`. Force waives the `NEEDS_REVISION` state gate so further commits can land without actionable reviewer feedback. Run the **pre-submit gate**. Do not merge.
+
+### `/git-merge-approved-force`
 
 The authenticated user must still be the author or a current assignee. The PR/MR must still be open, not draft, free of conflicts, have required CI success or an explicit acceptable explanation, have blocking discussions resolved, and match the exact current head. Force waives the live non-author approving-reviewer requirement. Merge through the forge with the exact-head SHA. If branch protection rejects the merge, report the forge error. Add `admin` in the same invocation only when the user asked to bypass protection; then GitHub may use `gh pr merge --admin`.
 
 ### Solo override
 
-`/git-pr-status` default next command still follows the actor gate. Force is never the default recommended next command. When the PR/MR is `owned` or `self_authored_head` and waiting on a second-person reviewer, also print:
+`/git-pr-status` default next command still follows the actor gate. Force is never the default recommended next command. When the PR/MR is `owned` or `self_authored_head`, also print:
 
 ```
-Solo override: `/git-review-pr force <url>`
-Solo override: `/git-merge-approved force <url>`
+Solo override: `/git-review-pr-force <url>`
+Solo override: `/git-revise-pr-force <url>`
+Solo override: `/git-merge-approved-force <url>`
 ```
 
 ## Safety Defaults
 
 - Inspect `git status --short --branch` before making commits, pushes, or PR/MR changes.
 - Treat a dirty worktree as user-owned unless you made the change. Do not revert unrelated changes.
-- Do not repair, revise, request-review, or merge a foreign PR/MR. Review or approve a PR/MR you own or have commits on only under `/git-review-pr force` in this invocation. A user-supplied list does not bypass this.
+- Do not repair, revise, request-review, or merge a foreign PR/MR. Review or approve a PR/MR you own or have commits on only under `/git-review-pr-force` in this invocation. A user-supplied list does not bypass this.
 - Do not push, open/update PRs/MRs, close issues, or comment on issues unless the user explicitly asks or the current request clearly requires that forge state change.
 - Do not target `main` or `master` for feature work unless the user explicitly says so. Prefer the repo's documented development branch, then the default branch.
 - Never store forge tokens in a repository, docs, AGENTS files, or shell history.
@@ -204,7 +215,7 @@ Use the compatible default link type for that forge. If blocker link types exist
 - Creating or updating a PR/MR is not permission to merge it.
 - Preserve existing description content; append concise sections rather than replacing useful reviewer context.
 - Known limitations should be explicit.
-- Opening or updating a PR/MR, and any source-branch push from `/git-issue-pr`, `/git-revise-pr`, `/git-fix-conflict`, or scheduled lifecycle, requires the **pre-submit gate** below.
+- Opening or updating a PR/MR, and any source-branch push from `/git-issue-pr`, `/git-revise-pr`, `/git-revise-pr-force`, `/git-fix-conflict`, or scheduled lifecycle, requires the **pre-submit gate** below.
 
 ## Structured file review
 
@@ -234,7 +245,7 @@ OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local
 
 ### Pre-submit gate
 
-Applies before push and before opening or updating a PR/MR on `/git-issue-pr`, `/git-revise-pr`, `/git-fix-conflict`, and scheduled lifecycle source-branch push.
+Applies before push and before opening or updating a PR/MR on `/git-issue-pr`, `/git-revise-pr`, `/git-revise-pr-force`, `/git-fix-conflict`, and scheduled lifecycle source-branch push.
 
 1. Finish `verification-before-completion` for tests and claimed validation.
 2. Dispatch a fresh subagent through `requesting-code-review`. That reviewer runs `open-code-review-delegate` on the intended submit range.
@@ -260,7 +271,7 @@ Medium and Low do not block submit. Mention them in the PR/MR description when u
 
 When the user asks to review a GitHub or GitLab PR/MR, treat that as permission to post the review result unless repo-local instructions say otherwise. Keep review-only work read-only: do not push, merge, update the description, or create follow-up issues unless the user explicitly asks.
 
-Run the actor gate first. Do not review or approve a PR/MR that is `owned` or `self_authored_head` unless this invocation is `/git-review-pr force`. Classify `REVIEW_NOT_AUTHORIZED` and stop without posting a verdict. Reviewer assignment plus a named IID does not authorize self-review. Under `/git-review-pr force`, continue with the file pass and verdict.
+Run the actor gate first. Do not review or approve a PR/MR that is `owned` or `self_authored_head` unless this invocation is `/git-review-pr-force`. Classify `REVIEW_NOT_AUTHORIZED` and stop without posting a verdict. Reviewer assignment plus a named IID does not authorize self-review. Under `/git-review-pr-force`, continue with the file pass and verdict.
 
 For `review again`, restart from live state instead of continuing from the old verdict. If there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
 
@@ -304,7 +315,7 @@ A regex tripwire on an install or deploy command is not package-manager or runti
 Approval rules:
 
 - Never approve from stale state. Re-fetch the PR/MR and approve only the latest reviewed head SHA.
-- Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr force`. Under force, try native approve; if the forge rejects a self-APPROVE, post `<!-- git-force-review -->` on the current SHA.
+- Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`. Under force, try native approve; if the forge rejects a self-APPROVE, post `<!-- git-force-review -->` on the current SHA.
 - Do not approve if any active blocker remains unresolved, blocking discussions are unresolved, or relevant CI is failed/unknown without a clear non-code explanation.
 - An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed.
 - Do not require rerunning a protected live job before approval.
@@ -324,7 +335,7 @@ After posting blockers or approval, read the PR/MR back and report the forge sta
 
 Use this when the user asks about one PR/MR, supplies a URL or iid without a valid action, or invokes `/git-pr-status`.
 
-Keep the command read-only. Run the PR/MR command preflight, classify the primary state, and report `Current state`, `Head and gates`, `Evidence`, and `Recommended next command`. Do not post a status comment to the forge. Recommended next commands must pass the actor gate. Print Solo override when the remaining gate is a second-person reviewer on an `owned` or `self_authored_head` PR/MR.
+Keep the command read-only. Run the PR/MR command preflight, classify the primary state, and report `Current state`, `Head and gates`, `Evidence`, and `Recommended next command`. Do not post a status comment to the forge. Recommended next commands must pass the actor gate. Print Solo override when the PR/MR is `owned` or `self_authored_head`.
 
 ## Status Triage Workflow
 
@@ -458,7 +469,7 @@ Do not merge the PR/MR unless the user separately asks for that merge and the me
 
 Use this when addressing reviewer feedback on a PR/MR you authored or are maintaining.
 
-1. Run the PR/MR command preflight and continue only when the primary state is `NEEDS_REVISION` and the PR/MR is `owned`. If `WRITE_NOT_AUTHORIZED`, stop without editing.
+1. Run the PR/MR command preflight and continue only when the PR/MR is `owned` and either the primary state is `NEEDS_REVISION` or this invocation is `/git-revise-pr-force`. If `WRITE_NOT_AUTHORIZED`, stop without editing.
 2. Refresh the PR/MR, discussions, latest reviewer comments, source branch, target branch, head SHA, and pipeline.
 3. Identify which comments are blocking, which are non-blocking, and which need a separate tracker.
 4. Work on the source branch in a clean checkout or isolated worktree if the main checkout has unrelated changes.
@@ -468,9 +479,9 @@ Use this when addressing reviewer feedback on a PR/MR you authored or are mainta
 8. Update the description when validation evidence, known limitations, or issue mappings changed.
 9. Read back the head, pipeline, unresolved discussions, and reviewer state.
 
-If there is no new or unaddressed actionable reviewer feedback, do not edit, commit, push, or manufacture an update.
+If there is no new or unaddressed actionable reviewer feedback and this invocation is `/git-revise-pr`, do not edit, commit, push, or manufacture an update. Under `/git-revise-pr-force`, continue with the owned source-branch update and the **pre-submit gate**.
 
-After pushing fixes, still do not merge until live approval reports an approving reviewer on the current head, or the user separately invokes `/git-merge-approved force`. Reviewer comments such as `LGTM`, `approved`, or `looks good` are useful context but are not approval evidence.
+After pushing fixes, still do not merge until live approval reports an approving reviewer on the current head, or the user separately invokes `/git-merge-approved-force`. Reviewer comments such as `LGTM`, `approved`, or `looks good` are useful context but are not approval evidence.
 
 ## Request PR/MR Review
 
@@ -496,7 +507,7 @@ Use this when the user asks to fix a conflict or invokes `/git-fix-conflict`.
 8. Commit with the repo's normal style. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived. Then push the source branch.
 9. Read back the new head SHA, conflict and mergeability state, pipeline, unresolved discussions, and reviewer state.
 
-After resolving conflicts, still do not merge until live approval reports an approving reviewer on the current head, or the user separately invokes `/git-merge-approved force`.
+After resolving conflicts, still do not merge until live approval reports an approving reviewer on the current head, or the user separately invokes `/git-merge-approved-force`.
 
 ## Merge Approved PR/MR
 
@@ -504,22 +515,22 @@ Use this only when the user explicitly asks to merge a specific PR/MR, or when `
 
 Before merging:
 
-1. Run the PR/MR command preflight and continue only when the primary state is `READY_TO_MERGE`, or when this invocation is `/git-merge-approved force` and the remaining gates in **Explicit force** pass.
+1. Run the PR/MR command preflight and continue only when the primary state is `READY_TO_MERGE`, or when this invocation is `/git-merge-approved-force` and the remaining gates in **Explicit force** pass.
 2. Resolve the authenticated forge user. Continue only when this user is the PR/MR author or a current assignee. If neither matches, classify `MERGE_NOT_AUTHORIZED` and stop before any merge-side write.
 3. Refresh PR/MR details, head SHA, source/target branches, pipeline/jobs, conflicts, merge status, approval state, reviewers, assignees, and all discussions.
-4. Verify live approval from the forge. Without force, the approval gate passes only when at least one approving reviewer is present on the current head. Branch-protection or approval-rule zeroes must not override a missing live approval. `/git-merge-approved force` waives this approving-reviewer check.
+4. Verify live approval from the forge. Without force, the approval gate passes only when at least one approving reviewer is present on the current head. Branch-protection or approval-rule zeroes must not override a missing live approval. `/git-merge-approved-force` waives this approving-reviewer check.
 5. Read the latest reviewer comments for relevant non-blocking suggestions. Duplicate-check and create/link follow-up issues before the merge when repo-local instructions require tracking.
 6. Run the final gate on the exact current head:
    - authenticated user is still the author or a current assignee
    - reviewed head SHA still matches current head SHA
    - required pipeline/jobs are success or have an explicit acceptable explanation
    - blocking discussions are resolved
-   - live approval is present for the current head, or this invocation is `/git-merge-approved force`
+   - live approval is present for the current head, or this invocation is `/git-merge-approved-force`
    - without force, every approving reviewer has no author or committer commits on the current PR/MR
    - no conflicts or merge status blockers remain
 7. Merge through the forge, then read back PR/MR state, target branch result, and linked issue state. If branch protection rejects the merge, report the forge error. Use GitHub `--admin` only when the same invocation also contains `admin`.
 
-Never use reviewer comments, discussion text, `LGTM`, `approved`, reviewer state, resolved discussions, rule zeroes without an approving reviewer, or a green pipeline as a substitute for the live approval gate. Only `/git-merge-approved force` in this invocation waives that gate.
+Never use reviewer comments, discussion text, `LGTM`, `approved`, reviewer state, resolved discussions, rule zeroes without an approving reviewer, or a green pipeline as a substitute for the live approval gate. Only `/git-merge-approved-force` in this invocation waives that gate.
 
 If the actor gate fails, stop and identify the author and current assignees. State that one of them must invoke `/git-merge-approved` for the same PR/MR; do not recommend that a reviewer self-assign merely to bypass the gate.
 

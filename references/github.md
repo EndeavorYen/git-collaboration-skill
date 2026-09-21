@@ -73,7 +73,7 @@ gh pr merge "$N" --match-head-commit "$HEAD"
 
 Use `--merge`, `--squash`, or `--rebase` only when repo-local instructions or the user name that strategy. `--match-head-commit` keeps the merge on the exact reviewed head.
 
-`/git-merge-approved force` uses the same exact-head merge. If required reviews reject it, report the forge error. Add `--admin` only when the same invocation also contains `admin`:
+`/git-merge-approved-force` uses the same exact-head merge. If required reviews reject it, report the forge error. Add `--admin` only when the same invocation also contains `admin`:
 
 ```bash
 gh pr merge "$N" --match-head-commit "$HEAD" --admin

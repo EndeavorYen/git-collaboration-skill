@@ -33,7 +33,7 @@ Optional modifiers:
 - `with-issues` — also implement ready issues via `/git-issue-pr`
 - `dry-run` — classify and list planned actions with no writes
 
-`/git-triage` and `/git-triage run` does not inherit force. Owned items waiting on a second-person reviewer still need `/git-request-review` or an explicit later `/git-review-pr force` / `/git-merge-approved force`.
+`/git-triage` and `/git-triage run` does not inherit force. Owned items waiting on a second-person reviewer still need `/git-request-review` or an explicit later `/git-review-pr-force` / `/git-revise-pr-force` / `/git-merge-approved-force`.
 
 ## Read-only triage (`todo` / `project` without `run`)
 

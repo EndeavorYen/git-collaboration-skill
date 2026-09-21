@@ -34,6 +34,9 @@ REQUIRED_FILES = [
     ROOT / "prompts" / "git-triage.md",
     ROOT / "prompts" / "git-scheduled-lifecycle.md",
     ROOT / "prompts" / "git-scheduled-merge.md",
+    ROOT / "prompts" / "git-review-pr-force.md",
+    ROOT / "prompts" / "git-merge-approved-force.md",
+    ROOT / "prompts" / "git-revise-pr-force.md",
 ]
 
 SKILL_PHRASES = [
@@ -63,8 +66,9 @@ SKILL_PHRASES = [
     "Blanket ship language is not a waiver",
     "Critical and High findings are submit blockers",
     "do not push, do not open or update the PR/MR",
-    "/git-review-pr force",
-    "/git-merge-approved force",
+    "/git-review-pr-force",
+    "/git-merge-approved-force",
+    "/git-revise-pr-force",
     "<!-- git-force-review -->",
     "Solo override",
     "does not inherit force",
@@ -74,8 +78,7 @@ PROMPT_PHRASES = {
     "git-review-pr.md": [
         "open-code-review-delegate",
         "OCR Step 7 Fix stays off",
-        "/git-review-pr force",
-        "<!-- git-force-review -->",
+        "REVIEW_NOT_AUTHORIZED",
     ],
     "git-issue-pr.md": [
         "all non-system notes",
@@ -106,6 +109,7 @@ PROMPT_PHRASES = {
         "pre-submit gate",
         "open-code-review-delegate",
         "Stop before push if Critical/High remain unfixed and unwaived",
+        "NEEDS_REVISION",
     ],
     "git-fix-conflict.md": [
         "pre-submit gate",
@@ -121,13 +125,30 @@ PROMPT_PHRASES = {
     "git-merge-approved.md": [
         "approving reviewer",
         "MERGE_NOT_AUTHORIZED",
-        "/git-merge-approved force",
+    ],
+    "git-review-pr-force.md": [
+        "/git-review-pr-force",
+        "open-code-review-delegate",
+        "<!-- git-force-review -->",
+        "OCR Step 7 Fix stays off",
+    ],
+    "git-merge-approved-force.md": [
+        "/git-merge-approved-force",
+        "MERGE_NOT_AUTHORIZED",
         "admin",
+    ],
+    "git-revise-pr-force.md": [
+        "/git-revise-pr-force",
+        "WRITE_NOT_AUTHORIZED",
+        "pre-submit gate",
+        "open-code-review-delegate",
+        "Stop before push if Critical/High remain unfixed and unwaived",
     ],
     "git-pr-status.md": [
         "Solo override",
-        "/git-review-pr force",
-        "/git-merge-approved force",
+        "/git-review-pr-force",
+        "/git-merge-approved-force",
+        "/git-revise-pr-force",
     ],
     "git-scheduled-merge.md": [
         "approving reviewer",
@@ -204,6 +225,24 @@ def validate_prompts() -> None:
             fail(f"prompts/{name}: still names an expected reviewer")
 
 
+DEFAULT_PROMPT_FORBIDDEN = {
+    "git-review-pr.md": ("/git-review-pr force",),
+    "git-merge-approved.md": ("/git-merge-approved force",),
+    "git-revise-pr.md": ("/git-revise-pr force",),
+}
+
+
+def validate_default_prompts_stay_strict() -> None:
+    for name, phrases in DEFAULT_PROMPT_FORBIDDEN.items():
+        path = ROOT / "prompts" / name
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        for phrase in phrases:
+            if phrase in text:
+                fail(f"prompts/{name}: default command must stay strict; found {phrase!r}")
+
+
 def validate_forge_references() -> None:
     github = ROOT / "references" / "github.md"
     gitlab = ROOT / "references" / "gitlab.md"
@@ -240,6 +279,7 @@ def main() -> int:
     validate_no_leaks()
     validate_skill_contract()
     validate_prompts()
+    validate_default_prompts_stay_strict()
     validate_forge_references()
     validate_scheduled_ocr_gate()
     if ERRORS:

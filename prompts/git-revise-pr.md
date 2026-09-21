@@ -8,7 +8,7 @@ Run the skill's read-only PR/MR command preflight first, including the actor gat
 
 Then implement the focused feedback on the PR/MR branch, validate, commit, run the skill's **pre-submit gate** (`requesting-code-review` dispatching a fresh subagent that runs `open-code-review-delegate`). Stop before push if Critical/High remain unfixed and unwaived, if the file pass failed, or if `ocr` is missing. Then push, reply to or resolve threads only when justified by the new code, update evidence if needed, and read back the new head state.
 
-If there is no new actionable reviewer feedback, do not edit, commit, or push. Report the current state and exact evidence instead. Recommend `/git-request-review` when current-head review has not been requested, `/git-merge-approved` when live approval and every final gate pass, `/git-fix-conflict` for conflicts, or `/git-pr-status` plus an explicit wait condition when review is already pending. Do not create an empty commit or a duplicate review request.
+If there is no new actionable reviewer feedback, do not edit, commit, or push. Report the current state and exact evidence instead. Recommend `/git-request-review` when current-head review has not been requested, `/git-merge-approved` when live approval and every final gate pass, `/git-fix-conflict` for conflicts, or `/git-pr-status` plus an explicit wait condition when review is already pending. Print Solo override for `/git-revise-pr-force` when the user owns the PR/MR and wants to iterate without `NEEDS_REVISION`. Do not create an empty commit or a duplicate review request.
 
 Do not merge from this command. After pushing, do not review or approve this PR/MR yourself.
 
