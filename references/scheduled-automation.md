@@ -119,7 +119,7 @@ Each PR/MR entry includes, when available, project and IID/URL; attempted action
 
 ## Approved-merge delegation
 
-Scheduled approved merge performs no review, revision, conflict repair, assignment, or preparatory write. For each allowlisted candidate it delegates only to the main skill's exact-head `/git-merge-approved` workflow.
+Scheduled approved merge performs no review, revision, conflict repair, assignment, or preparatory write. For each allowlisted candidate it delegates only to the main skill's exact-head `/git-merge-approved` workflow. Scheduled approved merge does not inherit force.
 
 Do not weaken or reproduce that merge gate. Immediately before the merge API call, the delegated workflow must still verify on the exact current head that:
 

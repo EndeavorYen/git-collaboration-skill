@@ -1,10 +1,10 @@
 ---
-description: Review another person's GitHub PR or GitLab MR and post a visible verdict
+description: Review another person's GitHub PR or GitLab MR and post a visible verdict, or force-review an owned PR/MR
 ---
 
 Use the installed `git-collaboration` skill in "Review someone else's PR/MR" mode. Detect the forge from the URL or remotes, then load `references/github.md` or `references/gitlab.md`.
 
-Run the skill's read-only PR/MR command preflight first, including the actor gate. Continue only when the PR/MR is not `owned` and not `self_authored_head`. If the authenticated user is the author or a current assignee, or any commit on the current PR/MR was authored or committed by that user, classify `REVIEW_NOT_AUTHORIZED` and do not post review feedback or approve. A named IID, URL, or list does not authorize self-review.
+Run the skill's read-only PR/MR command preflight first, including the actor gate. Continue only when the PR/MR is not `owned` and not `self_authored_head`, unless this invocation is `/git-review-pr force` (tokens: `force`, `強制`, `solo`, `self-review`). If the authenticated user is the author or a current assignee, or any commit on the current PR/MR was authored or committed by that user, classify `REVIEW_NOT_AUTHORIZED` and do not post review feedback or approve. A named IID, URL, or list does not authorize self-review. Under `/git-review-pr force`, continue with the structured file pass and a visible verdict. If the forge rejects a self-APPROVE, post a current-head comment that starts with `<!-- git-force-review -->` and names the SHA. Force review does not merge.
 
 If the PR/MR is merged/closed, the same current head was already reviewed with no new evidence, or the command is incompatible with the user's relationship to the PR/MR, do not post duplicate review feedback; report the focused status and recommend `/git-pr-status` or the command matching the state.
 

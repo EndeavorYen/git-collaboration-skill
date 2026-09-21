@@ -64,6 +64,8 @@ glab api --method PUT "projects/${PROJECT}/merge_requests/${IID}/merge" \
 
 Push options may create an MR when the user asked for a push/MR and the GitLab instance supports them. Creating an MR is not permission to merge it.
 
+`/git-merge-approved force` uses the same exact-head merge field. If approval rules reject the force merge, report the forge error. Do not push the source branch into the target locally.
+
 ## Inbox signals
 
 ```bash

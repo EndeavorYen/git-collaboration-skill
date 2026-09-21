@@ -10,7 +10,7 @@ Consider only current merge candidates from allowlisted projects. Ignore stale c
 
 Before every write, refresh the canonical allowlist identity by reloading the project allowlist and re-resolving the candidate's stable project ID and canonical URL; refresh live PR/MR state and rerun the skill's PR/MR command preflight.
 
-The sole permitted write is the merge delegated exclusively to `git-merge-approved`. Never post comments, change labels, or perform preparatory writes.
+The sole permitted write is the merge delegated exclusively to `git-merge-approved`. Never post comments, change labels, or perform preparatory writes. Scheduled approved merge does not inherit force.
 
 Require every gate enforced by that delegate:
 

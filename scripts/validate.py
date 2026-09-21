@@ -63,12 +63,19 @@ SKILL_PHRASES = [
     "Blanket ship language is not a waiver",
     "Critical and High findings are submit blockers",
     "do not push, do not open or update the PR/MR",
+    "/git-review-pr force",
+    "/git-merge-approved force",
+    "<!-- git-force-review -->",
+    "Solo override",
+    "does not inherit force",
 ]
 
 PROMPT_PHRASES = {
     "git-review-pr.md": [
         "open-code-review-delegate",
         "OCR Step 7 Fix stays off",
+        "/git-review-pr force",
+        "<!-- git-force-review -->",
     ],
     "git-issue-pr.md": [
         "all non-system notes",
@@ -93,6 +100,7 @@ PROMPT_PHRASES = {
         "Never invent a reviewer",
         "ask who to assign",
         "/git-plan-issue",
+        "does not inherit force",
     ],
     "git-revise-pr.md": [
         "pre-submit gate",
@@ -113,6 +121,17 @@ PROMPT_PHRASES = {
     "git-merge-approved.md": [
         "approving reviewer",
         "MERGE_NOT_AUTHORIZED",
+        "/git-merge-approved force",
+        "admin",
+    ],
+    "git-pr-status.md": [
+        "Solo override",
+        "/git-review-pr force",
+        "/git-merge-approved force",
+    ],
+    "git-scheduled-merge.md": [
+        "approving reviewer",
+        "does not inherit force",
     ],
 }
 
@@ -190,12 +209,12 @@ def validate_forge_references() -> None:
     gitlab = ROOT / "references" / "gitlab.md"
     if github.exists():
         text = github.read_text(encoding="utf-8")
-        for phrase in ("gh pr", "gh issue", "reviewDecision", "requested_reviewers"):
+        for phrase in ("gh pr", "gh issue", "reviewDecision", "requested_reviewers", "--admin"):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
     if gitlab.exists():
         text = gitlab.read_text(encoding="utf-8")
-        for phrase in ("glab api", "merge_requests", "approved_by"):
+        for phrase in ("glab api", "merge_requests", "approved_by", "force merge"):
             if phrase not in text:
                 fail(f"references/gitlab.md: missing {phrase!r}")
 
@@ -210,6 +229,7 @@ def validate_scheduled_ocr_gate() -> None:
         "open-code-review-delegate",
         "cannot waive Critical/High",
         "do not push",
+        "does not inherit force",
     ):
         if phrase not in text:
             fail(f"references/scheduled-automation.md: missing {phrase!r}")

@@ -10,6 +10,7 @@ accounts, or a default reviewer.
 
 - Detects GitHub vs GitLab from the request URL, then from `git remote`.
 - Reviews, revises, conflict-repairs, and merges PRs/MRs under live actor gates.
+- Explicit `/git-review-pr force` and `/git-merge-approved force` for solo self-review and second-person-approval waiver. Triage and scheduled runs do not inherit force.
 - Uses `open-code-review-delegate` for the file-by-file pass. `/git-review-pr` maps findings onto forge comments. Push and open/update PR/MR run a fail-closed pre-submit gate via a fresh `requesting-code-review` subagent.
 - Plans an issue (`/git-plan-issue`), then implements (`/git-issue-pr`) with
   optional dissent on the issue instead of silently following a weak plan.
@@ -61,3 +62,7 @@ There is no default reviewer. A reviewer comes from an explicit
 `reviewer:USERNAME`, a reviewer already requested on the PR/MR, or a question
 to the user. CODEOWNERS may be listed as options. Memory, prior runs, and
 hard-coded names do not create a reviewer.
+
+Solo override is per invocation: `/git-review-pr force <url>` and
+`/git-merge-approved force <url>`. Repo docs and "this is a solo project" do
+not create force.

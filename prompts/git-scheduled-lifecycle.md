@@ -8,6 +8,8 @@ Load and validate `.git-scheduled-automation.yml` from the repository root, or a
 
 Fail closed on configuration, identity, access, or project allowlist preflight failures before any forge or branch write.
 
+Scheduled lifecycle does not inherit force.
+
 Perform only the scheduled lifecycle capability boundary:
 
 - strict review and approval when every review gate passes;
