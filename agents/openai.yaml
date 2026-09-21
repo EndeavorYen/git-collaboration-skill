@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Collaboration"
+  short_description: "Safe GitHub and GitLab issues, PRs/MRs, replies, issue plans, triage, scheduled lifecycle, and approved merge."
+  default_prompt: "Use the git-collaboration skill to detect GitHub or GitLab first, then handle review, status, review request, issue reply, issue plan, issue-to-PR, revision, conflict repair, approved merge, scheduled lifecycle, or scheduled approved merge with command guardrails. Never invent a reviewer."
