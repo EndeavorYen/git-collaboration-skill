@@ -107,7 +107,11 @@ PROMPT_PHRASES = {
         "gentle-grill-me",
         "The local grill log is not the issue comment",
         "same session",
-        "do not ask the user to invoke `/git-issue-pr` again",
+        "Do not ask the user to invoke `/git-issue-pr` again",
+        "already settled",
+        "without loading `gentle-grill-me`",
+        "deferred or open",
+        "Do not post a brief while an unsettled product decision remains",
     ],
     "git-plan-issue.md": [
         "The brief is a proposal",
