@@ -14,7 +14,7 @@ Obey **Forge budget** and **Context budget** before drafting or posting. One tri
 4. Classify whether a current implementation brief is still needed. A current brief is a comment that contains `<!-- git-plan-issue -->` whose Goal, Recommended change, Out of scope, and Acceptance criteria have not been changed by later comments. A current brief is still needed when none exists, later comments changed those fields, or the user asked to re-plan.
 5. Draft the issue comment from the skill's Plan Issue Workflow recipe. The brief is a proposal. `/git-issue-pr` follows it when the implementer agrees, or posts a dissent and waits for a human decision.
 
-Do not post a duplicate brief. Do not implement or open a PR/MR. Ambiguous product decisions stop with a draft and a concise request for user direction; write nothing.
+Do not post a duplicate brief. Do not implement or open a PR/MR. When an unsettled product decision remains in Goal, Recommended change, Out of scope, or Acceptance criteria, load `gentle-grill-me` and post nothing until the user confirms the close log. After that confirmation, post one brief whose Goal, Recommended change, Out of scope, and Acceptance criteria are settled decisions, then stop. Scheduled runs and `/git-triage` do not load `gentle-grill-me`; recommend `/git-plan-issue`.
 
 Post one issue comment only when the issue is open, a current brief is still needed, and the draft is grounded in the local checkout. The write response is the read-back: report its comment id and timestamp, the issue state from the snapshot, and `/git-issue-pr` with the exact issue URL. Do not view the issue again when that response includes the comment id. If no write is justified, perform no write and report the evidence and exact wait or next action.
 

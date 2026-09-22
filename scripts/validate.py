@@ -55,6 +55,9 @@ SKILL_PHRASES = [
     "material disagreement",
     "human decision",
     "The brief is a proposal",
+    "gentle-grill-me",
+    "confirms the close log",
+    "unsettled product decision",
     "/git-review-pr",
     "/git-issue-pr",
     "/git-plan-issue",
@@ -94,6 +97,8 @@ PROMPT_PHRASES = {
         "pre-submit gate",
         "open-code-review-delegate",
         "Stop before push if Critical/High remain unfixed and unwaived",
+        "unsettled product decision",
+        "gentle-grill-me",
     ],
     "git-plan-issue.md": [
         "The brief is a proposal",
@@ -101,6 +106,9 @@ PROMPT_PHRASES = {
         "/git-issue-pr",
         "local checkout",
         "Forge budget",
+        "gentle-grill-me",
+        "confirms the close log",
+        "unsettled product decision",
     ],
     "git-request-review.md": [
         "Never invent a reviewer",
