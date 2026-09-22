@@ -58,6 +58,7 @@ SKILL_PHRASES = [
     "gentle-grill-me",
     "confirms the close log",
     "unsettled product decision",
+    "Do not post a brief while an unsettled product decision remains",
     "/git-review-pr",
     "/git-issue-pr",
     "/git-plan-issue",
@@ -223,6 +224,8 @@ def validate_skill_contract() -> None:
         fail("SKILL.md: still names an expected reviewer; use an approving reviewer with no default")
     if "Traditional Chinese" in text:
         fail("SKILL.md: drop language-forced review text; match the issue/PR or repo language")
+    if "draft that still contains an unsettled product decision is posted" in text:
+        fail("SKILL.md: do not post a draft that still contains an unsettled product decision")
 
 
 def validate_prompts() -> None:
