@@ -100,6 +100,7 @@ PROMPT_PHRASES = {
         "Stop before push if Critical/High remain unfixed and unwaived",
         "unsettled product decision",
         "gentle-grill-me",
+        "post no comment",
     ],
     "git-plan-issue.md": [
         "The brief is a proposal",
@@ -110,6 +111,8 @@ PROMPT_PHRASES = {
         "gentle-grill-me",
         "confirms the close log",
         "unsettled product decision",
+        "Do not post a brief while an unsettled product decision remains",
+        "deferred or open",
     ],
     "git-request-review.md": [
         "Never invent a reviewer",
