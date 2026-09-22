@@ -24,7 +24,7 @@ Use this when the task is to fix or implement a GitHub or GitLab issue.
 15. Keep the PR/MR description current: summary, issue link, validation evidence, known limitations, reviewer/assignee metadata when available, and any pre-submit waivers.
 16. The create or update response is the read-back. Report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state. One confirm view only when that response omits iid, URL, or head SHA.
 
-Do not merge the PR/MR unless the user separately asks for that merge and the merge gate below passes.
+Do not merge the PR/MR unless the user separately asks for that merge and the merge gate in `references/merge.md` passes.
 
 ## Project Orientation
 
@@ -60,7 +60,7 @@ Use the compatible default link type for that forge. If blocker link types exist
 - Creating or updating a PR/MR is not permission to merge it.
 - Preserve existing description content; append concise sections rather than replacing useful reviewer context.
 - Known limitations should be explicit.
-- Opening or updating a PR/MR, and any source-branch push from `/git-issue-pr`, `/git-revise-pr`, `/git-revise-pr-force`, `/git-fix-conflict`, or scheduled lifecycle, requires the **pre-submit gate** below.
+- Opening or updating a PR/MR, and any source-branch push from `/git-issue-pr`, `/git-revise-pr`, `/git-revise-pr-force`, `/git-fix-conflict`, or scheduled lifecycle, requires the pre-submit gate in `references/pre-submit.md`.
 
 ## Commits
 

@@ -2,7 +2,7 @@
 
 Read this file for `/git-fix-conflict`. Before push: `references/pre-submit.md`. Do not read `references/revise.md`.
 
-When the PR/MR is not `CONFLICTED` or the user is not the author or assignee, stop without changing the branch. For `WRITE_NOT_AUTHORIZED`, name the author or assignee and do not repair a foreign PR/MR.
+When the PR/MR is not `CONFLICTED` or the user is not the author or assignee, stop without changing the branch. For `WRITE_NOT_AUTHORIZED`, name the author or assignee and do not repair a foreign PR/MR. Otherwise recommend the command matching the classified state.
 
 ## Fix PR/MR Conflicts
 

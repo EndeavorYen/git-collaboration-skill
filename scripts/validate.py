@@ -317,13 +317,15 @@ def validate_skill_contract() -> None:
     words = len(text.split())
     if words > SKILL_WORD_LIMIT:
         fail(f"SKILL.md: {words} words exceeds {SKILL_WORD_LIMIT}")
-    for key, (line, banned) in LOAD_LINES.items():
-        if line not in text:
+    for key, (sentence, banned) in LOAD_LINES.items():
+        rows = [row for row in text.splitlines() if sentence in row]
+        if not rows:
             fail(f"SKILL.md: missing {key} load line")
             continue
-        for path in banned:
-            if path in line:
-                fail(f"SKILL.md: {key} load line names {path}")
+        for row in rows:
+            for path in banned:
+                if path in row:
+                    fail(f"SKILL.md: {key} load line names {path}")
 
 
 def validate_prompts() -> None:

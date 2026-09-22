@@ -2,7 +2,7 @@
 
 Read this file for `/git-request-review`.
 
-When the state is not `REVIEW_REQUEST_NEEDED` or the user is not the author or assignee, do not create a duplicate request. For `WRITE_NOT_AUTHORIZED`, name the author or assignee.
+When the state is not `REVIEW_REQUEST_NEEDED` or the user is not the author or assignee, do not create a duplicate request. For `WRITE_NOT_AUTHORIZED`, name the author or assignee. Otherwise recommend `/git-revise-pr`, `/git-merge-approved`, or waiting according to state.
 
 ## Request PR/MR Review
 

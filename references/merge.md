@@ -7,7 +7,7 @@ When `/git-merge-approved` is not `READY_TO_MERGE` or the user is not the author
 When `/git-merge-approved-force` fails a technical gate, stop. `MERGE_NOT_AUTHORIZED` still blocks.
 
 
-The authenticated user must still be the author or a current assignee. The PR/MR must still be open, not draft, free of conflicts, have required CI success or an explicit acceptable explanation, have blocking discussions resolved, and match the exact current head. Force waives the live non-author approving-reviewer requirement. Merge through the forge with the exact-head SHA. If branch protection rejects the merge, report the forge error. Add `admin` in the same invocation only when the user asked to bypass protection; then GitHub may use `gh pr merge --admin`.
+The authenticated user must still be the author or a current assignee. The PR/MR must still be open, not draft, free of conflicts, not `NEEDS_REVISION`, have required CI success or an explicit acceptable explanation, have blocking discussions resolved, and match the exact current head. Force waives the live non-author approving-reviewer requirement. Merge through the forge with the exact-head SHA. If branch protection rejects the merge, report the forge error. Add `admin` in the same invocation only when the user asked to bypass protection; then GitHub may use `gh pr merge --admin`.
 
 ## Merge Approved PR/MR
 
