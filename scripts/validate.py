@@ -59,6 +59,8 @@ SKILL_PHRASES = [
     "confirms the close log",
     "unsettled product decision",
     "Do not post a brief while an unsettled product decision remains",
+    "already settled",
+    "Load `gentle-grill-me` only when",
     "/git-review-pr",
     "/git-issue-pr",
     "/git-plan-issue",
@@ -113,6 +115,9 @@ PROMPT_PHRASES = {
         "unsettled product decision",
         "Do not post a brief while an unsettled product decision remains",
         "deferred or open",
+        "already settled",
+        "without loading `gentle-grill-me`",
+        "Load `gentle-grill-me` only when",
     ],
     "git-request-review.md": [
         "Never invent a reviewer",
