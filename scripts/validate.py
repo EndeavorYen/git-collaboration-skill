@@ -55,6 +55,12 @@ SKILL_PHRASES = [
     "material disagreement",
     "human decision",
     "The brief is a proposal",
+    "gentle-grill-me",
+    "confirms the close log",
+    "unsettled product decision",
+    "Do not post a brief while an unsettled product decision remains",
+    "already settled",
+    "Load `gentle-grill-me` only when",
     "/git-review-pr",
     "/git-issue-pr",
     "/git-plan-issue",
@@ -94,6 +100,9 @@ PROMPT_PHRASES = {
         "pre-submit gate",
         "open-code-review-delegate",
         "Stop before push if Critical/High remain unfixed and unwaived",
+        "unsettled product decision",
+        "gentle-grill-me",
+        "post no comment",
     ],
     "git-plan-issue.md": [
         "The brief is a proposal",
@@ -101,6 +110,14 @@ PROMPT_PHRASES = {
         "/git-issue-pr",
         "local checkout",
         "Forge budget",
+        "gentle-grill-me",
+        "confirms the close log",
+        "unsettled product decision",
+        "Do not post a brief while an unsettled product decision remains",
+        "deferred or open",
+        "already settled",
+        "without loading `gentle-grill-me`",
+        "Load `gentle-grill-me` only when",
     ],
     "git-request-review.md": [
         "Never invent a reviewer",
@@ -215,6 +232,8 @@ def validate_skill_contract() -> None:
         fail("SKILL.md: still names an expected reviewer; use an approving reviewer with no default")
     if "Traditional Chinese" in text:
         fail("SKILL.md: drop language-forced review text; match the issue/PR or repo language")
+    if "draft that still contains an unsettled product decision is posted" in text:
+        fail("SKILL.md: do not post a draft that still contains an unsettled product decision")
 
 
 def validate_prompts() -> None:

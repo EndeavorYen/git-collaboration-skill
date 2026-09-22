@@ -57,8 +57,8 @@ Classify the request before taking action. The mode controls which writes are al
 | Mode | User intent examples | Allowed writes | Stop condition |
 | --- | --- | --- | --- |
 | Review someone else's PR/MR | `plz review`, `review again`, review a PR/MR URL, `/git-review-pr-force`, solo self-review | Forge review comments, discussion resolution only when re-review proves the blocker is fixed, approve/request changes, or a `<!-- git-force-review -->` comment when self-APPROVE is rejected | Posted visible verdict and read back SHA, pipeline, discussions, and approval/request-changes state |
-| Plan issue | `plan this issue`, `analyze issue`, `/git-plan-issue` | One issue comment containing the implementation brief | Live preflight proves the issue is open, a current brief is still needed, and the brief is grounded in repo evidence |
-| Implement issue then PR/MR | `fix issue #N`, `resolve this issue`, issue implementation work | Code edits, tests, branch, commit, push, open/update PR/MR targeting the repo development branch; or one dissent issue comment when the current brief is materially disputed | PR/MR exists with issue links, validation evidence, reviewer/assignee metadata, and live read-back; or a dissent comment is posted and the run waits for a human decision; do not merge |
+| Plan issue | `plan this issue`, `analyze issue`, `/git-plan-issue` | One issue comment containing the implementation brief | Live preflight proves the issue is open, a current brief is still needed, and the brief is grounded in repo evidence. An unsettled product decision waits until the user confirms the close log and those four fields are settled decisions. A deferred or open field posts no brief |
+| Implement issue then PR/MR | `fix issue #N`, `resolve this issue`, issue implementation work | Code edits, tests, branch, commit, push, open/update PR/MR targeting the repo development branch; or one dissent issue comment when the current brief is materially disputed | PR/MR exists with issue links, validation evidence, reviewer/assignee metadata, and live read-back; or a dissent comment is posted and the run waits for a human decision; an unsettled contract stops with no code edit and recommends `/git-plan-issue`; do not merge |
 | Reply to issue | `reply to issue`, answer one issue URL, `/git-reply-issue` | One issue comment on the exact target only | Live preflight proves a material unanswered request, or no write with evidence/draft is reported |
 | Update own PR/MR after review | `address reviewer comment`, `fix PR feedback`, `push for re-review`, `/git-revise-pr-force` | Focused code/test/doc edits, commit, push to PR/MR branch, description/comment updates, replies to reviewer threads | Reviewer threads are answered/resolved when justified, PR/MR read-back reflects the new head; do not merge until a live non-author approval is present |
 | Fix PR/MR conflicts | `fix conflict`, PR/MR reports conflicts | Checkout/worktree setup, merge or rebase target into the source branch, conflict-resolution code edits, tests, commit, push to the source branch | Source branch is pushed and live read-back shows current head, conflict/mergeability, pipeline, discussions, and reviewer state; do not merge |
@@ -388,7 +388,7 @@ Treat notifications as signals, not conversational source of truth. Another user
 
 Classify into Ready to review, Ready to fix conflicts, Ready to revise, Ready to merge, Merge handoff needed, Ready to reply, Acknowledge or route, No reply needed, Needs semantic review, Ready to implement, Review request needed, and Waiting or blocked. A named foreign conflicted PR/MR is `WRITE_NOT_AUTHORIZED`, not ready to fix.
 
-Ready to implement: open issues assigned to me that are not blocked, not already covered by an active PR/MR, and have enough acceptance detail. A current `<!-- git-plan-issue -->` brief counts as acceptance detail; when none exists, recommend `/git-plan-issue` with the exact issue URL. An unresolved `<!-- git-plan-issue-dissent -->` waits for a human decision.
+Ready to implement: open issues assigned to me that are not blocked, not already covered by an active PR/MR, and have a current `<!-- git-plan-issue -->` brief whose Goal, Recommended change, Out of scope, and Acceptance criteria contain no unsettled product decision. When none exists, or an unsettled product decision remains, recommend `/git-plan-issue` with the exact issue URL. An unresolved `<!-- git-plan-issue-dissent -->` waits for a human decision. `/git-triage` does not load `gentle-grill-me`.
 
 Report each actionable item with reason, live evidence, remaining gate, and exact next command. End with a compact top three and ask which item to handle next.
 
@@ -396,7 +396,7 @@ Report each actionable item with reason, live evidence, remaining gate, and exac
 
 Scope to the current repository's forge project, or the project URL/path supplied in arguments. One metadata PR/MR list and one metadata issue list. Do not open each row. Apply the same relationship model inside the selected project. Include sibling repositories only when repo-local instructions identify them or the user asks.
 
-Add hygiene buckets **Needs reviewer** and **Needs assignee**. Do not auto-assign. Prefer `/git-request-review` when the user owns the PR/MR; otherwise report who should request review. For issues that are otherwise implementable, mention `/git-issue-pr` only after ownership is clear.
+Add hygiene buckets **Needs reviewer** and **Needs assignee**. Do not auto-assign. Prefer `/git-request-review` when the user owns the PR/MR; otherwise report who should request review. A list row has no comment body, so do not call an issue Ready to implement from the list. Recommend `/git-issue-pr` only after a trimmed snapshot shows a settled current brief. Until then the next command is `/git-plan-issue` with the exact issue URL. `/git-triage` does not load `gentle-grill-me`. Mention `/git-issue-pr` only after ownership is clear.
 
 Suggested commands include `/git-review-pr`, `/git-revise-pr`, `/git-fix-conflict`, `/git-request-review`, `/git-pr-status`, `/git-plan-issue`, `/git-issue-pr`, `/git-merge-approved`. End with a compact top-three recommendation and ask which item to handle next.
 
@@ -455,9 +455,10 @@ Use this when the user explicitly invokes `/git-plan-issue` or clearly asks to a
 
 The brief is a proposal. `/git-issue-pr` follows it when the implementer agrees, or posts a `<!-- git-plan-issue-dissent -->` and waits for a human decision.
 
-6. Post one issue comment only when the issue is open, a current brief is still needed, and the draft is grounded in the inspected checkout. The write response is the read-back. Report the new comment id and timestamp, current issue state from the snapshot, and `/git-issue-pr` with the exact issue URL. Do not view the issue again when the response includes the comment id.
+6. An unsettled product decision is a choice among two or more product behaviors that changes Goal, Recommended change, Out of scope, or Acceptance criteria, or an acceptance item that cannot be checked until that choice is made. A deferred or open assumption in the close log is still unsettled. Do not guess an unsettled product decision into one of those four fields. Load `gentle-grill-me` only when the draft still contains an unsettled product decision. When those four fields are already settled, do not load `gentle-grill-me` and do not wait for a close log; step 7 posts that draft. When the draft still contains an unsettled product decision, use that skill's rounds and post nothing until the user confirms the close log. After that confirmation, rewrite those four fields from settled log entries only. If any of those four fields is still deferred or open, post nothing and report that open assumption. On this unsettled path, that confirmation authorizes the one brief comment in step 7 only when those four fields are settled decisions. It does not authorize code, commits, pushes, or a PR/MR. Scheduled lifecycle, scheduled merge, and `/git-triage` do not load `gentle-grill-me`; recommend `/git-plan-issue` with the exact issue URL.
+7. Post one issue comment only when the issue is open, a current brief is still needed, the draft is grounded in the inspected checkout, and Goal, Recommended change, Out of scope, and Acceptance criteria are settled decisions. A draft whose four fields are already settled does not need a close log. The write response is the read-back. Report the new comment id and timestamp, current issue state from the snapshot, and `/git-issue-pr` with the exact issue URL. Do not view the issue again when the response includes the comment id.
 
-Do not post a duplicate brief. Do not implement, open a PR/MR, or guess a product decision. If the issue is closed, a current brief already exists and the user did not ask to re-plan, an open PR/MR already covers the issue and the user did not ask to re-plan, or the evidence is too thin for a grounded brief, perform no write and report the evidence plus the exact wait or next action.
+Do not post a duplicate brief. Do not implement or open a PR/MR. Do not post a brief while an unsettled product decision remains in those four fields. If the issue is closed, a current brief already exists and the user did not ask to re-plan, an open PR/MR already covers the issue and the user did not ask to re-plan, or the evidence is too thin for a grounded brief, perform no write and report the evidence plus the exact wait or next action.
 
 ## Issue Implementation To PR/MR
 
@@ -465,10 +466,11 @@ Use this when the task is to fix or implement a GitHub or GitLab issue.
 
 1. Read repo-local instructions, inspect local status, and take one issue snapshot: state, description, labels, assignees, links on that payload, marker comments, and the latest non-system comments. The latest body stays whole. Related PRs/MRs are only those links. Then inspect the local checkout. Do not read the issue again while implementing.
 2. If the issue has assignees and the authenticated user is not among them, stop without implementing or posting a dissent. Unassigned issues may be implemented.
-3. Collect the current proposal from that live evidence. If a current comment contains `<!-- git-plan-issue -->` and later comments have not superseded its Goal / Recommended change / Out of scope / Acceptance criteria, that comment is the current brief. Otherwise the issue description plus later material comments that change requirements is the proposal. A `<!-- git-plan-issue-dissent -->` stays unresolved until a human decision or a newer brief supersedes it. A human decision is a later non-system comment, a newer `<!-- git-plan-issue -->` brief, or explicit direction in this invocation that selects the original brief, the posted alternative, or a third way. The invoking user's explicit choice is final.
+3. Collect the current proposal from that live evidence. If a current comment contains `<!-- git-plan-issue -->` and later comments have not superseded its Goal / Recommended change / Out of scope / Acceptance criteria, that comment is the current brief. A description with no current brief is not an implementation contract. A `<!-- git-plan-issue-dissent -->` stays unresolved until a human decision or a newer brief supersedes it. A human decision is a later non-system comment, a newer `<!-- git-plan-issue -->` brief, or explicit direction in this invocation that selects the original brief, the posted alternative, or a third way. The invoking user's explicit choice is final.
 4. If an unresolved dissent exists and this invocation carries no human decision, perform no code edit and post no duplicate dissent. Report the dissent comment id and wait.
-5. Inspect the relevant current code and evaluate the current brief, or the description proposal when no brief exists. Material disagreement is a conflict on Goal, Recommended change shape, Out of scope, or Acceptance criteria. Names, extra tests, and equivalent structure inside that shape stay on the agree path.
-6. On material disagreement, post one issue comment using this recipe, then stop without editing code:
+5. Inspect the relevant current code and evaluate the current brief. Material disagreement is a conflict on Goal, Recommended change shape, Out of scope, or Acceptance criteria. Names, extra tests, and equivalent structure inside that shape stay on the agree path. Use the Plan Issue Workflow meaning of unsettled product decision.
+6. If no current brief exists, or Goal, Recommended change, Out of scope, or Acceptance criteria still contain an unsettled product decision, perform no code edit, post no comment, and do not load `gentle-grill-me`. Report that the contract is unsettled. Next command: `/git-plan-issue` with the exact issue URL.
+7. On material disagreement with a settled brief, post one issue comment using this recipe, then stop without editing code:
 
 ```markdown
 <!-- git-plan-issue-dissent -->
@@ -482,15 +484,15 @@ Use this when the task is to fix or implement a GitHub or GitLab issue.
 **Next:** reply on this issue, then `/git-issue-pr <exact issue URL>`
 ```
 
-7. When the implementer agrees, or a human decision has settled the direction, treat that note as the implementation contract. Report which comment id supplied the contract, or that the description supplied it, before editing code.
-8. Start from the current development branch unless repo-local instructions say otherwise. Create a dedicated feature branch; do not implement directly on the default or documented development branch.
-9. Use TDD when practical: add or update a focused failing test first for bug fixes or behavior changes, then implement the smallest reasonable fix.
-10. Validate with the relevant focused tests and broader checks proportional to risk, including the contract's Acceptance criteria.
-11. Commit with a focused conventional-style message and reference the issue.
-12. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived.
-13. Push the branch and open or update a PR/MR targeting the development branch when this is part of the issue workflow.
-14. Keep the PR/MR description current: summary, issue link, validation evidence, known limitations, reviewer/assignee metadata when available, and any pre-submit waivers.
-15. The create or update response is the read-back. Report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state. One confirm view only when that response omits iid, URL, or head SHA.
+8. When the implementer agrees with the settled brief, or a human decision has settled the original brief, the posted alternative, or a third way, treat that note as the implementation contract. Report the comment id that supplied the contract, or that this invocation selected the third way, before editing code.
+9. Start from the current development branch unless repo-local instructions say otherwise. Create a dedicated feature branch; do not implement directly on the default or documented development branch.
+10. Use TDD when practical: add or update a focused failing test first for bug fixes or behavior changes, then implement the smallest reasonable fix.
+11. Validate with the relevant focused tests and broader checks proportional to risk, including the contract's Acceptance criteria.
+12. Commit with a focused conventional-style message and reference the issue.
+13. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived.
+14. Push the branch and open or update a PR/MR targeting the development branch when this is part of the issue workflow.
+15. Keep the PR/MR description current: summary, issue link, validation evidence, known limitations, reviewer/assignee metadata when available, and any pre-submit waivers.
+16. The create or update response is the read-back. Report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state. One confirm view only when that response omits iid, URL, or head SHA.
 
 Do not merge the PR/MR unless the user separately asks for that merge and the merge gate below passes.
 
