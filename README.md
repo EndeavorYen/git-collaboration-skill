@@ -21,11 +21,22 @@ accounts, or a default reviewer.
 ## Layout
 
 ```text
-SKILL.md                         # workflow (source of truth)
+SKILL.md                         # router: forge, budgets, actor gate, force
 references/github.md             # gh CLI and GitHub approval APIs
 references/gitlab.md             # glab CLI and GitLab approval APIs
+references/pre-submit.md         # file pass and waiver rules
+references/review.md             # review and force-review
+references/plan-issue.md         # brief and dissent recipe
+references/implement.md          # issue to PR/MR
+references/revise.md             # owned update
+references/conflict.md           # conflict repair
+references/merge.md              # approved merge
+references/reply.md              # issue reply
+references/request-review.md
+references/status.md
+references/triage.md             # read-only triage and aggressive run
 references/scheduled-automation.md
-prompts/git-*.md                 # slash/action sources
+prompts/git-*.md                 # mode name, actor gate, reference path
 scripts/validate.py              # leak + contract checks
 ```
 

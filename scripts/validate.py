@@ -22,6 +22,17 @@ REQUIRED_FILES = [
     ROOT / "references" / "github.md",
     ROOT / "references" / "gitlab.md",
     ROOT / "references" / "scheduled-automation.md",
+    ROOT / "references" / "pre-submit.md",
+    ROOT / "references" / "review.md",
+    ROOT / "references" / "plan-issue.md",
+    ROOT / "references" / "implement.md",
+    ROOT / "references" / "revise.md",
+    ROOT / "references" / "conflict.md",
+    ROOT / "references" / "merge.md",
+    ROOT / "references" / "reply.md",
+    ROOT / "references" / "request-review.md",
+    ROOT / "references" / "status.md",
+    ROOT / "references" / "triage.md",
     ROOT / "prompts" / "git-review-pr.md",
     ROOT / "prompts" / "git-issue-pr.md",
     ROOT / "prompts" / "git-plan-issue.md",
@@ -49,32 +60,8 @@ SKILL_PHRASES = [
     "READY_TO_MERGE",
     "REVIEW_NOT_AUTHORIZED",
     "WRITE_NOT_AUTHORIZED",
+    "MERGE_NOT_AUTHORIZED",
     "self_authored_head",
-    "<!-- git-plan-issue -->",
-    "<!-- git-plan-issue-dissent -->",
-    "material disagreement",
-    "human decision",
-    "The brief is a proposal",
-    "gentle-grill-me",
-    "confirms the close log",
-    "unsettled product decision",
-    "Do not post a brief while an unsettled product decision remains",
-    "already settled",
-    "Load `gentle-grill-me` only when",
-    "The local grill log is not the issue comment",
-    "same session",
-    "Do not ask the user to invoke `/git-issue-pr` again",
-    "/git-review-pr",
-    "/git-issue-pr",
-    "/git-plan-issue",
-    "open-code-review-delegate",
-    "requesting-code-review",
-    "pre-submit gate",
-    "fresh subagent",
-    "human in this conversation",
-    "Blanket ship language is not a waiver",
-    "Critical and High findings are submit blockers",
-    "do not push, do not open or update the PR/MR",
     "/git-review-pr-force",
     "/git-merge-approved-force",
     "/git-revise-pr-force",
@@ -86,109 +73,191 @@ SKILL_PHRASES = [
     "local checkout",
     "write response is the read-back",
     "Do not read repository files",
+    "Explicit force",
 ]
 
-PROMPT_PHRASES = {
-    "git-review-pr.md": [
+SKILL_WORD_LIMIT = 3000
+
+REFERENCE_PHRASES = {
+    "pre-submit.md": [
         "open-code-review-delegate",
-        "OCR Step 7 Fix stays off",
-        "REVIEW_NOT_AUTHORIZED",
+        "requesting-code-review",
+        "pre-submit gate",
+        "fresh subagent",
+        "human in this conversation",
+        "Blanket ship language is not a waiver",
+        "Critical and High findings are submit blockers",
+        "do not push, do not open or update the PR/MR",
     ],
-    "git-issue-pr.md": [
-        "latest non-system notes",
+    "review.md": [
+        "references/pre-submit.md",
+        "OCR Step 7 Fix stays off",
+        "<!-- git-force-review -->",
+        "Evidence class",
+    ],
+    "plan-issue.md": [
         "<!-- git-plan-issue -->",
         "<!-- git-plan-issue-dissent -->",
-        "material disagreement",
-        "human decision",
-        "pre-submit gate",
-        "open-code-review-delegate",
-        "Stop before push if Critical/High remain unfixed and unwaived",
-        "unsettled product decision",
-        "gentle-grill-me",
-        "The local grill log is not the issue comment",
-        "same session",
-        "Do not ask the user to invoke `/git-issue-pr` again",
-        "already settled",
-        "without loading `gentle-grill-me`",
-        "deferred or open",
-        "Do not post a brief while an unsettled product decision remains",
-    ],
-    "git-plan-issue.md": [
         "The brief is a proposal",
-        "<!-- git-plan-issue -->",
-        "/git-issue-pr",
-        "local checkout",
-        "Forge budget",
         "gentle-grill-me",
         "confirms the close log",
         "unsettled product decision",
         "Do not post a brief while an unsettled product decision remains",
-        "deferred or open",
         "already settled",
-        "without loading `gentle-grill-me`",
         "Load `gentle-grill-me` only when",
         "The local grill log is not the issue comment",
+        "material disagreement",
+        "human decision",
+    ],
+    "implement.md": [
+        "Do not ask the user to invoke `/git-issue-pr` again",
         "same session",
+        "references/plan-issue.md",
+        "references/pre-submit.md",
     ],
-    "git-request-review.md": [
-        "Never invent a reviewer",
-        "ask who to assign",
-    ],
-    "git-triage.md": [
-        "Never invent a reviewer",
-        "ask who to assign",
-        "/git-plan-issue",
-        "does not inherit force",
-    ],
-    "git-revise-pr.md": [
-        "pre-submit gate",
-        "open-code-review-delegate",
-        "Stop before push if Critical/High remain unfixed and unwaived",
+    "revise.md": [
         "NEEDS_REVISION",
-    ],
-    "git-fix-conflict.md": [
         "pre-submit gate",
-        "open-code-review-delegate",
-        "Stop before push if Critical/High remain unfixed and unwaived",
+        "references/pre-submit.md",
     ],
-    "git-scheduled-lifecycle.md": [
-        "open-code-review-delegate",
+    "conflict.md": [
+        "CONFLICTED",
         "pre-submit gate",
-        "cannot waive Critical/High",
-        "do not push",
+        "references/pre-submit.md",
     ],
-    "git-merge-approved.md": [
+    "merge.md": [
         "approving reviewer",
         "MERGE_NOT_AUTHORIZED",
+        "exact current head",
+    ],
+    "reply.md": [
+        "No reply needed",
+    ],
+    "request-review.md": [
+        "Never invent a reviewer",
+        "REVIEW_REQUEST_NEEDED",
+    ],
+    "status.md": [
+        "Solo override",
+    ],
+    "triage.md": [
+        "does not inherit force",
+        "/git-plan-issue",
+        "ask who to assign",
+    ],
+}
+
+# Numbered-procedure sentences. Prompts point at the home; they do not copy it.
+PROCEDURE_SENTENCES = [
+    "Critical and High findings are submit blockers",
+    "The brief is a proposal",
+    "Load `gentle-grill-me` only when",
+    "OCR Step 7 Fix stays off",
+    "Do not ask the user to invoke `/git-issue-pr` again",
+    "Blanket ship language is not a waiver",
+]
+
+PROMPT_PHRASES = {
+    "git-review-pr.md": [
+        "REVIEW_NOT_AUTHORIZED",
+        "references/review.md",
+        "references/pre-submit.md",
+        "references/github.md",
+        "references/gitlab.md",
     ],
     "git-review-pr-force.md": [
         "/git-review-pr-force",
-        "open-code-review-delegate",
-        "<!-- git-force-review -->",
-        "OCR Step 7 Fix stays off",
+        "references/review.md",
+        "references/pre-submit.md",
     ],
-    "git-merge-approved-force.md": [
-        "/git-merge-approved-force",
-        "MERGE_NOT_AUTHORIZED",
-        "admin",
+    "git-plan-issue.md": [
+        "references/plan-issue.md",
+        "references/github.md",
+        "references/gitlab.md",
+    ],
+    "git-issue-pr.md": [
+        "references/implement.md",
+        "references/plan-issue.md",
+        "references/pre-submit.md",
+        "stop without implementing",
+    ],
+    "git-reply-issue.md": [
+        "references/reply.md",
+    ],
+    "git-revise-pr.md": [
+        "WRITE_NOT_AUTHORIZED",
+        "NEEDS_REVISION",
+        "references/revise.md",
+        "references/pre-submit.md",
     ],
     "git-revise-pr-force.md": [
         "/git-revise-pr-force",
         "WRITE_NOT_AUTHORIZED",
-        "pre-submit gate",
-        "open-code-review-delegate",
-        "Stop before push if Critical/High remain unfixed and unwaived",
+        "references/revise.md",
+        "references/pre-submit.md",
+    ],
+    "git-fix-conflict.md": [
+        "WRITE_NOT_AUTHORIZED",
+        "CONFLICTED",
+        "references/conflict.md",
+        "references/pre-submit.md",
+    ],
+    "git-merge-approved.md": [
+        "approving reviewer",
+        "MERGE_NOT_AUTHORIZED",
+        "references/merge.md",
+        "references/github.md",
+        "references/gitlab.md",
+    ],
+    "git-merge-approved-force.md": [
+        "/git-merge-approved-force",
+        "MERGE_NOT_AUTHORIZED",
+        "references/merge.md",
+    ],
+    "git-request-review.md": [
+        "WRITE_NOT_AUTHORIZED",
+        "Never invent a reviewer",
+        "references/request-review.md",
     ],
     "git-pr-status.md": [
         "Solo override",
         "/git-review-pr-force",
         "/git-merge-approved-force",
         "/git-revise-pr-force",
+        "references/status.md",
+    ],
+    "git-triage.md": [
+        "Never invent a reviewer",
+        "does not inherit force",
+        "references/triage.md",
+    ],
+    "git-scheduled-lifecycle.md": [
+        "does not inherit force",
+        "references/scheduled-automation.md",
     ],
     "git-scheduled-merge.md": [
-        "approving reviewer",
         "does not inherit force",
+        "references/scheduled-automation.md",
     ],
+}
+
+LOAD_LINES = {
+    "review": (
+        "Review someone else's PR/MR: read `references/review.md` and `references/pre-submit.md`, and one of `references/github.md` or `references/gitlab.md`.",
+        ("references/plan-issue.md", "references/implement.md", "references/merge.md", "references/triage.md"),
+    ),
+    "plan": (
+        "Plan issue: read `references/plan-issue.md` and one of `references/github.md` or `references/gitlab.md`.",
+        ("references/pre-submit.md",),
+    ),
+    "merge": (
+        "Merge approved PR/MR: read `references/merge.md` and one of `references/github.md` or `references/gitlab.md`.",
+        ("references/pre-submit.md", "references/review.md"),
+    ),
+    "scheduled": (
+        "Scheduled lifecycle or scheduled approved merge: read `references/scheduled-automation.md`.",
+        ("references/triage.md", "references/review.md"),
+    ),
 }
 
 
@@ -245,6 +314,18 @@ def validate_skill_contract() -> None:
         fail("SKILL.md: drop language-forced review text; match the issue/PR or repo language")
     if "draft that still contains an unsettled product decision is posted" in text:
         fail("SKILL.md: do not post a draft that still contains an unsettled product decision")
+    words = len(text.split())
+    if words > SKILL_WORD_LIMIT:
+        fail(f"SKILL.md: {words} words exceeds {SKILL_WORD_LIMIT}")
+    for key, (sentence, banned) in LOAD_LINES.items():
+        rows = [row for row in text.splitlines() if sentence in row]
+        if not rows:
+            fail(f"SKILL.md: missing {key} load line")
+            continue
+        for row in rows:
+            for path in banned:
+                if path in row:
+                    fail(f"SKILL.md: {key} load line names {path}")
 
 
 def validate_prompts() -> None:
@@ -260,6 +341,28 @@ def validate_prompts() -> None:
                 fail(f"prompts/{name}: missing {phrase!r}")
         if "expected reviewer" in text:
             fail(f"prompts/{name}: still names an expected reviewer")
+        for sentence in PROCEDURE_SENTENCES:
+            if sentence in text:
+                fail(f"prompts/{name}: copies procedure sentence {sentence!r}")
+    review = (ROOT / "prompts" / "git-review-pr.md").read_text(encoding="utf-8") if (ROOT / "prompts" / "git-review-pr.md").exists() else ""
+    for banned in ("references/plan-issue.md", "references/implement.md", "references/merge.md", "references/triage.md"):
+        if banned in review:
+            fail(f"prompts/git-review-pr.md names {banned}")
+    plan = (ROOT / "prompts" / "git-plan-issue.md").read_text(encoding="utf-8") if (ROOT / "prompts" / "git-plan-issue.md").exists() else ""
+    if "references/pre-submit.md" in plan:
+        fail("prompts/git-plan-issue.md names references/pre-submit.md")
+    merge = (ROOT / "prompts" / "git-merge-approved.md").read_text(encoding="utf-8") if (ROOT / "prompts" / "git-merge-approved.md").exists() else ""
+    for banned in ("references/pre-submit.md", "references/review.md"):
+        if banned in merge:
+            fail(f"prompts/git-merge-approved.md names {banned}")
+    for name in ("git-scheduled-lifecycle.md", "git-scheduled-merge.md"):
+        path = ROOT / "prompts" / name
+        if not path.exists():
+            continue
+        scheduled = path.read_text(encoding="utf-8")
+        for banned in ("references/triage.md", "references/review.md"):
+            if banned in scheduled:
+                fail(f"prompts/{name} names {banned}")
 
 
 DEFAULT_PROMPT_FORBIDDEN = {
@@ -278,6 +381,31 @@ def validate_default_prompts_stay_strict() -> None:
         for phrase in phrases:
             if phrase in text:
                 fail(f"prompts/{name}: default command must stay strict; found {phrase!r}")
+
+
+def validate_reference_phrases() -> None:
+    for name, phrases in REFERENCE_PHRASES.items():
+        path = ROOT / "references" / name
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        for phrase in phrases:
+            if phrase not in text:
+                fail(f"references/{name}: missing {phrase!r}")
+    plan = ROOT / "references" / "plan-issue.md"
+    if plan.exists():
+        recipe_bodies = (
+            "**Disagree with:**",
+            "**Goal:** <one observable completion state>",
+        )
+        for name in ("review.md", "implement.md", "revise.md", "conflict.md", "merge.md", "triage.md", "reply.md"):
+            path = ROOT / "references" / name
+            if not path.exists():
+                continue
+            text = path.read_text(encoding="utf-8")
+            for body in recipe_bodies:
+                if body in text:
+                    fail(f"references/{name}: recipe body belongs only in references/plan-issue.md")
 
 
 def validate_forge_references() -> None:
@@ -317,6 +445,7 @@ def main() -> int:
     validate_skill_contract()
     validate_prompts()
     validate_default_prompts_stay_strict()
+    validate_reference_phrases()
     validate_forge_references()
     validate_scheduled_ocr_gate()
     if ERRORS:

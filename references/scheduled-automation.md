@@ -61,7 +61,15 @@ A source-branch push still requires the main skill's **pre-submit gate**: a fres
 
 ## Strict review and required test gate
 
-For strict review, run the main skill's structured file review (`open-code-review-delegate`) on the current head and map findings with the `/git-review-pr` mapping. OCR Step 7 Fix stays off. Then review correctness and regression risk; automated tests and reproducible validation; APIs, schemas, generated artifacts, and data contracts; security; required CI; deployment and operations; and agreement between documentation and behavior. A substantive unverified risk blocks approval. Style-only preferences stay non-blocking unless repository policy requires them.
+For strict review, run `open-code-review-delegate` on the current head. OCR Step 7 Fix stays off. Map findings with this severity table:
+
+| OCR severity | Forge action |
+| --- | --- |
+| critical, high | Blocking inline discussion on the changed line |
+| medium | Blocking when the finding is correctness, security, a broken contract, or missing required validation; otherwise a non-blocking follow-up comment |
+| low | Omit unless thorough-review is on |
+
+Then review correctness and regression risk; automated tests and reproducible validation; APIs, schemas, generated artifacts, and data contracts; security; required CI; deployment and operations; and agreement between documentation and behavior. A substantive unverified risk blocks approval. Style-only preferences stay non-blocking unless repository policy requires them.
 
 Any new behavior or behavior change without corresponding automated tests is blocking. The only exception is reproducible alternative validation whose strength is proportionate to risk. That evidence must state the exact environment, steps, inputs, expected observable result, captured output or artifact, why automation is impractical, and why the evidence is sufficient for the risk. A green pipeline, small diff, authority, deadline, or screenshots alone do not satisfy this exception.
 
