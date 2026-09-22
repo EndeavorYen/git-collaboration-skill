@@ -23,7 +23,7 @@ Treat notifications as signals, not conversational source of truth. Another user
 
 Classify into Ready to review, Ready to fix conflicts, Ready to revise, Ready to merge, Merge handoff needed, Ready to reply, Acknowledge or route, No reply needed, Needs semantic review, Ready to implement, Review request needed, and Waiting or blocked. A named foreign conflicted PR/MR is `WRITE_NOT_AUTHORIZED`, not ready to fix.
 
-Ready to implement: open issues assigned to me that are not blocked, not already covered by an active PR/MR, and have a current `plan-issue brief` brief whose Goal, Recommended change, Out of scope, and Acceptance criteria contain no unsettled product decision. When none exists, or an unsettled product decision remains, recommend `/git-plan-issue` with the exact issue URL. An unresolved `dissent comment` waits for a human decision. `/git-triage` does not load `gentle-grill-me`.
+Ready to implement: open issues assigned to me that are not blocked, not already covered by an active PR/MR, and have a current `<!-- git-plan-issue -->` brief whose Goal, Recommended change, Out of scope, and Acceptance criteria contain no unsettled product decision. When none exists, or an unsettled product decision remains, recommend `/git-plan-issue` with the exact issue URL. An unresolved `<!-- git-plan-issue-dissent -->` waits for a human decision. `/git-triage` does not load `gentle-grill-me`.
 
 Report each actionable item with reason, live evidence, remaining gate, and exact next command. End with a compact top three and ask which item to handle next.
 

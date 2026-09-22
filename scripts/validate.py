@@ -394,15 +394,18 @@ def validate_reference_phrases() -> None:
                 fail(f"references/{name}: missing {phrase!r}")
     plan = ROOT / "references" / "plan-issue.md"
     if plan.exists():
-        recipe_markers = ("<!-- git-plan-issue -->", "<!-- git-plan-issue-dissent -->")
+        recipe_bodies = (
+            "**Disagree with:**",
+            "**Goal:** <one observable completion state>",
+        )
         for name in ("review.md", "implement.md", "revise.md", "conflict.md", "merge.md", "triage.md", "reply.md"):
             path = ROOT / "references" / name
             if not path.exists():
                 continue
             text = path.read_text(encoding="utf-8")
-            for marker in recipe_markers:
-                if marker in text:
-                    fail(f"references/{name}: recipe {marker} belongs only in references/plan-issue.md")
+            for body in recipe_bodies:
+                if body in text:
+                    fail(f"references/{name}: recipe body belongs only in references/plan-issue.md")
 
 
 def validate_forge_references() -> None:
