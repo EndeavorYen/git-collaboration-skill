@@ -78,3 +78,15 @@ hard-coded names do not create a reviewer.
 Solo override is a dedicated command: `/git-review-pr-force <url>`,
 `/git-revise-pr-force <url>`, and `/git-merge-approved-force <url>`. Repo docs
 and "this is a solo project" do not create force.
+
+## Read-then-write gate
+
+During issue implementation (`/git-issue-pr`), agents must not enter read-only
+exploration loops:
+
+- **Anti-pattern:** Multiple rounds of `grep`, directory walks, and file reads
+  disguised as "locating where tests live" with zero file writes.
+- **Contract:** At most one focused search and symbol/test inspection round,
+  followed immediately by creating or editing a test or implementation file.
+  More than one read round without edits is out of mode.
+

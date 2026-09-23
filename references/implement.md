@@ -16,7 +16,10 @@ Use this when the task is to fix or implement a GitHub or GitLab issue.
 
 8. When the implementer agrees with the settled brief, or a human decision has settled the original brief, the posted alternative, or a third way, treat that note as the implementation contract. Report the comment id that supplied the contract, or that this invocation selected the third way, before editing code.
 9. Start from the current development branch unless repo-local instructions say otherwise. Create a dedicated feature branch; do not implement directly on the default or documented development branch.
-10. Use TDD when practical: add or update a focused failing test first for bug fixes or behavior changes, then implement the smallest reasonable fix.
+10. Use TDD when practical: add or update a focused failing test first for bug fixes or behavior changes, then implement the smallest reasonable fix. Enforce the hard **read-then-write gate**:
+    - After at most one focused search and opening the relevant symbol and its test (per Context budget), the next tool actions must **create or edit** a test or implementation file.
+    - TDD means **write** a failing test file or assertion immediately, not further exploration or grepping disguised as "finding where to put the test."
+    - A run that performs only reads/greps for more than one exploration round is **out of mode**: stop, report what was missing from the brief, or write the smallest failing test from the Acceptance criteria.
 11. Validate with the relevant focused tests and broader checks proportional to risk, including the description's checkable Acceptance criteria.
 12. Commit with a focused conventional-style message and reference the issue.
 13. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived.
