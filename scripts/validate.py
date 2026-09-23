@@ -115,6 +115,9 @@ REFERENCE_PHRASES = {
         "**Still elsewhere:**",
         "description holds the checkable acceptance checklist",
         "do not duplicate the full checklist",
+        'status: "follow_up"',
+        'open a forge issue for each confirmed close log record with `status: "follow_up"`',
+        'fails this mode when a `follow_up` record has no issue URL',
     ],
     "implement.md": [
         "Do not ask the user to invoke `/git-issue-pr` again",
