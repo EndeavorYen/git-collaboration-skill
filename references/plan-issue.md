@@ -20,8 +20,7 @@ Use this when the user explicitly invokes `/git-plan-issue` or clearly asks to a
 **Root cause:** <file and behavior evidence>
 **Recommended change:** <what to change, where, and why this shape>
 **Out of scope:** <work this issue will not do>
-**Acceptance criteria:**
-- [ ] <checkable item with oracle: command, expected result, or observable API/UI>
+**Acceptance criteria:** <summary of acceptance changes or deliverables; full checkable list lives in the issue description, do not duplicate the full checklist>
 **Tests:** <tests to add or required runs>
 **Constraints:** <repo-local instructions or existing contracts>
 **Next:** `/git-issue-pr <exact issue URL>`
@@ -45,7 +44,7 @@ Rules for that block:
 - Wording that appears only in the comment, or only as prose under Out of scope, does not count.
 - When every original acceptance line remains satisfied, omit the section. Do not invent an exception.
 
-Post one issue comment containing the brief. The `<!-- git-plan-issue -->` comment remains the change record and must match the description. A comment-only acceptance change fails this mode. A draft whose four fields are already settled does not need a close log. The write response is the read-back. Report the updated description status, the new comment id and timestamp, current issue state from the snapshot, and `/git-issue-pr` with the exact issue URL. Do not view the issue again when the response includes the comment id.
+Post one issue comment containing the brief. The description holds the checkable acceptance checklist. The `<!-- git-plan-issue -->` comment remains the change record and change authorization; it summarizes acceptance changes without duplicating the full checklist. A comment-only acceptance change fails this mode. A draft whose four fields are already settled does not need a close log. The write response is the read-back. Report the updated description status, the new comment id and timestamp, current issue state from the snapshot, and `/git-issue-pr` with the exact issue URL. Do not view the issue again when the response includes the comment id.
 
 Do not post a duplicate brief. Do not implement or open a PR/MR. Do not post a brief while an unsettled product decision remains in those four fields. If the issue is closed, a current brief already exists and the user did not ask to re-plan, an open PR/MR already covers the issue and the user did not ask to re-plan, or the evidence is too thin for a grounded brief, perform no write and report the evidence plus the exact wait or next action.
 

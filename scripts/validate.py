@@ -113,6 +113,8 @@ REFERENCE_PHRASES = {
         "**Original:**",
         "**This issue:**",
         "**Still elsewhere:**",
+        "description holds the checkable acceptance checklist",
+        "do not duplicate the full checklist",
     ],
     "implement.md": [
         "Do not ask the user to invoke `/git-issue-pr` again",
@@ -120,6 +122,7 @@ REFERENCE_PHRASES = {
         "references/plan-issue.md",
         "references/pre-submit.md",
         "stale description checklist is a failed plan",
+        "description holds the checkable acceptance checklist",
     ],
     "revise.md": [
         "NEEDS_REVISION",
