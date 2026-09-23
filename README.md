@@ -90,3 +90,14 @@ exploration loops:
   followed immediately by creating or editing a test or implementation file.
   More than one read round without edits is out of mode.
 
+## Minimal implement profile
+
+For consumers who only need issue implementation into a PR/MR (`/git-issue-pr`), load only the minimal implement set instead of the full router or secondary workflow files:
+
+- **Always:** Forge budget and Context budget from `SKILL.md`.
+- **Mode:** `references/implement.md` + `references/plan-issue.md` (brief and dissent recipe only) + `references/pre-submit.md` + one forge reference (`references/github.md` or `references/gitlab.md`).
+- **Never for implement-only:** `references/merge.md`, `references/review.md`, `references/triage.md`, `references/scheduled-automation.md`, and force variants (`/git-review-pr-force`, `/git-revise-pr-force`, `/git-merge-approved-force`).
+
+Opening or updating a draft PR is not permission to merge. Merge modes are a separate invocation and require their own approval gates.
+
+
