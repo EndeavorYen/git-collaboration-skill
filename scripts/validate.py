@@ -266,6 +266,10 @@ LOAD_LINES = {
         "Plan issue: read `references/plan-issue.md` and one of `references/github.md` or `references/gitlab.md`.",
         ("references/pre-submit.md",),
     ),
+    "implement": (
+        "Implement issue then PR/MR: read `references/implement.md`, `references/plan-issue.md` for the brief and dissent recipe, and `references/pre-submit.md` before push.",
+        ("references/merge.md", "references/review.md", "references/triage.md", "references/scheduled-automation.md"),
+    ),
     "merge": (
         "Merge approved PR/MR: read `references/merge.md` and one of `references/github.md` or `references/gitlab.md`.",
         ("references/pre-submit.md", "references/review.md"),
@@ -379,6 +383,10 @@ def validate_prompts() -> None:
         for banned in ("references/triage.md", "references/review.md"):
             if banned in scheduled:
                 fail(f"prompts/{name} names {banned}")
+    implement = (ROOT / "prompts" / "git-issue-pr.md").read_text(encoding="utf-8") if (ROOT / "prompts" / "git-issue-pr.md").exists() else ""
+    for banned in ("references/merge.md", "references/review.md", "references/triage.md", "references/scheduled-automation.md"):
+        if banned in implement:
+            fail(f"prompts/git-issue-pr.md names {banned}")
 
 
 DEFAULT_PROMPT_FORBIDDEN = {
@@ -455,6 +463,23 @@ def validate_scheduled_ocr_gate() -> None:
             fail(f"references/scheduled-automation.md: missing {phrase!r}")
 
 
+def validate_implement_profile() -> None:
+    readme = ROOT / "README.md"
+    if not readme.exists():
+        fail("README.md: missing file")
+        return
+    text = readme.read_text(encoding="utf-8")
+    for phrase in (
+        "Minimal implement profile",
+        "references/implement.md",
+        "references/plan-issue.md",
+        "references/pre-submit.md",
+        "is not permission to merge",
+    ):
+        if phrase not in text:
+            fail(f"README.md: minimal implement profile missing {phrase!r}")
+
+
 def main() -> int:
     validate_files_exist()
     validate_no_leaks()
@@ -464,6 +489,7 @@ def main() -> int:
     validate_reference_phrases()
     validate_forge_references()
     validate_scheduled_ocr_gate()
+    validate_implement_profile()
     if ERRORS:
         print("Validation failed:", file=sys.stderr)
         for error in ERRORS:
