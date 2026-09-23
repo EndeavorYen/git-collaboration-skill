@@ -126,6 +126,9 @@ REFERENCE_PHRASES = {
         "references/pre-submit.md",
         "stale description checklist is a failed plan",
         "description holds the checkable acceptance checklist",
+        "read-then-write gate",
+        "out of mode",
+        "at most one focused search",
     ],
     "revise.md": [
         "NEEDS_REVISION",
@@ -192,6 +195,7 @@ PROMPT_PHRASES = {
         "references/plan-issue.md",
         "references/pre-submit.md",
         "stop without implementing",
+        "read-then-write gate",
     ],
     "git-reply-issue.md": [
         "references/reply.md",
