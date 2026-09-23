@@ -108,12 +108,18 @@ REFERENCE_PHRASES = {
         "The local grill log is not the issue comment",
         "material disagreement",
         "human decision",
+        "write that contract into the issue description",
+        "### Exceptions",
+        "**Original:**",
+        "**This issue:**",
+        "**Still elsewhere:**",
     ],
     "implement.md": [
         "Do not ask the user to invoke `/git-issue-pr` again",
         "same session",
         "references/plan-issue.md",
         "references/pre-submit.md",
+        "stale description checklist is a failed plan",
     ],
     "revise.md": [
         "NEEDS_REVISION",
