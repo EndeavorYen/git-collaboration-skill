@@ -79,6 +79,24 @@ Solo override is a dedicated command: `/git-review-pr-force <url>`,
 `/git-revise-pr-force <url>`, and `/git-merge-approved-force <url>`. Repo docs
 and "this is a solo project" do not create force.
 
+## Executor-ready brief
+
+`/git-plan-issue` may run on a strong model while `/git-issue-pr` runs on a
+weaker one. The brief is therefore a work order, not a summary:
+
+- **Planned at** `branch@SHA`, so the executor can diff the planned paths and
+  notice drift.
+- **Execution plan**: ordered steps, each with files, the exact change, and a
+  Verify command with its expected result. Tests come first.
+- **Interfaces**: new or changed signatures and shapes, never function bodies.
+- **Test cases**: Given / When / Then with literal values, each mapped to an
+  acceptance line.
+- **Stop and dissent when**: checkable assumptions. If one fails, the executor
+  posts a dissent instead of improvising.
+
+A plan that needs more than 8 steps is a scope decision and goes through the
+grill instead of a longer brief.
+
 ## Read-then-write gate
 
 During issue implementation (`/git-issue-pr`), agents must not enter read-only

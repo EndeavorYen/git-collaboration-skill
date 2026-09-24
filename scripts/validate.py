@@ -118,6 +118,17 @@ REFERENCE_PHRASES = {
         'status: "follow_up"',
         'open a forge issue for each confirmed close log record with `status: "follow_up"`',
         'fails this mode when a `follow_up` record has no issue URL',
+        "## Executor-ready brief",
+        "**Planned at:**",
+        "### Execution plan",
+        "### Interfaces",
+        "### Test cases",
+        "### Stop and dissent when",
+        "Do not write function bodies",
+        "No vague verbs",
+        "more than 8 steps",
+        "never the line's text",
+        "also an unsettled product decision about Out of scope",
     ],
     "implement.md": [
         "Do not ask the user to invoke `/git-issue-pr` again",
@@ -129,6 +140,11 @@ REFERENCE_PHRASES = {
         "read-then-write gate",
         "out of mode",
         "at most one focused search",
+        "it is the work order",
+        "planned-at",
+        "Stop and dissent when",
+        "every brief Test case",
+        "do not revert them",
     ],
     "revise.md": [
         "NEEDS_REVISION",
@@ -421,6 +437,8 @@ def validate_reference_phrases() -> None:
         recipe_bodies = (
             "**Disagree with:**",
             "**Goal:** <one observable completion state>",
+            "### Execution plan",
+            "**Planned at:**",
         )
         for name in ("review.md", "implement.md", "revise.md", "conflict.md", "merge.md", "triage.md", "reply.md"):
             path = ROOT / "references" / name
