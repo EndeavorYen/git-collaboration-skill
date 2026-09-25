@@ -2,7 +2,7 @@
 
 Read this file for `/git-revise-pr` and `/git-revise-pr-force`. Before push: `references/pre-submit.md`.
 
-When `/git-revise-pr` is not `NEEDS_REVISION` or the user is not the author or assignee, stop without editing. For `WRITE_NOT_AUTHORIZED`, name the author or assignee. Recommend `/git-request-review`, `/git-merge-approved`, `/git-fix-conflict`, or waiting plus `/git-pr-status`. Print Solo override.
+When `/git-revise-pr` is not `NEEDS_REVISION` or the user is not the author or assignee, stop without editing. For `WRITE_NOT_AUTHORIZED`, name the author or assignee. The reply uses the review handoff in `SKILL.md`.
 
 When `/git-revise-pr-force` is not owned, not open, `CONFLICTED`, or `MERGED_OR_CLOSED`, stop without editing. `WRITE_NOT_AUTHORIZED` still blocks. Conflicts go to `/git-fix-conflict`.
 

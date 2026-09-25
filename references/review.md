@@ -45,7 +45,7 @@ Row 5 is allowed only in this force reply. `/git-pr-status` still must not recom
 
 ### `/git-review-pr` mapping
 
-The current reviewer runs the file pass on this checkout after the actor gate. Do not dispatch an implementer-session self-review as a substitute.
+The current reviewer runs the file pass on this checkout after the actor gate. Do not dispatch an implementer-session self-review as a substitute. The `/git-review-pr` operator reply ends with one `next step:` line from the review handoff in `SKILL.md`. Do not print the Solo override block.
 
 | OCR severity | Forge action |
 | --- | --- |

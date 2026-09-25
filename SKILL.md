@@ -22,7 +22,7 @@ In this skill, **PR/MR** means the current forge's change request. Commands belo
 
 ## Forge budget
 
-The forge is the mailbox for issue and PR/MR state. The local checkout is the codebase. Every `gh` invocation, `glab` invocation, forge REST call, and GitHub or GitLab MCP call counts. Use one client: `gh` on GitHub, `glab` on GitLab. Do not also query that object through MCP.
+Every `gh` invocation, `glab` invocation, forge REST call, and GitHub or GitLab MCP call counts. Use one client: `gh` on GitHub, `glab` on GitLab. Do not also query that object through MCP.
 
 A **snapshot** is one read whose payload already contains every forge field that mode needs. Reuse a snapshot already in this conversation when the user has not said that object changed.
 
@@ -35,13 +35,11 @@ A **snapshot** is one read whose payload already contains every forge field that
 
 Triage lists stay lists. One metadata list per relationship. Classify from that payload. Open one trimmed snapshot only for an item you are about to write, or the one item the user named.
 
-Download one failed job log when a verdict or a fix depends on that log. Keep the failing command and the error lines. Discard the rest of the log. Do not list or download jobs whose conclusions are already in the snapshot.
+Download one failed job log when a verdict or a fix depends on it. Keep the failing command and the error lines.
 
 Related PRs/MRs come from links already in the snapshot. Do not search the forge for them unless the user asked whether a PR/MR exists and the snapshot has no link.
 
 ## Context budget
-
-Forge budget limits how often you call the forge. Context budget limits what those calls, and the local reads, put into the conversation. One unfiltered PR/MR or issue payload is enough to blow the context window.
 
 - Run the snapshot command in the forge reference with its `--jq` or `jq` pipe. If the filter errors, fix the filter once. Do not rerun without it, and do not page through raw JSON.
 - The issue or PR/MR body stays whole. A comment or review body stays whole when it contains `git-plan-issue`, `git-plan-issue-dissent`, or `git-force-review`, or when it is the latest one. Every other body keeps author, time, id, and the first 400 characters. Also keep review commit OID, discussion resolved state, and commit author login, name, and email. Empty login is not a missing author when name or email is present.
@@ -52,13 +50,11 @@ Forge budget limits how often you call the forge. Context budget limits what tho
 
 ## Task Mode Decision
 
-Classify the request before taking action. The mode controls which writes are allowed and which gates must pass.
-
 | Mode | User intent examples | Allowed writes | Stop condition |
 | --- | --- | --- | --- |
 | Review someone else's PR/MR | `/git-review-pr`, `/git-review-pr-force` | Forge review comments, discussion resolution only when re-review proves the blocker is fixed, approve/request changes, or a `<!-- git-force-review -->` comment when self-APPROVE is rejected | Plain `/git-review-pr`: posted visible verdict and read back SHA, pipeline, discussions, and approval/request-changes state. Force `/git-review-pr-force`: that read-back, and the reply prints `verdict:`, `forge approval:`, and one `next step:` line. |
 | Plan issue | `/git-plan-issue` | Issue description update, follow-up forge issues for confirmed `status: "follow_up"` grill records, plus one brief comment | Live preflight proves the issue is open, a current brief is still needed, and the brief is grounded in repo evidence. An unsettled product decision waits until the user confirms the close log and those four fields are settled decisions. A deferred or open field posts no brief |
-| Implement issue then PR/MR | `/git-issue-pr` | Code edits, tests, branch, commit, push, open/update PR/MR targeting the repo development branch; one settled brief comment when none exists; or one dissent issue comment when the current brief is materially disputed | PR/MR exists with issue links, validation evidence, reviewer/assignee metadata, and live read-back; or a dissent comment is posted and the run waits for a human decision; a deferred or open field posts no brief and does not implement; a settled brief is posted and implemented in the same session; do not merge |
+| Implement issue then PR/MR | `/git-issue-pr` | Code edits, tests, branch, commit, push, open/update PR/MR targeting the repo development branch; one settled brief comment when none exists; or one dissent issue comment when the current brief is materially disputed | PR/MR exists with issue links, validation evidence, reviewer/assignee metadata, and live read-back; or a dissent comment is posted and the run waits for a human decision; a deferred or open field posts no brief and does not implement; a settled brief is posted and implemented in the same session; do not merge. Reply: one `next step:` line from the review handoff |
 | Reply to issue | `/git-reply-issue` | One issue comment on the exact target only | Live preflight proves a material unanswered request, or no write with evidence/draft is reported |
 | Update own PR/MR after review | `/git-revise-pr`, `/git-revise-pr-force` | Focused code/test/doc edits, commit, push to PR/MR branch, description/comment updates, replies to reviewer threads | Plain `/git-revise-pr`: reviewer threads answered when justified, head read-back shows the new SHA, no merge until a live non-author approval. Force `/git-revise-pr-force`: that read-back, and the reply ends with one `next step:` line. |
 | Fix PR/MR conflicts | `/git-fix-conflict` | Checkout/worktree setup, merge or rebase target into the source branch, conflict-resolution code edits, tests, commit, push to the source branch | Source branch is pushed and live read-back shows current head, conflict/mergeability, pipeline, discussions, and reviewer state; do not merge |
@@ -123,7 +119,7 @@ Actor gates, evaluated before `CONFLICTED` / `NEEDS_REVISION` / review-state rou
 | `/git-pr-status` | any | none |
 | `/git-triage` delegated item | same gate as the delegated command | skip that item |
 
-On an actor-gate failure, perform no code edit, commit, push, comment, approval, discussion resolve, or review request. Report `Requested command`, `Current state`, `Actor`, `Evidence`, `Why the action was blocked`, and `Recommended next command`. For `WRITE_NOT_AUTHORIZED` or `MERGE_NOT_AUTHORIZED`, name the author and current assignees and tell them to run the command; do not recommend that a reviewer self-assign as a bypass. For `REVIEW_NOT_AUTHORIZED` on an owned PR/MR, recommend `/git-request-review` and print the Solo override lines. For `REVIEW_NOT_AUTHORIZED` because of `self_authored_head`, recommend another reviewer and `/git-pr-status`, and print the Solo override lines.
+On an actor-gate failure, perform no code edit, commit, push, comment, approval, discussion resolve, or review request. For `WRITE_NOT_AUTHORIZED` or `MERGE_NOT_AUTHORIZED`, name the author and current assignees. Do not recommend that a reviewer self-assign as a bypass. The reply ends with one `next step:` line from the review handoff and does not print the Solo override block.
 
 Classify exactly one primary state using the strongest current evidence:
 
@@ -161,7 +157,20 @@ Each force command's waiver is in its mode reference: `references/review.md`, `r
 
 ### Solo override
 
-`/git-pr-status` still prints the Solo override block for `owned` or `self_authored_head`. Force is never the default next command. A force-command reply ends with one `next step:` line and does not print the Solo override block.
+`/git-pr-status` still prints the Solo override block for `owned` or `self_authored_head`. Its recommended next command is never a force command. `/git-triage` keeps one next command per item. A force-command reply ends with one `next step:` line and does not print the Solo override block.
+
+### Review handoff
+
+First match:
+
+1. `/git-plan-issue` posted a brief → `next step: /git-issue-pr <url>`
+2. `/git-plan-issue` posted nothing, `/git-reply-issue`, plain `/git-review-pr`, or no PR/MR was opened → `next step: none`
+3. `/git-request-review` recorded a reviewer, or another user already has a current-head review request → `next step: /git-pr-status <url>`
+4. After `/git-issue-pr`, `/git-revise-pr`, or `/git-fix-conflict`, the actor is the author or `self_authored_head` → `next step: /git-review-pr-force <url>`
+5. Otherwise after those three → `next step: /git-request-review <url>`
+6. Plain `/git-merge-approved` merged → `next step: none`. `NEEDS_REVISION` → `next step: /git-revise-pr <url>`. `CONFLICTED` → `next step: /git-fix-conflict <url>`. `REVIEW_REQUEST_NEEDED` → `next step: /git-request-review <url>`. Any other stop → `next step: /git-pr-status <url>`
+7. `REVIEW_NOT_AUTHORIZED` → `next step: /git-review-pr-force <url>`
+8. `WRITE_NOT_AUTHORIZED` or `MERGE_NOT_AUTHORIZED` → `next step: none`
 
 ```
 Solo override: `/git-review-pr-force <url>`
@@ -177,6 +186,5 @@ Solo override: `/git-merge-approved-force <url>`
 - Do not push, open/update PRs/MRs, close issues, or comment on issues unless the user explicitly asks or the current request clearly requires that forge state change.
 - Do not target `main` or `master` for feature work unless the user explicitly says so. Prefer the repo's documented development branch, then the default branch.
 - Never store forge tokens in a repository, docs, AGENTS files, or shell history.
-- Prefer `gh` on GitHub and `glab` on GitLab when available.
 - Before write API calls, verify auth for the detected forge. If auth is missing or the wrong account is active, ask the user to authenticate instead of guessing credentials.
 

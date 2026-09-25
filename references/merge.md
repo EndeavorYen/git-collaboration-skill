@@ -2,7 +2,7 @@
 
 Read this file for `/git-merge-approved` and `/git-merge-approved-force`. Also read one of `references/github.md` or `references/gitlab.md`. The approving-reviewer definition stays in `SKILL.md`.
 
-When `/git-merge-approved` is not `READY_TO_MERGE` or the user is not the author or assignee, stop. For `MERGE_NOT_AUTHORIZED`, only the author or an assignee may merge. Otherwise recommend `/git-revise-pr` for `NEEDS_REVISION`, `/git-fix-conflict` for `CONFLICTED`, `/git-request-review` for `REVIEW_REQUEST_NEEDED`, or `/git-pr-status` for `WAITING_FOR_REVIEW` / `BLOCKED`. Print Solo override when the remaining gate is a second-person reviewer.
+When `/git-merge-approved` is not `READY_TO_MERGE` or the user is not the author or assignee, stop. For `MERGE_NOT_AUTHORIZED`, only the author or an assignee may merge. The reply uses the review handoff in `SKILL.md`.
 
 When `/git-merge-approved-force` fails a technical gate, stop. `MERGE_NOT_AUTHORIZED` still blocks.
 

@@ -628,11 +628,64 @@ def validate_force_reply_stops() -> None:
             fail(error)
 
 
+HANDOFF_REFERENCES = (
+    "implement.md",
+    "revise.md",
+    "conflict.md",
+    "request-review.md",
+    "plan-issue.md",
+    "reply.md",
+    "review.md",
+    "merge.md",
+)
+
+HANDOFF_PROMPTS = (
+    "git-issue-pr.md",
+    "git-revise-pr.md",
+    "git-fix-conflict.md",
+    "git-request-review.md",
+    "git-plan-issue.md",
+    "git-reply-issue.md",
+    "git-review-pr.md",
+    "git-merge-approved.md",
+)
+
+
+def validate_review_handoff() -> None:
+    skill_path = ROOT / "SKILL.md"
+    text = skill_path.read_text(encoding="utf-8") if skill_path.exists() else ""
+    for phrase in (
+        "review handoff",
+        "next step: /git-review-pr-force <url>",
+        "next step: /git-request-review <url>",
+        "next step: /git-issue-pr <url>",
+        "Its recommended next command is never a force command.",
+        "next step: none",
+    ):
+        if phrase not in text:
+            fail(f"SKILL.md review handoff missing {phrase!r}")
+    stops = {mode: stop for mode, _intent, _writes, stop in task_mode_rows(text)}
+    implement_stop = stops.get("Implement issue then PR/MR", "")
+    if "next step:" not in implement_stop:
+        fail("SKILL.md implement stop missing next step:")
+    for name in HANDOFF_REFERENCES:
+        path = ROOT / "references" / name
+        body = path.read_text(encoding="utf-8") if path.exists() else ""
+        if "review handoff" not in body:
+            fail(f"references/{name}: missing review handoff")
+    for name in HANDOFF_PROMPTS:
+        path = ROOT / "prompts" / name
+        body = path.read_text(encoding="utf-8") if path.exists() else ""
+        if "review handoff" not in body:
+            fail(f"prompts/{name}: missing review handoff")
+
+
 def main() -> int:
     validate_files_exist()
     validate_no_leaks()
     validate_skill_contract()
     validate_force_reply_stops()
+    validate_review_handoff()
     validate_prompts()
     validate_default_prompts_stay_strict()
     validate_reference_phrases()

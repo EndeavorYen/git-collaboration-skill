@@ -6,5 +6,6 @@ Read `references/implement.md` before acting. Brief and dissent recipe: `referen
 
 Actor gate: if the issue has assignees and the authenticated user is not among them, stop without implementing. Unassigned issues may be implemented.
 Enforce the read-then-write gate: after at most one focused read round, create or edit a file; do not loop on reads.
+Reply rule: one `next step:` line, review handoff in `SKILL.md`.
 
 $ARGUMENTS
