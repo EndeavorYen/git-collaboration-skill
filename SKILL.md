@@ -5,7 +5,7 @@ description: Use when working with GitHub or GitLab issues, pull/merge requests,
 
 # Git Collaboration
 
-Use this skill for GitHub or GitLab work that changes repository state or forge state. Read the matching mode reference before acting. Local project instructions may strengthen the merge gate, but must never replace a live non-author approval with reviewer notes, reviewer state, resolved discussions, or a green pipeline. Only `/git-merge-approved-force` in this invocation waives that approval gate.
+Use this skill for GitHub or GitLab work that changes repository state or forge state. Local project instructions may strengthen the merge gate, but must never replace a live non-author approval with reviewer notes, reviewer state, resolved discussions, or a green pipeline. Only `/git-merge-approved-force` in this invocation waives that approval gate.
 
 ## Detect the forge
 
@@ -56,13 +56,13 @@ Classify the request before taking action. The mode controls which writes are al
 
 | Mode | User intent examples | Allowed writes | Stop condition |
 | --- | --- | --- | --- |
-| Review someone else's PR/MR | `/git-review-pr`, `/git-review-pr-force` | Forge review comments, discussion resolution only when re-review proves the blocker is fixed, approve/request changes, or a `<!-- git-force-review -->` comment when self-APPROVE is rejected | Posted visible verdict and read back SHA, pipeline, discussions, and approval/request-changes state |
+| Review someone else's PR/MR | `/git-review-pr`, `/git-review-pr-force` | Forge review comments, discussion resolution only when re-review proves the blocker is fixed, approve/request changes, or a `<!-- git-force-review -->` comment when self-APPROVE is rejected | Plain `/git-review-pr`: posted visible verdict and read back SHA, pipeline, discussions, and approval/request-changes state. Force `/git-review-pr-force`: that read-back, and the reply prints `verdict:`, `forge approval:`, and one `next step:` line. |
 | Plan issue | `/git-plan-issue` | Issue description update, follow-up forge issues for confirmed `status: "follow_up"` grill records, plus one brief comment | Live preflight proves the issue is open, a current brief is still needed, and the brief is grounded in repo evidence. An unsettled product decision waits until the user confirms the close log and those four fields are settled decisions. A deferred or open field posts no brief |
 | Implement issue then PR/MR | `/git-issue-pr` | Code edits, tests, branch, commit, push, open/update PR/MR targeting the repo development branch; one settled brief comment when none exists; or one dissent issue comment when the current brief is materially disputed | PR/MR exists with issue links, validation evidence, reviewer/assignee metadata, and live read-back; or a dissent comment is posted and the run waits for a human decision; a deferred or open field posts no brief and does not implement; a settled brief is posted and implemented in the same session; do not merge |
 | Reply to issue | `/git-reply-issue` | One issue comment on the exact target only | Live preflight proves a material unanswered request, or no write with evidence/draft is reported |
-| Update own PR/MR after review | `/git-revise-pr`, `/git-revise-pr-force` | Focused code/test/doc edits, commit, push to PR/MR branch, description/comment updates, replies to reviewer threads | Reviewer threads are answered/resolved when justified, PR/MR read-back reflects the new head; do not merge until a live non-author approval is present |
+| Update own PR/MR after review | `/git-revise-pr`, `/git-revise-pr-force` | Focused code/test/doc edits, commit, push to PR/MR branch, description/comment updates, replies to reviewer threads | Plain `/git-revise-pr`: reviewer threads answered when justified, head read-back shows the new SHA, no merge until a live non-author approval. Force `/git-revise-pr-force`: that read-back, and the reply ends with one `next step:` line. |
 | Fix PR/MR conflicts | `/git-fix-conflict` | Checkout/worktree setup, merge or rebase target into the source branch, conflict-resolution code edits, tests, commit, push to the source branch | Source branch is pushed and live read-back shows current head, conflict/mergeability, pipeline, discussions, and reviewer state; do not merge |
-| Merge approved PR/MR | `/git-merge-approved`, `/git-merge-approved-force` | Follow-up issue creation/linking for relevant non-blocking reviewer notes, then merge | Final gate passes on the exact current head and merge read-back confirms result |
+| Merge approved PR/MR | `/git-merge-approved`, `/git-merge-approved-force` | Follow-up issue creation/linking for relevant non-blocking reviewer notes, then merge | Plain `/git-merge-approved`: final gate passes on the exact current head and merge read-back confirms result. Force `/git-merge-approved-force`: that read-back, and the reply ends with one `next step:` line. |
 | Request PR/MR review | `/git-request-review` | Assign or re-request a reviewer the user named or that is already on the PR/MR, only when current-head review is actually needed | Request is visible on the forge and read back; do not change code or merge |
 | Focused PR/MR status | `/git-pr-status` | None | Read-only state, evidence, and exact next command are reported |
 | Status or triage | `/git-triage` | Usually read-only; create/update only if explicitly requested | Live ranked todo inbox and/or project triage with next commands; no auto-assign |
@@ -71,8 +71,6 @@ Classify the request before taking action. The mode controls which writes are al
 | Scheduled approved merge | unattended scheduled approved-merge run | Only delegation to the exact-head `/git-merge-approved` workflow; never assigns reviewers or assignees | Stable result buckets; never asks a question or waits for input |
 
 When the wording is ambiguous, choose the safer mode. A review-only request never implies permission to push, update the PR/MR description, create follow-up issues, or merge. Plain `/git-triage` stays read-only; only `run` / `aggressive` / `execute` authorizes the aggressive sweep.
-
-For either scheduled mode, read `references/scheduled-automation.md` in full before acting. Its scheduled profile overrides interactive aggressive-triage behavior: it never assigns reviewers or assignees and never asks a question or waits for input. Scheduled lifecycle cannot merge or implement issues; Scheduled approved merge cannot review, revise, repair conflicts, or perform preparatory writes.
 
 Review someone else's PR/MR: read `references/review.md` and `references/pre-submit.md`, and one of `references/github.md` or `references/gitlab.md`.
 
@@ -163,7 +161,7 @@ Each force command's waiver is in its mode reference: `references/review.md`, `r
 
 ### Solo override
 
-`/git-pr-status` still prints the Solo override block for `owned` or `self_authored_head`. Force is never the default next command. A force-command reply does not print the Solo override block and ends with one `next step:` line.
+`/git-pr-status` still prints the Solo override block for `owned` or `self_authored_head`. Force is never the default next command. A force-command reply ends with one `next step:` line and does not print the Solo override block.
 
 ```
 Solo override: `/git-review-pr-force <url>`

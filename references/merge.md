@@ -9,7 +9,7 @@ When `/git-merge-approved-force` fails a technical gate, stop. `MERGE_NOT_AUTHOR
 
 The authenticated user must still be the author or a current assignee. The PR/MR must still be open, not draft, free of conflicts, not `NEEDS_REVISION`, have required CI success or an explicit acceptable explanation, have blocking discussions resolved, and match the exact current head. Force waives the live non-author approving-reviewer requirement. Merge through the forge with the exact-head SHA. If branch protection rejects the merge, report the forge error. Add `admin` in the same invocation only when the user asked to bypass protection; then GitHub may use `gh pr merge --admin`.
 
-After `/git-merge-approved-force`, the operator reply does not print the Solo override block. It ends with one `next step:` line. Merged: `next step: none`. `NEEDS_REVISION`: `next step: /git-revise-pr <url>`. `CONFLICTED`: `next step: /git-fix-conflict <url>`. Any other stop: `next step: /git-pr-status <url>`.
+After `/git-merge-approved-force`, the operator reply ends with one `next step:` line and does not print the Solo override block. Merged: `next step: none`. `NEEDS_REVISION`: `next step: /git-revise-pr <url>`. `CONFLICTED`: `next step: /git-fix-conflict <url>`. Any other stop: `next step: /git-pr-status <url>`.
 
 ## Merge Approved PR/MR
 

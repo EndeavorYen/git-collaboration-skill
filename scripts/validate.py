@@ -514,10 +514,125 @@ def validate_implement_profile() -> None:
             fail(f"README.md: minimal implement profile missing {phrase!r}")
 
 
+MODE_STOPS = (
+    ("Review someone else's PR/MR", "/git-review-pr", "/git-review-pr-force", True),
+    ("Update own PR/MR after review", "/git-revise-pr", "/git-revise-pr-force", False),
+    ("Merge approved PR/MR", "/git-merge-approved", "/git-merge-approved-force", False),
+)
+
+REVIEW_STOP = (
+    "Plain `/git-review-pr`: posted visible verdict and read back SHA, pipeline, discussions, "
+    "and approval/request-changes state. Force `/git-review-pr-force`: that read-back, and the "
+    "reply prints `verdict:`, `forge approval:`, and one `next step:` line."
+)
+SOLO_PROHIBITION = "does not print the Solo override block"
+SIX_ROW_MARKER = "`owned` → `next step:`"
+
+
+def task_mode_rows(text: str) -> list[tuple[str, str, str, str]]:
+    header = "| Mode | User intent examples | Allowed writes | Stop condition |"
+    start = text.find(header)
+    if start < 0:
+        return []
+    rows: list[tuple[str, str, str, str]] = []
+    for line in text[start:].splitlines():
+        if not line.startswith("|"):
+            if rows:
+                break
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) != 4 or cells[0] == "Mode" or set(cells[0]) <= {"-", " "}:
+            continue
+        rows.append((cells[0], cells[1], cells[2], cells[3]))
+    return rows
+
+
+def force_stop_errors(text: str) -> list[str]:
+    errors: list[str] = []
+    rows = {mode: stop for mode, _intent, _writes, stop in task_mode_rows(text)}
+    for mode, plain_cmd, force_cmd, needs_verdict in MODE_STOPS:
+        stop = rows.get(mode)
+        if stop is None or " Force `" not in stop:
+            errors.append(f"SKILL.md {mode} stop has no Force clause")
+            continue
+        plain, force_tail = stop.split(" Force `", 1)
+        force = "Force `" + force_tail
+        if not plain.startswith(f"Plain `{plain_cmd}`:"):
+            errors.append(f"SKILL.md {mode} Plain clause does not start with Plain `{plain_cmd}`:")
+        if "next step:" in plain:
+            errors.append(f"SKILL.md {plain_cmd} stop contains next step:")
+        if not force.startswith(f"Force `{force_cmd}`:"):
+            errors.append(f"SKILL.md {mode} Force clause does not start with Force `{force_cmd}`:")
+        if "next step:" not in force:
+            errors.append(f"SKILL.md {mode} Force clause missing next step:")
+        if needs_verdict and ("verdict:" not in force or "forge approval:" not in force):
+            errors.append(f"SKILL.md {mode} Force clause missing verdict: or forge approval:")
+    if SIX_ROW_MARKER in text:
+        errors.append("SKILL.md contains the six-row next-step table")
+    for pointer in ("references/review.md", "references/revise.md", "references/merge.md"):
+        if pointer not in text:
+            errors.append(f"SKILL.md missing {pointer}")
+    return errors
+
+
+def reply_order_errors(text: str, label: str) -> list[str]:
+    errors: list[str] = []
+    if label == "SKILL.md":
+        start = text.find("### Solo override")
+        end = text.find("```", start if start >= 0 else 0)
+        if start < 0 or end < 0:
+            return [f"{label} Solo override section missing"]
+        scoped = text[start:end]
+    else:
+        ban_at = text.find(SOLO_PROHIBITION)
+        if ban_at < 0:
+            return [f"{label} missing {SOLO_PROHIBITION}"]
+        para_start = text.rfind("\n\n", 0, ban_at)
+        para_start = 0 if para_start < 0 else para_start + 2
+        para_end = text.find("\n\n", ban_at)
+        scoped = text[para_start: len(text) if para_end < 0 else para_end]
+    step_at = scoped.find("next step:")
+    ban_at = scoped.find(SOLO_PROHIBITION)
+    if step_at < 0 or ban_at < 0 or step_at > ban_at:
+        errors.append(f"{label} next step: does not precede the Solo override prohibition")
+    if label == "references/revise.md":
+        told = text.find("Print Solo override for")
+        if told >= 0 and "/git-revise-pr-force" in text[told:]:
+            errors.append(f"{label} tells /git-revise-pr-force to print Solo override")
+    return errors
+
+
+def validate_force_reply_stops() -> None:
+    skill = ROOT / "SKILL.md"
+    text = skill.read_text(encoding="utf-8") if skill.exists() else ""
+    for error in force_stop_errors(text):
+        fail(error)
+    if REVIEW_STOP in text:
+        decoy = text.replace(" and one `next step:` line", "", 1)
+        decoy_errors = force_stop_errors(decoy)
+        if not any(
+            "Review someone else's PR/MR" in error and "next step:" in error
+            for error in decoy_errors
+        ):
+            fail(
+                "force stop check accepted a review Force clause with no next step: "
+                "while the phrase remained elsewhere"
+            )
+    for label, path in (
+        ("SKILL.md", ROOT / "SKILL.md"),
+        ("references/revise.md", ROOT / "references" / "revise.md"),
+        ("references/merge.md", ROOT / "references" / "merge.md"),
+    ):
+        body = path.read_text(encoding="utf-8") if path.exists() else ""
+        for error in reply_order_errors(body, label):
+            fail(error)
+
+
 def main() -> int:
     validate_files_exist()
     validate_no_leaks()
     validate_skill_contract()
+    validate_force_reply_stops()
     validate_prompts()
     validate_default_prompts_stay_strict()
     validate_reference_phrases()
