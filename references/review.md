@@ -15,7 +15,7 @@ Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or 
 - `verdict: approve` — file pass done, no unresolved blocker, relevant CI is not failed or unknown.
 - `verdict: request-changes` — any remaining blocker, including a failed file pass.
 
-Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines below. Do not also post a comment. If the forge rejects a self-APPROVE, post one current-head comment that starts with the same lines. A comment never sets `forge approval: present`.
+Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines below. Do not also post a comment. If the forge rejects that native event (`APPROVE` or `REQUEST_CHANGES`), post one current-head comment that starts with the same lines. A comment never sets `forge approval: present`.
 
 Opening lines:
 
@@ -28,7 +28,7 @@ forge approval: absent
 
 Use `verdict: request-changes` on the second line when that is the result. Use `forge approval: present` only when this invocation's native `APPROVE` was accepted.
 
-The first visible sentence after the opening lines states the verdict. When the PR/MR language is Chinese, that sentence is `同意` for `verdict: approve` and `不同意` for `verdict: request-changes`. When the language is English, use agree or disagree: `agree` for `verdict: approve` and `disagree` for `verdict: request-changes`. When the native event was rejected, the following sentence names the rejection. For a GitHub author that sentence is: the author cannot approve their own pull request. Evidence follows those sentences.
+The first visible sentence after the opening lines states the verdict. When the PR/MR language is Chinese, that sentence is `同意` for `verdict: approve` and `不同意` for `verdict: request-changes`. When the language is English, use agree or disagree: `agree` for `verdict: approve` and `disagree` for `verdict: request-changes`. When the native event was rejected, the following sentence names that rejection. For a rejected GitHub `APPROVE` that sentence is: the author cannot approve their own pull request. For a rejected GitHub `REQUEST_CHANGES` that sentence is: the author cannot request changes on their own pull request. Evidence follows those sentences.
 
 The operator reply prints the verdict line, the `forge approval:` line, and exactly one `next step:` line. Do not print the Solo override block. No second command.
 
@@ -103,7 +103,7 @@ A regex tripwire on an install or deploy command is not package-manager or runti
 Approval rules:
 
 - Never approve from a snapshot taken before the file pass. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
-- Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`. Under force, use the `/git-review-pr-force` verdict: try native `APPROVE` or `REQUEST_CHANGES` on the reviewed SHA; if the forge rejects a self-APPROVE, post the opening lines on the current SHA.
+- Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`. Under force, use the `/git-review-pr-force` verdict: try native `APPROVE` or `REQUEST_CHANGES` on the reviewed SHA; if the forge rejects that native event, post the opening lines on the current SHA.
 - Do not approve if any active blocker remains unresolved, blocking discussions are unresolved, or relevant CI is failed/unknown without a clear non-code explanation.
 - An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed.
 - Do not require rerunning a protected live job before approval.
