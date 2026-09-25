@@ -15,7 +15,7 @@ Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or 
 - `verdict: approve` — file pass done, no unresolved blocker, relevant CI is not failed or unknown.
 - `verdict: request-changes` — any remaining blocker, including a failed file pass.
 
-Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines below. Do not also post a comment. If the forge rejects a self-APPROVE, post one current-head comment that starts with the same lines. The comment's next sentence names the rejection: the author cannot approve their own pull request. A comment never sets `forge approval: present`.
+Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines below. Do not also post a comment. If the forge rejects a self-APPROVE, post one current-head comment that starts with the same lines. A comment never sets `forge approval: present`.
 
 Opening lines:
 
@@ -28,7 +28,7 @@ forge approval: absent
 
 Use `verdict: request-changes` on the second line when that is the result. Use `forge approval: present` only when this invocation's native `APPROVE` was accepted.
 
-The next visible sentence is `同意` or `不同意` when the PR/MR language is Chinese, and `agree or disagree` when it is English. The sentence matches the verdict: `同意` and agree only for `verdict: approve`; `不同意` and disagree only for `verdict: request-changes`. Evidence follows that sentence.
+The first visible sentence after the opening lines states the verdict. When the PR/MR language is Chinese, that sentence is `同意` for `verdict: approve` and `不同意` for `verdict: request-changes`. When the language is English, use agree or disagree: `agree` for `verdict: approve` and `disagree` for `verdict: request-changes`. When the native event was rejected, the following sentence names the rejection. For a GitHub author that sentence is: the author cannot approve their own pull request. Evidence follows those sentences.
 
 The operator reply prints the verdict line, the `forge approval:` line, and exactly one `next step:` line. Do not print the Solo override block. No second command.
 
