@@ -9,6 +9,8 @@ When `/git-revise-pr-force` is not owned, not open, `CONFLICTED`, or `MERGED_OR_
 
 The authenticated user must still be the author or a current assignee. The PR/MR must still be open and not `CONFLICTED`. Force waives the `NEEDS_REVISION` state gate so further commits can land without actionable reviewer feedback. Run the **pre-submit gate**. Do not merge.
 
+After a successful `/git-revise-pr-force` push, the operator reply does not print the Solo override block. It ends with one `next step:` line. When the actor is `owned` or `self_authored_head` and no other user has a current-head review request, that line is `next step: /git-review-pr-force <url>`. When some other user has a current-head review request, that line is `next step: /git-pr-status <url>`.
+
 ## Updating An Existing PR/MR
 
 Use this when addressing reviewer feedback on a PR/MR you authored or are maintaining.

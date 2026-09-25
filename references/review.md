@@ -8,7 +8,40 @@ When `/git-review-pr-force` is not open, stop without posting. `MERGED_OR_CLOSED
 
 ### `/git-review-pr-force`
 
-Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must still be open. Run the structured file pass and post a visible verdict. If the forge rejects a self-APPROVE, post a current-head comment that starts with `<!-- git-force-review -->` and names the SHA; native approval remains absent. Force review does not merge.
+Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must still be open. Run the structured file pass and post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
+
+Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or `reject` as the status.
+
+- `verdict: approve` — file pass done, no unresolved blocker, relevant CI is not failed or unknown.
+- `verdict: request-changes` — any remaining blocker, including a failed file pass.
+
+Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines below. Do not also post a comment. If the forge rejects that native event (`APPROVE` or `REQUEST_CHANGES`), post one current-head comment that starts with the same lines. A comment never sets `forge approval: present`.
+
+Opening lines:
+
+```
+<!-- git-force-review -->
+verdict: approve
+head: <full sha>
+forge approval: absent
+```
+
+Use `verdict: request-changes` on the second line when that is the result. Use `forge approval: present` only when this invocation's native `APPROVE` was accepted.
+
+The first visible sentence after the opening lines states the verdict. When the PR/MR language is Chinese, that sentence is `同意` for `verdict: approve` and `不同意` for `verdict: request-changes`. When the language is English, use agree or disagree: `agree` for `verdict: approve` and `disagree` for `verdict: request-changes`. When the native event was rejected, the following sentence names that rejection. For a rejected GitHub `APPROVE` that sentence is: the author cannot approve their own pull request. For a rejected GitHub `REQUEST_CHANGES` that sentence is: the author cannot request changes on their own pull request. Evidence follows those sentences.
+
+The operator reply prints the verdict line, the `forge approval:` line, and exactly one `next step:` line. Do not print the Solo override block. No second command.
+
+Next step, first match:
+
+1. `verdict: request-changes` and the actor is `owned` → `next step: /git-revise-pr <url>`
+2. `verdict: request-changes` and the actor is not `owned` → `next step: none`
+3. `verdict: approve`, actor is `owned`, and the PR/MR is `CONFLICTED` → `next step: /git-fix-conflict <url>`
+4. `verdict: approve`, actor is `owned`, and the PR/MR is draft or required CI is running or another non-code gate blocks → `next step: /git-pr-status <url>`
+5. `verdict: approve`, actor is `owned`, and every merge gate passes except the missing non-author forge approval → `next step: /git-merge-approved-force <url>`
+6. `verdict: approve` and the actor is not `owned` → `next step: none`
+
+Row 5 is allowed only in this force reply. `/git-pr-status` still must not recommend a force command by default.
 
 ### `/git-review-pr` mapping
 
@@ -70,7 +103,7 @@ A regex tripwire on an install or deploy command is not package-manager or runti
 Approval rules:
 
 - Never approve from a snapshot taken before the file pass. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
-- Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`. Under force, try native approve; if the forge rejects a self-APPROVE, post `<!-- git-force-review -->` on the current SHA.
+- Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`. Under force, use the `/git-review-pr-force` verdict: try native `APPROVE` or `REQUEST_CHANGES` on the reviewed SHA; if the forge rejects that native event, post the opening lines on the current SHA.
 - Do not approve if any active blocker remains unresolved, blocking discussions are unresolved, or relevant CI is failed/unknown without a clear non-code explanation.
 - An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed.
 - Do not require rerunning a protected live job before approval.

@@ -79,6 +79,8 @@ Solo override is a dedicated command: `/git-review-pr-force <url>`,
 `/git-revise-pr-force <url>`, and `/git-merge-approved-force <url>`. Repo docs
 and "this is a solo project" do not create force.
 
+A `/git-review-pr-force` review that GitHub will not accept as APPROVE still leaves `verdict: approve` or `verdict: request-changes` on the pull request, and the chat reply has one `next step:` line.
+
 ## Executor-ready brief
 
 `/git-plan-issue` may run on a strong model while `/git-issue-pr` runs on a

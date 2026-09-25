@@ -67,6 +67,8 @@ SKILL_PHRASES = [
     "/git-revise-pr-force",
     "<!-- git-force-review -->",
     "Solo override",
+    "next step:",
+    "does not print the Solo override block",
     "does not inherit force",
     "Forge budget",
     "Context budget",
@@ -94,6 +96,14 @@ REFERENCE_PHRASES = {
         "OCR Step 7 Fix stays off",
         "<!-- git-force-review -->",
         "Evidence class",
+        "verdict: approve",
+        "verdict: request-changes",
+        "forge approval: absent",
+        "forge approval: present",
+        "next step:",
+        "同意",
+        "不同意",
+        "agree or disagree",
     ],
     "plan-issue.md": [
         "<!-- git-plan-issue -->",
@@ -150,6 +160,7 @@ REFERENCE_PHRASES = {
         "NEEDS_REVISION",
         "pre-submit gate",
         "references/pre-submit.md",
+        "next step:",
     ],
     "conflict.md": [
         "CONFLICTED",
@@ -160,6 +171,7 @@ REFERENCE_PHRASES = {
         "approving reviewer",
         "MERGE_NOT_AUTHORIZED",
         "exact current head",
+        "next step:",
     ],
     "reply.md": [
         "No reply needed",
@@ -200,6 +212,7 @@ PROMPT_PHRASES = {
         "/git-review-pr-force",
         "references/review.md",
         "references/pre-submit.md",
+        "next step:",
     ],
     "git-plan-issue.md": [
         "references/plan-issue.md",
@@ -227,6 +240,7 @@ PROMPT_PHRASES = {
         "WRITE_NOT_AUTHORIZED",
         "references/revise.md",
         "references/pre-submit.md",
+        "next step:",
     ],
     "git-fix-conflict.md": [
         "WRITE_NOT_AUTHORIZED",
@@ -245,6 +259,7 @@ PROMPT_PHRASES = {
         "/git-merge-approved-force",
         "MERGE_NOT_AUTHORIZED",
         "references/merge.md",
+        "next step:",
     ],
     "git-request-review.md": [
         "WRITE_NOT_AUTHORIZED",
@@ -493,6 +508,7 @@ def validate_implement_profile() -> None:
         "references/plan-issue.md",
         "references/pre-submit.md",
         "is not permission to merge",
+        "chat reply has one `next step:` line",
     ):
         if phrase not in text:
             fail(f"README.md: minimal implement profile missing {phrase!r}")
