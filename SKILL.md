@@ -165,8 +165,8 @@ First match:
 3. `/git-plan-issue` posted a brief → `next step: /git-issue-pr <url>`
 4. `/git-plan-issue` posted nothing, or `/git-reply-issue` → `next step: none`
 5. `/git-request-review` recorded a reviewer → `next step: /git-pr-status <url>`
-6. `/git-issue-pr`, `/git-revise-pr`, or `/git-fix-conflict` opened no PR/MR → `next step: none`
-7. One of those three, and another user has a current-head review request → `next step: /git-pr-status <url>`
+6. `/git-issue-pr` opened no PR/MR → `next step: none`
+7. `/git-issue-pr`, `/git-revise-pr`, or `/git-fix-conflict`, and another user has a current-head review request → `next step: /git-pr-status <url>`
 8. One of those three, and the actor is the author or `self_authored_head` → `next step: /git-review-pr-force <url>`
 9. Otherwise one of those three → `next step: /git-request-review <url>`
 10. Plain `/git-review-pr` → `next step: none`

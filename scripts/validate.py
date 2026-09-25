@@ -676,7 +676,9 @@ def validate_review_handoff() -> None:
     if denied < 0 or plain_review < 0 or denied > plain_review:
         fail("SKILL.md review handoff checks plain review before REVIEW_NOT_AUTHORIZED")
     for line in section.splitlines():
-        if "opened no PR/MR" in line and "/git-issue-pr" not in line:
+        if "opened no PR/MR" in line and (
+            "/git-issue-pr" not in line or "/git-revise-pr" in line or "/git-fix-conflict" in line
+        ):
             fail("SKILL.md review handoff applies opened-no-PR outside /git-issue-pr")
     review = ROOT / "references" / "review.md"
     review_text = review.read_text(encoding="utf-8") if review.exists() else ""
