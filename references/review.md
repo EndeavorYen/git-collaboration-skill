@@ -2,7 +2,7 @@
 
 Read this file for `/git-review-pr` and `/git-review-pr-force`. File pass: `references/pre-submit.md`. Also read one of `references/github.md` or `references/gitlab.md`. Do not read other mode files.
 
-When `/git-review-pr` is not open or is `REVIEW_NOT_AUTHORIZED`, stop without posting review feedback. Do not approve. Recommend `/git-request-review` when the user owns the PR/MR, or another reviewer plus `/git-pr-status` when `self_authored_head`. Print Solo override.
+When `/git-review-pr` is not open or is `REVIEW_NOT_AUTHORIZED`, stop without posting review feedback. Do not approve. The reply uses the review handoff in `SKILL.md`.
 
 When `/git-review-pr-force` is not open, stop without posting. `MERGED_OR_CLOSED` stays blocked.
 

@@ -668,6 +668,20 @@ def validate_review_handoff() -> None:
     implement_stop = stops.get("Implement issue then PR/MR", "")
     if "next step:" not in implement_stop:
         fail("SKILL.md implement stop missing next step:")
+    start = text.find("### Review handoff")
+    end = text.find("```", start if start >= 0 else 0)
+    section = text[start:end] if start >= 0 and end >= 0 else ""
+    plain_review = section.find("Plain `/git-review-pr`")
+    denied = section.find("REVIEW_NOT_AUTHORIZED")
+    if denied < 0 or plain_review < 0 or denied > plain_review:
+        fail("SKILL.md review handoff checks plain review before REVIEW_NOT_AUTHORIZED")
+    for line in section.splitlines():
+        if "opened no PR/MR" in line and "/git-issue-pr" not in line:
+            fail("SKILL.md review handoff applies opened-no-PR outside /git-issue-pr")
+    review = ROOT / "references" / "review.md"
+    review_text = review.read_text(encoding="utf-8") if review.exists() else ""
+    if "Print Solo override." in review_text:
+        fail("references/review.md still prints the Solo override block")
     for name in HANDOFF_REFERENCES:
         path = ROOT / "references" / name
         body = path.read_text(encoding="utf-8") if path.exists() else ""

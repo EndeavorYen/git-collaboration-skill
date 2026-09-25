@@ -5,7 +5,7 @@ description: Use when working with GitHub or GitLab issues, pull/merge requests,
 
 # Git Collaboration
 
-Use this skill for GitHub or GitLab work that changes repository state or forge state. Local project instructions may strengthen the merge gate, but must never replace a live non-author approval with reviewer notes, reviewer state, resolved discussions, or a green pipeline. Only `/git-merge-approved-force` in this invocation waives that approval gate.
+Local project instructions may strengthen the merge gate, but must never replace a live non-author approval with reviewer notes, reviewer state, resolved discussions, or a green pipeline. Only `/git-merge-approved-force` in this invocation waives that approval gate.
 
 ## Detect the forge
 
@@ -35,7 +35,7 @@ A **snapshot** is one read whose payload already contains every forge field that
 
 Triage lists stay lists. One metadata list per relationship. Classify from that payload. Open one trimmed snapshot only for an item you are about to write, or the one item the user named.
 
-Download one failed job log when a verdict or a fix depends on it. Keep the failing command and the error lines.
+Download one failed job log when a verdict or a fix depends on it. Keep the failing command and the error lines. Discard the rest of the log. Do not list or download jobs whose conclusions are already in the snapshot.
 
 Related PRs/MRs come from links already in the snapshot. Do not search the forge for them unless the user asked whether a PR/MR exists and the snapshot has no link.
 
@@ -46,7 +46,6 @@ Related PRs/MRs come from links already in the snapshot. Do not search the forge
 - List calls return metadata only: number, title, state, updated time, author, assignees, url, and for a PR/MR also draft, `reviewDecision`, mergeable, and head SHA. No comment bodies, review bodies, or check logs.
 - Do not paste the snapshot, this skill, or source listings into the reply, the posted comment, or the pre-submit subagent. The subagent gets the submit range and the contract. The reply reports the decision fields the mode requires.
 - Search, then open the matching symbol and its test. Do not read a directory, a whole unrelated file, or both forge references into context.
-- Reuse the trimmed snapshot already in this conversation. Do not re-read it back into context to "be sure."
 
 ## Task Mode Decision
 
@@ -93,8 +92,6 @@ Scheduled lifecycle or scheduled approved merge: read `references/scheduled-auto
 ## PR/MR Command Preflight
 
 Every PR/MR-scoped command starts with one read-only snapshot, as **Forge budget** defines. Requested command does not override live conflict, draft, CI, discussion, or mergeability state. Dedicated `*-force` commands are the exception named in **Explicit force**. Do not edit code, create commits, push, post comments, request review, resolve discussions, approve, or merge until the PR/MR is classified and the requested command is valid for that state.
-
-Snapshot fields and the snapshot command live in the forge reference.
 
 Actor relationship, computed before any other classification:
 
@@ -163,14 +160,17 @@ Each force command's waiver is in its mode reference: `references/review.md`, `r
 
 First match:
 
-1. `/git-plan-issue` posted a brief → `next step: /git-issue-pr <url>`
-2. `/git-plan-issue` posted nothing, `/git-reply-issue`, plain `/git-review-pr`, or no PR/MR was opened → `next step: none`
-3. `/git-request-review` recorded a reviewer, or another user already has a current-head review request → `next step: /git-pr-status <url>`
-4. After `/git-issue-pr`, `/git-revise-pr`, or `/git-fix-conflict`, the actor is the author or `self_authored_head` → `next step: /git-review-pr-force <url>`
-5. Otherwise after those three → `next step: /git-request-review <url>`
-6. Plain `/git-merge-approved` merged → `next step: none`. `NEEDS_REVISION` → `next step: /git-revise-pr <url>`. `CONFLICTED` → `next step: /git-fix-conflict <url>`. `REVIEW_REQUEST_NEEDED` → `next step: /git-request-review <url>`. Any other stop → `next step: /git-pr-status <url>`
-7. `REVIEW_NOT_AUTHORIZED` → `next step: /git-review-pr-force <url>`
-8. `WRITE_NOT_AUTHORIZED` or `MERGE_NOT_AUTHORIZED` → `next step: none`
+1. `REVIEW_NOT_AUTHORIZED` → `next step: /git-review-pr-force <url>`
+2. `WRITE_NOT_AUTHORIZED` or `MERGE_NOT_AUTHORIZED` → `next step: none`
+3. `/git-plan-issue` posted a brief → `next step: /git-issue-pr <url>`
+4. `/git-plan-issue` posted nothing, or `/git-reply-issue` → `next step: none`
+5. `/git-request-review` recorded a reviewer → `next step: /git-pr-status <url>`
+6. `/git-issue-pr`, `/git-revise-pr`, or `/git-fix-conflict` opened no PR/MR → `next step: none`
+7. One of those three, and another user has a current-head review request → `next step: /git-pr-status <url>`
+8. One of those three, and the actor is the author or `self_authored_head` → `next step: /git-review-pr-force <url>`
+9. Otherwise one of those three → `next step: /git-request-review <url>`
+10. Plain `/git-review-pr` → `next step: none`
+11. Plain `/git-merge-approved` merged → `next step: none`. `NEEDS_REVISION` → `next step: /git-revise-pr <url>`. `CONFLICTED` → `next step: /git-fix-conflict <url>`. `REVIEW_REQUEST_NEEDED` → `next step: /git-request-review <url>`. Any other stop → `next step: /git-pr-status <url>`
 
 ```
 Solo override: `/git-review-pr-force <url>`
