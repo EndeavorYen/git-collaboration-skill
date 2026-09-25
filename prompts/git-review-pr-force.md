@@ -4,6 +4,8 @@ description: Force-review an owned or self-authored GitHub PR or GitLab MR and p
 
 `/git-review-pr-force`: read `references/review.md` and `references/pre-submit.md`, and one of `references/github.md` or `references/gitlab.md`.
 
+Reply rule: one `next step:` line, in `references/review.md`.
+
 This command waives the review actor gate. The PR/MR must still be open. The waiver is in Explicit force and in `references/review.md`.
 
 $ARGUMENTS

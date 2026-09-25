@@ -146,7 +146,7 @@ For every PR/MR-scoped command, evaluate the actor gate before other primary sta
 
 Treat an unresolved resolvable reviewer discussion as actionable. A reviewer comment is not automatically actionable: determine whether it requests a change or decision and whether a later commit or reply already addressed it. If all feedback predates the latest fix and no newer reviewer response exists, classify as `REVIEW_REQUEST_NEEDED` or `WAITING_FOR_REVIEW`, not `NEEDS_REVISION`.
 
-Any incompatible or unrecognized PR/MR command degrades to a focused read-only status result. Report `Requested command`, `Current state`, `Evidence`, `Why the action was blocked`, and `Recommended next command`. Reuse the same URL or iid in the recommendation so it can be invoked directly.
+Any incompatible or unrecognized PR/MR command degrades to a focused read-only status result. Report `Requested command`, `Current state`, `Evidence`, `Why the action was blocked`, and `Recommended next command`. Reuse the same URL or iid in the recommendation.
 
 ## Explicit force
 
@@ -163,7 +163,7 @@ Each force command's waiver is in its mode reference: `references/review.md`, `r
 
 ### Solo override
 
-`/git-pr-status` default next command still follows the actor gate. Force is never the default recommended next command. When the PR/MR is `owned` or `self_authored_head`, also print:
+`/git-pr-status` still prints the Solo override block for `owned` or `self_authored_head`. Force is never the default next command. A force-command reply does not print the Solo override block and ends with one `next step:` line.
 
 ```
 Solo override: `/git-review-pr-force <url>`
