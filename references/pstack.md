@@ -29,14 +29,14 @@ Use `poteto-agent` only when listed, else `generalPurpose` or inline. One model 
 
 ## Hook table
 
-Mode / step | pstack skill | Runs when | Evidence | Fallback
+Columns: step, skill, when, evidence, fallback.
 
 - Pre-submit. **principle-prove-it-works**. Implement, revise, conflict, before the gate. `Proof:` from a real run. `pstack: absent` via `verification-before-completion`.
 - Pre-submit. `verify-<app>`. Mapped feature in the diff. `Surface:` names skill and feature. `Surface: none: <reason>`.
 - Pre-submit. `create-verification-skill`. Issue asks. Separate work. Recommend `/create-verification-skill`.
 - Plan step 3. `how`. More than one subsystem. `file:line` in Root cause. current step 3.
 - Plan step 3. `why`. Introducing commit. current step 3.
-- Plan step 5. `architect`. `arena` for two or more shapes. Function boundary. Real rejected candidate. current step 5.
+- Plan step 5. `architect`. Function boundary. Real rejected candidate. current step 5.
 - Plan step 5. `blast-radius`. Shared contract, wire format, schema, or config default. Stop and dissent line. current step 5.
 - Plan step 5. **principle-sequence-verifiable-units**. Always when present. Verify on each step. current step 5.
 - Plan step 6. Prototype playbook. Observable by running code. Cited run. current step 6.
@@ -48,10 +48,10 @@ Mode / step | pstack skill | Runs when | Evidence | Fallback
 ## Implement rows
 
 - **Playbook by kind.** Bug fix steps 1, 2, 4, and 5, plus `tdd` when cheap. Feature steps 4 to 6. Refactoring step 1 and step 6.
-- **Brief overrides redesign.** With an Execution plan, record `how`, `architect`, and `arena` as `skip: brief is the work order`.
+- **Brief overrides redesign.** With an Execution plan, record `how` and `architect` as `skip: brief is the work order`.
 - **Todo order.** `references/implement.md` steps are the outer list. Nest playbook steps under steps 10 and 11. Steps 12 to 16 replace "Run Opening a PR".
 - **Delegation.** The delegate gets file pointers and the brief, never the forge snapshot, and makes no forge call. The parent reviews the diff before commit.
-- **Prose.** When installed, run `technical-writing` and `unslop` on the PR/MR and commit bodies, plus `/deslop` and `/no-comments` on the diff, before the pre-submit gate.
+- **Prose.** Default off; not in the default required set. `technical-writing`, `unslop`, `/deslop`, `/no-comments` run before the pre-submit gate only for `pstack:prose`, explicit ask to fix prose/copy, or equivalent opt-in. Without opt-in, missing Prose is not a silent-skip failure.
 - **PR/MR body.** `## Why`, `## Scope`, `## Tradeoffs`, `## Blast Radius`, and `## Verification` may be the layout. Include the summary, the issue link, each brief Test case id and result, the Proof record under `## Verification`, and known limitations.
 
 ## Pre-submit and review hooks
