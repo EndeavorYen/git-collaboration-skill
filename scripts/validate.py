@@ -216,6 +216,18 @@ REFERENCE_PHRASES = {
 
 PSTACK_WORD_LIMIT = 900
 
+# Required Proof record labels. Brief: and Executor-model: are optional
+# observation lines under ## Verification. Do not add them here. A missing
+# observation line must not fail pre-submit.
+PROOF_RECORD_LABELS = (
+    "Proof:",
+    "Evidence class:",
+    "Surface:",
+    "Load-bearing fact:",
+    "pstack:",
+)
+OPTIONAL_OBSERVATION_LABELS = ("Brief:", "Executor-model:")
+
 PSTACK_FORBIDDEN_PROMPTS = (
     "git-merge-approved.md",
     "git-merge-approved-force.md",
@@ -835,6 +847,30 @@ def validate_review_handoff() -> None:
             fail(f"prompts/{name}: missing review handoff")
 
 
+def proof_record_fence_labels(text: str) -> list[str] | None:
+    """Return label names from the first fence under ### Proof record."""
+    marker = "### Proof record"
+    start = text.find(marker)
+    if start < 0:
+        return None
+    open_at = text.find("```", start)
+    if open_at < 0:
+        return None
+    line_end = text.find("\n", open_at)
+    if line_end < 0:
+        return None
+    close_at = text.find("```", line_end + 1)
+    if close_at < 0:
+        return None
+    labels: list[str] = []
+    for line in text[line_end + 1 : close_at].splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        labels.append(stripped.split(":", 1)[0] + ":")
+    return labels
+
+
 def validate_pstack() -> None:
     path = ROOT / "references" / "pstack.md"
     if not path.exists():
@@ -860,9 +896,18 @@ def validate_pstack() -> None:
         if "references/pstack.md" in prompt.read_text(encoding="utf-8"):
             fail(f"prompts/{name} names references/pstack.md")
     pre = (ROOT / "references" / "pre-submit.md").read_text(encoding="utf-8")
-    for label in ("Proof:", "Evidence class:", "Surface:", "Load-bearing fact:", "pstack:"):
+    for label in PROOF_RECORD_LABELS:
         if label not in pre:
             fail(f"references/pre-submit.md: missing Proof record label {label!r}")
+    for label in OPTIONAL_OBSERVATION_LABELS:
+        if label in PROOF_RECORD_LABELS:
+            fail(f"references/pre-submit.md: {label} must not be a required Proof label")
+    fence_labels = proof_record_fence_labels(pre)
+    if fence_labels != list(PROOF_RECORD_LABELS):
+        fail(
+            "references/pre-submit.md: Proof record fence must stay "
+            + ", ".join(PROOF_RECORD_LABELS)
+        )
     if "Inconclusive or wrong-surface is not a pass" not in pre:
         fail("references/pre-submit.md: missing inconclusive-surface rule")
     scheduled = (ROOT / "references" / "scheduled-automation.md").read_text(encoding="utf-8")
@@ -929,6 +974,12 @@ def validate_pstack() -> None:
     review = (ROOT / "references" / "review.md").read_text(encoding="utf-8")
     if "An unproven load-bearing fact is a remaining gate" not in review:
         fail("references/review.md: missing remaining-gate ladder rule")
+    review_labels = (
+        "The labels are `Proof:`, `Evidence class:`, `Surface:`, "
+        "`Load-bearing fact:`, and `pstack:`."
+    )
+    if review_labels not in review:
+        fail("references/review.md: Proof five labels changed")
     routing = "pstack Babysit and Shipping never run under this skill."
     if routing not in text:
         fail("references/pstack.md: missing routing sentence")
