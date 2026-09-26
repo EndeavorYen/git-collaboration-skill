@@ -1,6 +1,6 @@
 # Plan issue
 
-Read this file for `/git-plan-issue`. Also read one of `references/github.md` or `references/gitlab.md`. Do not read `references/pre-submit.md` for this mode.
+Read this file for `/git-plan-issue`. Also read one of `references/github.md` or `references/gitlab.md`. Do not read `references/pre-submit.md` for this mode. When detection says pstack is present and not off, read `references/pstack.md`.
 
 ## Plan Issue Workflow
 
@@ -24,6 +24,7 @@ The planner and the executor may be different models. Write the brief for an exe
 **Out of scope:** <work this issue will not do>
 **Acceptance criteria:** <summary of acceptance changes or deliverables; full checkable list lives in the issue description, do not duplicate the full checklist>
 **Tests:** <test files to add or change, and the exact commands to run>
+**Proof:** <verify skill and feature to drive, or command> | tests only: <reason>
 **Constraints:** <repo-local instructions or existing contracts>
 **Planned at:** `<branch>@<short SHA>`
 
@@ -52,7 +53,7 @@ The planner and the executor may be different models. Write the brief for an exe
 
 The brief is a proposal. `/git-issue-pr` follows it when the implementer agrees, or posts a `<!-- git-plan-issue-dissent -->` and waits for a human decision.
 
-6. An unsettled product decision is a choice among two or more product behaviors that changes Goal, Recommended change, Out of scope, or Acceptance criteria, or an acceptance item that cannot be checked until that choice is made. A deferred or open assumption in the close log is still unsettled. Do not guess an unsettled product decision into one of those four fields. An Execution plan over the **Executor-ready brief** size limit is also an unsettled product decision about Out of scope.
+6. A fork whose answer can be observed by running code is settled by a recorded local run (pstack's Prototype playbook, or an equivalent script), not by the grill. Product and preference choices still load `gentle-grill-me`. An unsettled product decision is a choice among two or more product behaviors that changes Goal, Recommended change, Out of scope, or Acceptance criteria, or an acceptance item that cannot be checked until that choice is made. A deferred or open assumption in the close log is still unsettled. Do not guess an unsettled product decision into one of those four fields. An Execution plan over the **Executor-ready brief** size limit is also an unsettled product decision about Out of scope.
    - **Already settled:** when those four fields are already settled, do not load `gentle-grill-me` and do not wait for a close log; step 7 posts that draft.
    - **Grill:** Load `gentle-grill-me` only when the draft still contains an unsettled product decision. Use that skill's rounds and post nothing until the user confirms the close log. After that confirmation, rewrite those four fields, and the Execution plan and Test cases that depend on them, from settled log entries only. If any of those four fields is still deferred or open, post nothing and report that open assumption.
    - **Follow-ups:** when work is moved to a later issue during the grill, that disposition is recorded in machine-readable form with `status: "follow_up"`. Standalone `/gentle-grill-me` does not implement and does not open issues; the caller that loaded the grill does. Do not invent follow-ups from chat memory when the close log was not confirmed. A `skipped` record or still-open assumption does not become an issue by itself. After the user confirms the close log, search open issues in that project first to prevent duplicate creation. For each non-duplicate record, open a forge issue for each confirmed close log record with `status: "follow_up"` before the turn ends, linked to the source issue. The created follow-up issue states the pending work, reason for splitting, and source issue URL. List each new follow-up issue URL in the brief comment and description update. If any required follow-up issue was not opened, the turn does not report the plan complete; ending the turn with only `grill-log.jsonl` fails this mode when a `follow_up` record has no issue URL.
@@ -87,6 +88,7 @@ The brief is a work order. The executor reads it, opens the files named in step 
 - **Test cases are concrete.** Given, When, and Then use literal values, not "valid input" or "works correctly". Every acceptance line is covered by at least one test case or an exact command. `Covers` holds the description checklist line number, never the line's text, so the brief does not duplicate the checklist. Include the regression case that reproduces the root cause, and each edge case the change introduces.
 - **No vague verbs.** Replace "handle", "improve", "clean up", "as needed", "appropriate", "etc.", and "similar" with the exact behavior. If you cannot state the exact behavior, the evidence is too thin or a product decision is unsettled.
 - **Stop and dissent when** lists the assumptions the plan relies on that the executor can check: a symbol's current behavior, a caller count, a config default, a test that currently passes. If one fails, the executor dissents instead of improvising.
+- **Proof.** `tests only: <reason>` is allowed only when the change has no user-visible surface. Do not paste pstack artifacts into the brief.
 - **Size.** When the Execution plan needs more than 8 steps or touches unrelated areas, how to split the work is a scope choice: treat it as an unsettled product decision about Out of scope.
 
 ## Dissent recipe

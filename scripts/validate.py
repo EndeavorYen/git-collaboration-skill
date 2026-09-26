@@ -33,6 +33,8 @@ REQUIRED_FILES = [
     ROOT / "references" / "request-review.md",
     ROOT / "references" / "status.md",
     ROOT / "references" / "triage.md",
+    ROOT / "references" / "pstack.md",
+    ROOT / "references" / "pstack-compat.md",
     ROOT / "prompts" / "git-review-pr.md",
     ROOT / "prompts" / "git-issue-pr.md",
     ROOT / "prompts" / "git-plan-issue.md",
@@ -104,6 +106,10 @@ REFERENCE_PHRASES = {
         "同意",
         "不同意",
         "agree or disagree",
+        "Re-run the `Proof:` command on the current review head",
+        "cannot re-run",
+        "An Evidence class mismatch is `verdict: request-changes` with severity High",
+        "Do not require rerunning a protected live job before approval",
     ],
     "plan-issue.md": [
         "<!-- git-plan-issue -->",
@@ -188,7 +194,29 @@ REFERENCE_PHRASES = {
         "/git-plan-issue",
         "ask who to assign",
     ],
+    "pstack.md": [
+        "pstack:off",
+        "pstack:required",
+        "git-collaboration wins",
+        "never writes to the forge",
+        "Forge budget",
+    ],
 }
+
+PSTACK_WORD_LIMIT = 900
+
+PSTACK_FORBIDDEN_PROMPTS = (
+    "git-merge-approved.md",
+    "git-merge-approved-force.md",
+    "git-scheduled-lifecycle.md",
+    "git-scheduled-merge.md",
+    "git-triage.md",
+    "git-reply-issue.md",
+    "git-request-review.md",
+    "git-pr-status.md",
+)
+
+TRIAGE_LOAD_LINE = "Status or triage, including the aggressive run: read `references/triage.md`."
 
 # Numbered-procedure sentences. Prompts point at the home; they do not copy it.
 PROCEDURE_SENTENCES = [
@@ -696,6 +724,106 @@ def validate_review_handoff() -> None:
             fail(f"prompts/{name}: missing review handoff")
 
 
+def validate_pstack() -> None:
+    path = ROOT / "references" / "pstack.md"
+    if not path.exists():
+        fail("references/pstack.md: missing file")
+        return
+    text = path.read_text(encoding="utf-8")
+    words = len(text.split())
+    if words > PSTACK_WORD_LIMIT:
+        fail(f"references/pstack.md: {words} words exceeds {PSTACK_WORD_LIMIT}")
+    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8") if (ROOT / "SKILL.md").exists() else ""
+    for key in ("merge", "scheduled"):
+        sentence, _banned = LOAD_LINES[key]
+        for row in skill.splitlines():
+            if sentence in row and "references/pstack.md" in row:
+                fail(f"SKILL.md: {key} load line names references/pstack.md")
+    for row in skill.splitlines():
+        if TRIAGE_LOAD_LINE in row and "references/pstack.md" in row:
+            fail("SKILL.md: triage load line names references/pstack.md")
+    for name in PSTACK_FORBIDDEN_PROMPTS:
+        prompt = ROOT / "prompts" / name
+        if not prompt.exists():
+            continue
+        if "references/pstack.md" in prompt.read_text(encoding="utf-8"):
+            fail(f"prompts/{name} names references/pstack.md")
+    pre = (ROOT / "references" / "pre-submit.md").read_text(encoding="utf-8")
+    for label in ("Proof:", "Evidence class:", "Surface:", "Load-bearing fact:", "pstack:"):
+        if label not in pre:
+            fail(f"references/pre-submit.md: missing Proof record label {label!r}")
+    if "Inconclusive or wrong-surface is not a pass" not in pre:
+        fail("references/pre-submit.md: missing inconclusive-surface rule")
+    scheduled = (ROOT / "references" / "scheduled-automation.md").read_text(encoding="utf-8")
+    if "pstack: off" not in scheduled:
+        fail("references/scheduled-automation.md: missing 'pstack: off'")
+    plan = (ROOT / "references" / "plan-issue.md").read_text(encoding="utf-8")
+    if "**Proof:**" not in plan:
+        fail("references/plan-issue.md: missing **Proof:**")
+    fork = (
+        "A fork whose answer can be observed by running code is settled by a recorded "
+        "local run (pstack's Prototype playbook, or an equivalent script), not by the grill."
+    )
+    if fork not in plan:
+        fail("references/plan-issue.md: missing observable-fork sentence")
+    if plan.count("references/pre-submit.md") != 1 or "Do not read `references/pre-submit.md`" not in plan:
+        fail("references/plan-issue.md: pre-submit mention must stay the Do not read sentence")
+    if "skip: brief is the work order" not in text:
+        fail("references/pstack.md: missing skip: brief is the work order")
+    if "never the forge snapshot, and makes no forge call" not in text:
+        fail("references/pstack.md: missing no-forge-call delegate rule")
+    if "The parent reviews the diff" not in text:
+        fail("references/pstack.md: delegate rule must say the parent reviews the diff")
+    if "A silent skip fails the pre-submit gate" not in text:
+        fail("references/pstack.md: missing silent-skip rule")
+    review = (ROOT / "references" / "review.md").read_text(encoding="utf-8")
+    if "An unproven load-bearing fact is a remaining gate" not in review:
+        fail("references/review.md: missing remaining-gate ladder rule")
+    routing = "pstack Babysit and Shipping never run under this skill."
+    if routing not in text:
+        fail("references/pstack.md: missing routing sentence")
+    drift = "Record the sweep result in the Proof record."
+    if "run a drift sweep" not in text or drift not in text:
+        fail("references/pstack.md: missing drift-sweep sentence")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8") if (ROOT / "README.md").exists() else ""
+    for phrase in ("pstack:off", "pstack:required", "references/pstack.md", "references/pstack-compat.md"):
+        if phrase not in readme:
+            fail(f"README.md: missing {phrase!r}")
+    for phrase in (
+        "references/pstack-compat.md",
+        "unsupported",
+        "Out of range",
+        "unreadable version",
+        "not `present`",
+        "all hooks absent",
+        "v1 named list",
+    ):
+        if phrase not in text:
+            fail(f"references/pstack.md: missing {phrase!r}")
+    compat_path = ROOT / "references" / "pstack-compat.md"
+    if not compat_path.exists():
+        fail("references/pstack-compat.md: missing file")
+        return
+    compat = compat_path.read_text(encoding="utf-8")
+    for phrase in (
+        "contract-id: `pstack-compat-v1`",
+        "tested: `0.15.5`",
+        "supported: `>=0.14.0 <0.17.0`",
+        "## Named skills",
+        "## Agents",
+        "poteto-agent",
+        "## Upgrade checklist",
+        ".pstack-pin",
+        "named skills",
+        "tip PR",
+        "contract unchanged",
+        "Do not vendor pstack",
+        "verify-<app>",
+    ):
+        if phrase not in compat:
+            fail(f"references/pstack-compat.md: missing {phrase!r}")
+
+
 def main() -> int:
     validate_files_exist()
     validate_no_leaks()
@@ -708,6 +836,7 @@ def main() -> int:
     validate_forge_references()
     validate_scheduled_ocr_gate()
     validate_implement_profile()
+    validate_pstack()
     if ERRORS:
         print("Validation failed:", file=sys.stderr)
         for error in ERRORS:
