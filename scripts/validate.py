@@ -587,6 +587,11 @@ def validate_pstack() -> None:
         fail("references/pstack.md: missing no-forge-call delegate rule")
     if "The parent reviews the diff" not in text:
         fail("references/pstack.md: delegate rule must say the parent reviews the diff")
+    if "A silent skip fails the pre-submit gate" not in text:
+        fail("references/pstack.md: missing silent-skip rule")
+    review = (ROOT / "references" / "review.md").read_text(encoding="utf-8")
+    if "An unproven load-bearing fact is a remaining gate" not in review:
+        fail("references/review.md: missing remaining-gate ladder rule")
 
 
 def main() -> int:

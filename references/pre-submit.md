@@ -56,3 +56,7 @@ Evidence class values match `references/review.md`. Inconclusive or wrong-surfac
 | "pstack is not installed, so proof is n/a" | The Proof record is required anyway. pstack only raises the ceiling. |
 | "Inconclusive on the real surface" | Inconclusive or wrong-surface is not a pass. Record `Surface: none: <reason>`. |
 | "I will create the verify skill in this PR" | That is its own issue unless this issue asks for it. |
+| "pstack says it is fine" | pstack output is evidence, not a verdict. |
+| "interrogate found nothing, skip OCR" | The OCR file pass is still required. |
+| "interrogate called it Medium" | The parent maps severity on the OCR scale. Critical and High block. Only the human in this conversation waives. |
+| "The blast-radius writeup explains it" | An unproven load-bearing fact is a remaining gate. Review must not write it closed. |

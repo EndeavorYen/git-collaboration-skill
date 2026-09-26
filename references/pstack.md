@@ -54,3 +54,12 @@ Mode / step | pstack skill | Runs when | Evidence | Fallback
 - **Prose.** When installed, run `technical-writing` and `unslop` on the PR/MR and commit bodies, plus `/deslop` and `/no-comments` on the diff, before the pre-submit gate.
 - **PR/MR body.** `## Why`, `## Scope`, `## Tradeoffs`, `## Blast Radius`, and `## Verification` may be the layout. Include the summary, the issue link, each brief Test case id and result, the Proof record under `## Verification`, known limitations, reviewer and assignee metadata, and pre-submit waivers.
 - **No pstack forge path.** No `gh` or `origin` from Opening a PR, no Babysit after opening, and no merge.
+
+## Pre-submit and review hooks
+
+Run `blast-radius` when the diff changes an exported or public signature, a schema or migration, a wire or JSON payload shape, a config default or CLI flag, or an auth, security, or data-deletion path, deletes or renames a symbol used from another module, or the user asks for blast radius.
+
+Run `interrogate` when a dissent was settled by a third way, `arena` was used for this change, a thorough-review trigger from `references/review.md` is present, or the user asks for interrogate or adversarial review.
+
+With pstack present and a trigger hit, the hook runs, or the Proof record says `skip: <reason>`. A silent skip fails the pre-submit gate. The OCR file pass runs first and is never replaced. `interrogate` reviewers are readonly and receive no forge snapshot. Map findings to Critical, High, Medium, or Low. Critical and High block pre-submit. The human-only waiver is unchanged. No auto-apply. No `arena` in review.
+
