@@ -2,7 +2,7 @@
 
 Read this file for `/git-review-pr` and `/git-review-pr-force`. File pass: `references/pre-submit.md`. Also read one of `references/github.md` or `references/gitlab.md`. Do not read other mode files.
 
-When `/git-review-pr` is not open or is `REVIEW_NOT_AUTHORIZED`, stop without posting review feedback. Do not approve. Recommend `/git-request-review` when the user owns the PR/MR, or another reviewer plus `/git-pr-status` when `self_authored_head`. Print Solo override.
+When `/git-review-pr` is not open or is `REVIEW_NOT_AUTHORIZED`, stop without posting review feedback. Do not approve. The reply uses the review handoff in `SKILL.md`.
 
 When `/git-review-pr-force` is not open, stop without posting. `MERGED_OR_CLOSED` stays blocked.
 
@@ -45,7 +45,7 @@ Row 5 is allowed only in this force reply. `/git-pr-status` still must not recom
 
 ### `/git-review-pr` mapping
 
-The current reviewer runs the file pass on this checkout after the actor gate. Do not dispatch an implementer-session self-review as a substitute.
+The current reviewer runs the file pass on this checkout after the actor gate. Do not dispatch an implementer-session self-review as a substitute. The `/git-review-pr` operator reply ends with one `next step:` line from the review handoff in `SKILL.md`. Do not print the Solo override block.
 
 | OCR severity | Forge action |
 | --- | --- |

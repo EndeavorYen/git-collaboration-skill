@@ -5,5 +5,6 @@ description: Analyze one GitHub or GitLab issue, post an implementation brief wi
 Read `references/plan-issue.md` before acting, and one of `references/github.md` or `references/gitlab.md`.
 
 Update the issue description when settled acceptance differs, open follow-up forge issues for confirmed grill records with `status: "follow_up"`, and post at most one issue comment containing the implementation brief on the exact issue. Do not change code, commits, or any other forge object.
+Reply rule: one `next step:` line, review handoff in `SKILL.md`.
 
 $ARGUMENTS

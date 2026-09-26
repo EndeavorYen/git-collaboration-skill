@@ -2,7 +2,7 @@
 
 Read this file for `/git-fix-conflict`. Before push: `references/pre-submit.md`. Do not read `references/revise.md`.
 
-When the PR/MR is not `CONFLICTED` or the user is not the author or assignee, stop without changing the branch. For `WRITE_NOT_AUTHORIZED`, name the author or assignee and do not repair a foreign PR/MR. Otherwise recommend the command matching the classified state.
+When the PR/MR is not `CONFLICTED` or the user is not the author or assignee, stop without changing the branch. For `WRITE_NOT_AUTHORIZED`, name the author or assignee and do not repair a foreign PR/MR. The reply uses the review handoff in `SKILL.md`.
 
 ## Fix PR/MR Conflicts
 
@@ -20,4 +20,4 @@ Use this when the user asks to fix a conflict or invokes `/git-fix-conflict`.
 8. Commit with the repo's normal style. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived. Then push the source branch.
 9. The push response is the read-back for the new head SHA. One confirm view only when it omits head SHA, conflict or mergeability state, pipeline, unresolved discussions, or reviewer state. Bundle any missing fields into that one view.
 
-After resolving conflicts, still do not merge until live approval reports an approving reviewer on the current head, or the user separately invokes `/git-merge-approved-force`.
+After resolving conflicts, still do not merge until live approval reports an approving reviewer on the current head, or the user separately invokes `/git-merge-approved-force`. The operator reply ends with one `next step:` line from the review handoff in `SKILL.md`. Do not print the Solo override block.

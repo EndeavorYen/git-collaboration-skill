@@ -11,6 +11,6 @@ Use this only when the user explicitly invokes `/git-reply-issue` or clearly ask
 3. Identify the latest material request, the latest material response by the authenticated user, and any later response or state change that superseded it. Draft from that snapshot and repo-local instructions in the checkout.
 4. Classify the response as a decision, requested information, acknowledgment, routing, or `No reply needed`.
 5. Post one issue comment only when a material unanswered request remains.
-6. The write response is the read-back. Report the new comment id/time, current state, assignees, and remaining owner or blocker from that response and the snapshot. Do not view the issue again when the response includes the comment id.
+6. The write response is the read-back. Report the new comment id/time, current state, assignees, and remaining owner or blocker from that response and the snapshot. Do not view the issue again when the response includes the comment id. The operator reply ends with one `next step:` line from the review handoff in `SKILL.md`.
 
 Do not post a duplicate response. Ambiguous product decisions stop with a draft and a request for user direction; write nothing.

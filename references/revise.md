@@ -2,14 +2,14 @@
 
 Read this file for `/git-revise-pr` and `/git-revise-pr-force`. Before push: `references/pre-submit.md`.
 
-When `/git-revise-pr` is not `NEEDS_REVISION` or the user is not the author or assignee, stop without editing. For `WRITE_NOT_AUTHORIZED`, name the author or assignee. Recommend `/git-request-review`, `/git-merge-approved`, `/git-fix-conflict`, or waiting plus `/git-pr-status`. Print Solo override for `/git-revise-pr-force`.
+When `/git-revise-pr` is not `NEEDS_REVISION` or the user is not the author or assignee, stop without editing. For `WRITE_NOT_AUTHORIZED`, name the author or assignee. The reply uses the review handoff in `SKILL.md`.
 
 When `/git-revise-pr-force` is not owned, not open, `CONFLICTED`, or `MERGED_OR_CLOSED`, stop without editing. `WRITE_NOT_AUTHORIZED` still blocks. Conflicts go to `/git-fix-conflict`.
 
 
 The authenticated user must still be the author or a current assignee. The PR/MR must still be open and not `CONFLICTED`. Force waives the `NEEDS_REVISION` state gate so further commits can land without actionable reviewer feedback. Run the **pre-submit gate**. Do not merge.
 
-After a successful `/git-revise-pr-force` push, the operator reply does not print the Solo override block. It ends with one `next step:` line. When the actor is `owned` or `self_authored_head` and no other user has a current-head review request, that line is `next step: /git-review-pr-force <url>`. When some other user has a current-head review request, that line is `next step: /git-pr-status <url>`.
+After a successful `/git-revise-pr-force` push, the operator reply ends with one `next step:` line and does not print the Solo override block. When the actor is `owned` or `self_authored_head` and no other user has a current-head review request, that line is `next step: /git-review-pr-force <url>`. When some other user has a current-head review request, that line is `next step: /git-pr-status <url>`.
 
 ## Updating An Existing PR/MR
 
