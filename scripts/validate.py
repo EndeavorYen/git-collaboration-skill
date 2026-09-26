@@ -581,6 +581,12 @@ def validate_pstack() -> None:
         fail("references/plan-issue.md: missing observable-fork sentence")
     if plan.count("references/pre-submit.md") != 1 or "Do not read `references/pre-submit.md`" not in plan:
         fail("references/plan-issue.md: pre-submit mention must stay the Do not read sentence")
+    if "skip: brief is the work order" not in text:
+        fail("references/pstack.md: missing skip: brief is the work order")
+    if "never the forge snapshot, and makes no forge call" not in text:
+        fail("references/pstack.md: missing no-forge-call delegate rule")
+    if "The parent reviews the diff" not in text:
+        fail("references/pstack.md: delegate rule must say the parent reviews the diff")
 
 
 def main() -> int:
