@@ -36,6 +36,12 @@ Use `poteto-agent` only when the runtime lists it. Otherwise use `generalPurpose
 | Pre-submit on implement, revise, and conflict | **principle-prove-it-works** | Before the pre-submit gate, when the skill is present | `Proof:` from a real run of the changed behavior | `verification-before-completion` fills `Proof:`, and the record says `pstack: absent` |
 | Pre-submit surface | `verify-<app>` | The repo has that skill and the diff touches a feature in its map | `Surface:` names the skill and the feature driven | `Surface: none: <reason>` |
 | Pre-submit verify skill | `create-verification-skill` | The issue asks for that skill | The new verify skill is separate work | Do not create it in this PR/MR. The chat report recommends `/create-verification-skill` |
+| Plan step 3 inspect | `how` | The change spans more than one subsystem | Root cause cites `file:line` | current step 3 |
+| Plan step 3 inspect | `why`, local `git log` / `git blame` and the snapshot only, no forge or MCP query | The issue is a regression | Root cause names the introducing commit | current step 3 |
+| Plan step 5 Recommended change | `architect`; `arena` when two or more valid shapes exist | The change crosses a function boundary | The rejected-alternative line names a real candidate | current step 5 |
+| Plan step 5 Stop and dissent | `blast-radius` load-bearing fact | Shared contract, wire format, schema, or config default | That fact is a checkable Stop and dissent line | current step 5 |
+| Plan step 5 Execution plan | **principle-sequence-verifiable-units** | Always when present | Each step ends in Verify | current step 5 |
+| Plan step 6 before the grill | Prototype playbook | A fork whose answer can be observed by running code | The run is cited in Root cause or Recommended change | current step 6 |
 
 ## Record line
 

@@ -570,6 +570,17 @@ def validate_pstack() -> None:
     scheduled = (ROOT / "references" / "scheduled-automation.md").read_text(encoding="utf-8")
     if "pstack: off" not in scheduled:
         fail("references/scheduled-automation.md: missing 'pstack: off'")
+    plan = (ROOT / "references" / "plan-issue.md").read_text(encoding="utf-8")
+    if "**Proof:**" not in plan:
+        fail("references/plan-issue.md: missing **Proof:**")
+    fork = (
+        "A fork whose answer can be observed by running code is settled by a recorded "
+        "local run (pstack's Prototype playbook, or an equivalent script), not by the grill."
+    )
+    if fork not in plan:
+        fail("references/plan-issue.md: missing observable-fork sentence")
+    if plan.count("references/pre-submit.md") != 1 or "Do not read `references/pre-submit.md`" not in plan:
+        fail("references/plan-issue.md: pre-submit mention must stay the Do not read sentence")
 
 
 def main() -> int:
