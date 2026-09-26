@@ -49,6 +49,8 @@ Detection runs once and makes no forge call. `pstack:off` turns pstack off for t
 
 git-collaboration gates win on conflict. pstack never merges and never polls the forge under this skill.
 
+Consumers should dual-pin the git-collaboration tip SHA and the pstack version; before upgrading either side, run the checklist in `references/pstack-compat.md`.
+
 ## Install
 
 Copy or symlink this directory into your agent skills folder as

@@ -10,7 +10,7 @@ Detection makes no forge call.
 4. Otherwise run one filesystem probe. A `.cursor-plugin/plugin.json` with `name` `pstack`, or `poteto-mode/SKILL.md` under `~/.cursor/skills`, `${CLAUDE_HOME:-~/.claude}/skills`, `${CODEX_HOME:-~/.codex}/skills`, or repo `.cursor/skills`. Use the `plugin.json` version.
 5. Otherwise pstack is absent.
 
-A missing leaf skill disables only that hook. Read its `SKILL.md` in full (`disable-model-invocation: true`).
+After reading version, compare to `supported` in `references/pstack-compat.md`. Out of range or unreadable version: `pstack: unsupported <ver|unknown>`, all hooks absent, not `present`; `pstack:required` stops before write, names range or missing version. In range, check v1 named list; missing skill disables only that hook (`missing:<name>`). Read its `SKILL.md` in full (`disable-model-invocation: true`).
 
 ## Precedence
 
@@ -35,7 +35,7 @@ Mode / step | pstack skill | Runs when | Evidence | Fallback
 - Pre-submit. `verify-<app>`. Mapped feature in the diff. `Surface:` names skill and feature. `Surface: none: <reason>`.
 - Pre-submit. `create-verification-skill`. Issue asks. Separate work. Recommend `/create-verification-skill`.
 - Plan step 3. `how`. More than one subsystem. `file:line` in Root cause. current step 3.
-- Plan step 3. `why`. Local git and the existing snapshot only, no forge or MCP query. Introducing commit. current step 3.
+- Plan step 3. `why`. Introducing commit. current step 3.
 - Plan step 5. `architect`. `arena` for two or more shapes. Function boundary. Real rejected candidate. current step 5.
 - Plan step 5. `blast-radius`. Shared contract, wire format, schema, or config default. Stop and dissent line. current step 5.
 - Plan step 5. **principle-sequence-verifiable-units**. Always when present. Verify on each step. current step 5.
@@ -43,7 +43,7 @@ Mode / step | pstack skill | Runs when | Evidence | Fallback
 
 ## Record line
 
-`pstack: present <version> [hooks run] | absent | off`
+`pstack: present <version> [hooks…] | unsupported <version|unknown> [missing:…] | absent | off`
 
 ## Implement rows
 
@@ -52,8 +52,7 @@ Mode / step | pstack skill | Runs when | Evidence | Fallback
 - **Todo order.** `references/implement.md` steps are the outer list. Nest playbook steps under steps 10 and 11. Steps 12 to 16 replace "Run Opening a PR".
 - **Delegation.** The delegate gets file pointers and the brief, never the forge snapshot, and makes no forge call. The parent reviews the diff before commit.
 - **Prose.** When installed, run `technical-writing` and `unslop` on the PR/MR and commit bodies, plus `/deslop` and `/no-comments` on the diff, before the pre-submit gate.
-- **PR/MR body.** `## Why`, `## Scope`, `## Tradeoffs`, `## Blast Radius`, and `## Verification` may be the layout. Include the summary, the issue link, each brief Test case id and result, the Proof record under `## Verification`, known limitations, reviewer and assignee metadata, and pre-submit waivers.
-- **No pstack forge path.** No `gh` or `origin` from Opening a PR, no Babysit after opening, and no merge.
+- **PR/MR body.** `## Why`, `## Scope`, `## Tradeoffs`, `## Blast Radius`, and `## Verification` may be the layout. Include the summary, the issue link, each brief Test case id and result, the Proof record under `## Verification`, and known limitations.
 
 ## Pre-submit and review hooks
 
