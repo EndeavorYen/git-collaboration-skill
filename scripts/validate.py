@@ -598,6 +598,10 @@ def validate_pstack() -> None:
     drift = "Record the sweep result in the Proof record."
     if "run a drift sweep" not in text or drift not in text:
         fail("references/pstack.md: missing drift-sweep sentence")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8") if (ROOT / "README.md").exists() else ""
+    for phrase in ("pstack:off", "pstack:required", "references/pstack.md"):
+        if phrase not in readme:
+            fail(f"README.md: missing {phrase!r}")
 
 
 def main() -> int:

@@ -36,9 +36,18 @@ references/request-review.md
 references/status.md
 references/triage.md             # read-only triage and aggressive run
 references/scheduled-automation.md
+references/pstack.md             # optional pstack companion
 prompts/git-*.md                 # mode name, actor gate, reference path
 scripts/validate.py              # leak + contract checks
 ```
+
+## Optional pstack companion
+
+pstack is optional. Modes keep their current behavior when it is absent, apart from the Proof record.
+
+Detection runs once and makes no forge call. `pstack:off` turns pstack off for that invocation. `pstack:required` stops before the first write and names the missing skills when detection fails. Otherwise the runtime skill list, then one filesystem probe, decides whether pstack is present.
+
+git-collaboration gates win on conflict. pstack never merges and never polls the forge under this skill.
 
 ## Install
 
@@ -117,6 +126,7 @@ For consumers who only need issue implementation into a PR/MR (`/git-issue-pr`),
 - **Always:** Forge budget and Context budget from `SKILL.md`.
 - **Mode:** `references/implement.md` + `references/plan-issue.md` (brief and dissent recipe only) + `references/pre-submit.md` + one forge reference (`references/github.md` or `references/gitlab.md`).
 - **Never for implement-only:** `references/merge.md`, `references/review.md`, `references/triage.md`, `references/scheduled-automation.md`, and force variants (`/git-review-pr-force`, `/git-revise-pr-force`, `/git-merge-approved-force`).
+- **Optional add-on:** `references/pstack.md`. The profile works without it. When vendored, vendor the file whole.
 
 Opening or updating a draft PR is not permission to merge. Merge modes are a separate invocation and require their own approval gates.
 
