@@ -34,6 +34,7 @@ REQUIRED_FILES = [
     ROOT / "references" / "status.md",
     ROOT / "references" / "triage.md",
     ROOT / "references" / "pstack.md",
+    ROOT / "references" / "pstack-compat.md",
     ROOT / "prompts" / "git-review-pr.md",
     ROOT / "prompts" / "git-issue-pr.md",
     ROOT / "prompts" / "git-plan-issue.md",
@@ -603,9 +604,42 @@ def validate_pstack() -> None:
     if "run a drift sweep" not in text or drift not in text:
         fail("references/pstack.md: missing drift-sweep sentence")
     readme = (ROOT / "README.md").read_text(encoding="utf-8") if (ROOT / "README.md").exists() else ""
-    for phrase in ("pstack:off", "pstack:required", "references/pstack.md"):
+    for phrase in ("pstack:off", "pstack:required", "references/pstack.md", "references/pstack-compat.md"):
         if phrase not in readme:
             fail(f"README.md: missing {phrase!r}")
+    for phrase in (
+        "references/pstack-compat.md",
+        "unsupported",
+        "Out of range",
+        "unreadable version",
+        "not `present`",
+        "all hooks absent",
+        "v1 named list",
+    ):
+        if phrase not in text:
+            fail(f"references/pstack.md: missing {phrase!r}")
+    compat_path = ROOT / "references" / "pstack-compat.md"
+    if not compat_path.exists():
+        fail("references/pstack-compat.md: missing file")
+        return
+    compat = compat_path.read_text(encoding="utf-8")
+    for phrase in (
+        "contract-id: `pstack-compat-v1`",
+        "tested: `0.15.5`",
+        "supported: `>=0.14.0 <0.17.0`",
+        "## Named skills",
+        "## Agents",
+        "poteto-agent",
+        "## Upgrade checklist",
+        ".pstack-pin",
+        "named skills",
+        "tip PR",
+        "contract unchanged",
+        "Do not vendor pstack",
+        "verify-<app>",
+    ):
+        if phrase not in compat:
+            fail(f"references/pstack-compat.md: missing {phrase!r}")
 
 
 def main() -> int:
