@@ -85,6 +85,22 @@ Blocking versus non-blocking:
 - Put blockers in unresolved inline diff discussions on the exact changed line when possible.
 - Put non-blocking findings in a concise PR/MR comment marked as follow-up or optional.
 
+Proof re-run. Both `/git-review-pr` and `/git-review-pr-force` run this check after the structured file pass and OCR mapping, and before the verdict. Read the pre-submit Proof record from the PR/MR body under `## Verification`. The labels are `Proof:`, `Evidence class:`, `Surface:`, `Load-bearing fact:`, and `pstack:`.
+
+Re-run the `Proof:` command on the current review head checkout. Use the same checkout as "Use the current head". If the command can run, record the actual result. Compare that result to the author's `-> <observed result>`. If the actual result contradicts the recorded observed result, treat that contradiction as an Evidence class mismatch.
+
+If the command cannot re-run, write the reason in the verdict and in the evidence. The command cannot re-run when any of these is true.
+
+- `Proof:` is missing.
+- The environment is missing.
+- The command is non-deterministic.
+- A secret is required.
+- The job is a protected live job.
+
+Never pretend the command ran. Still run the Evidence class check for a protected live job.
+
+Check `Evidence class:` against the actual evidence and the re-run result. Use the class table below. A missing `Evidence class:` label is an Evidence class mismatch. An Evidence class mismatch is `verdict: request-changes` with severity High. When the inline rules allow a comment on the changed line, post that High finding as a blocking inline discussion. Otherwise put High on the verdict main table.
+
 Evidence class. Every approve or block verdict must label the strongest evidence used. Classes, strongest first:
 
 | Class | Meaning |
