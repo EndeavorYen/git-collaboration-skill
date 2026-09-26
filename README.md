@@ -36,7 +36,7 @@ references/request-review.md
 references/status.md
 references/triage.md             # read-only triage and aggressive run
 references/scheduled-automation.md
-references/pstack.md             # optional pstack companion
+references/pstack.md
 prompts/git-*.md                 # mode name, actor gate, reference path
 scripts/validate.py              # leak + contract checks
 ```
