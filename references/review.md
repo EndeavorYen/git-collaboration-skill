@@ -94,6 +94,8 @@ Evidence class. Every approve or block verdict must label the strongest evidence
 | source-contract / regex tripwire | String or schema lock, not runtime proof |
 | docs alignment | Text matches intended policy |
 
+Blast-radius level to Evidence class: 5 live job / real artifact bytes, 4 executable unit tests, 2 and 3 source-contract / regex tripwire, 1 no evidence. An unproven load-bearing fact is a remaining gate. Do not write it closed.
+
 Approve must not treat tripwire as live proof. A policy change that keeps old host config must say in the verdict that testing scope shrinks.
 
 Thorough-review triggers in the user text or invocation arguments include thorough, don't rubber-stamp, 徹底, 抓出來, and 不要放水. Thorough review does not promote style to blocking. It must put remaining gates, policy cost, and the evidence class in the verdict main table, and must not hide remaining gates in a non-blocking note.

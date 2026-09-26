@@ -6,6 +6,8 @@ When the PR/MR is not `CONFLICTED` or the user is not the author or assignee, st
 
 ## Fix PR/MR Conflicts
 
+When `references/pstack.md` is loaded, apply its conflict rows.
+
 Use this when the user asks to fix a conflict or invokes `/git-fix-conflict`.
 
 1. Run the PR/MR command preflight and continue only when the primary state is `CONFLICTED` and the PR/MR is `owned`. If `WRITE_NOT_AUTHORIZED`, stop without changing the branch even when the user named this PR/MR.
