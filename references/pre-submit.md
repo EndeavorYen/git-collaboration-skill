@@ -26,9 +26,23 @@ Applies before push and before opening or updating a PR/MR on `/git-issue-pr`, `
 4. A waiver is valid only when the **human in this conversation** names the path, the issue, and a reason. **Blanket ship language is not a waiver.** The agent does not waive. Unattended scheduled runs have no human in the conversation, so they cannot waive.
 5. Record each waiver in the commit body or PR/MR description.
 6. After fixes, run the file pass again on the new range until no unwaived Critical/High remain.
-7. A failed file pass, leftover unwaived Critical/High, or a missing waiver record → do not push, do not open or update the PR/MR.
+7. A failed file pass, leftover unwaived Critical/High, a missing waiver record, or a missing Proof record → do not push, do not open or update the PR/MR.
 
 Medium and Low do not block submit. Mention them in the PR/MR description when useful.
+
+### Proof record
+
+The gate modes above write this record under `## Verification`, or in the update comment otherwise.
+
+```
+Proof: <command or skill run> -> <observed result>
+Evidence class: live job / real artifact bytes | executable unit tests | source-contract / regex tripwire | docs alignment
+Surface: <verify skill and feature driven> | none: <reason>
+Load-bearing fact: <fact> (level 1-5) | n/a
+pstack: present <version> [hooks run] | absent | off
+```
+
+Evidence class values match `references/review.md`. Inconclusive or wrong-surface is not a pass. A user-visible change proven only by tests records `Surface: none: <reason>`.
 
 | Excuse | Reality |
 | --- | --- |
@@ -39,3 +53,6 @@ Medium and Low do not block submit. Mention them in the PR/MR description when u
 | "Ship it / LGTM" | Blanket ship language is not a waiver. |
 | "I wrote this code, I know it's correct" | Pre-submit uses a fresh subagent. |
 | "Scheduled run, no one to waive, push anyway" | Unattended runs cannot waive; leftover Critical/High stops the push. |
+| "pstack is not installed, so proof is n/a" | The Proof record is required anyway. pstack only raises the ceiling. |
+| "Inconclusive on the real surface" | Inconclusive or wrong-surface is not a pass. Record `Surface: none: <reason>`. |
+| "I will create the verify skill in this PR" | That is its own issue unless this issue asks for it. |

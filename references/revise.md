@@ -22,7 +22,7 @@ Use this when addressing reviewer feedback on a PR/MR you authored or are mainta
 5. Implement focused fixes and add or update tests for behavior changes.
 6. Commit on the PR/MR branch, preserving unrelated user work. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived. Then push.
 7. Reply to reviewer threads with what changed and validation evidence. Resolve a thread only after the new code actually addresses it.
-8. Update the description when validation evidence, known limitations, or issue mappings changed.
+8. Update the description when validation evidence, known limitations, issue mappings, or the Proof record from `references/pre-submit.md` changed.
 9. The push and thread-reply responses are the read-back for head, pipeline, unresolved discussions, and reviewer state. One confirm view only when those responses omit the new head SHA.
 
 If there is no new or unaddressed actionable reviewer feedback and this invocation is `/git-revise-pr`, do not edit, commit, push, or manufacture an update. Under `/git-revise-pr-force`, continue with the owned source-branch update and the **pre-submit gate**.

@@ -32,7 +32,10 @@ Use `poteto-agent` only when the runtime lists it. Otherwise use `generalPurpose
 ## Hook table
 
 | Mode / step | pstack skill | Runs when | Evidence | Fallback |
-| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- |
+| Pre-submit on implement, revise, and conflict | **principle-prove-it-works** | Before the pre-submit gate, when the skill is present | `Proof:` from a real run of the changed behavior | `verification-before-completion` fills `Proof:`, and the record says `pstack: absent` |
+| Pre-submit surface | `verify-<app>` | The repo has that skill and the diff touches a feature in its map | `Surface:` names the skill and the feature driven | `Surface: none: <reason>` |
+| Pre-submit verify skill | `create-verification-skill` | The issue asks for that skill | The new verify skill is separate work | Do not create it in this PR/MR. The chat report recommends `/create-verification-skill` |
 
 ## Record line
 

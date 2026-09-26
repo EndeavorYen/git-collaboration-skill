@@ -25,7 +25,7 @@ Use this when the task is to fix or implement a GitHub or GitLab issue.
 12. Commit with a focused conventional-style message and reference the issue.
 13. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived.
 14. Push the branch and open or update a PR/MR targeting the development branch when this is part of the issue workflow.
-15. Keep the PR/MR description current: summary, issue link, validation evidence with each brief Test case id and its result, known limitations, reviewer/assignee metadata when available, and any pre-submit waivers.
+15. Keep the PR/MR description current: summary, issue link, validation evidence with each brief Test case id and its result, known limitations, reviewer/assignee metadata when available, any pre-submit waivers, and the Proof record from `references/pre-submit.md`.
 16. The create or update response is the read-back. Report iid, URL, current head SHA, pipeline state, issue link, and reviewer/assignee state. One confirm view only when that response omits iid, URL, or head SHA.
 
 Do not merge the PR/MR unless the user separately asks for that merge and the merge gate in `references/merge.md` passes.

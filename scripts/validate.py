@@ -561,6 +561,15 @@ def validate_pstack() -> None:
             continue
         if "references/pstack.md" in prompt.read_text(encoding="utf-8"):
             fail(f"prompts/{name} names references/pstack.md")
+    pre = (ROOT / "references" / "pre-submit.md").read_text(encoding="utf-8")
+    for label in ("Proof:", "Evidence class:", "Surface:", "Load-bearing fact:", "pstack:"):
+        if label not in pre:
+            fail(f"references/pre-submit.md: missing Proof record label {label!r}")
+    if "Inconclusive or wrong-surface is not a pass" not in pre:
+        fail("references/pre-submit.md: missing inconclusive-surface rule")
+    scheduled = (ROOT / "references" / "scheduled-automation.md").read_text(encoding="utf-8")
+    if "pstack: off" not in scheduled:
+        fail("references/scheduled-automation.md: missing 'pstack: off'")
 
 
 def main() -> int:
