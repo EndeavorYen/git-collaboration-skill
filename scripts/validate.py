@@ -105,6 +105,10 @@ REFERENCE_PHRASES = {
         "同意",
         "不同意",
         "agree or disagree",
+        "Re-run the `Proof:` command on the current review head",
+        "cannot re-run",
+        "An Evidence class mismatch is `verdict: request-changes` with severity High",
+        "Do not require rerunning a protected live job before approval",
     ],
     "plan-issue.md": [
         "<!-- git-plan-issue -->",
