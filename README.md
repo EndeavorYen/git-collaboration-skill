@@ -96,8 +96,10 @@ A `/git-review-pr-force` review that GitHub will not accept as APPROVE still lea
 
 ## Executor-ready brief
 
+Default brief is a decision card; a handoff to another session, model, or agent gets the full work-order.
+
 `/git-plan-issue` may run on a strong model while `/git-issue-pr` runs on a
-weaker one. The brief is therefore a work order, not a summary:
+weaker one. The handoff work-order is that full recipe:
 
 - **Planned at** `branch@SHA`, so the executor can diff the planned paths and
   notice drift.
@@ -109,7 +111,7 @@ weaker one. The brief is therefore a work order, not a summary:
 - **Stop and dissent when**: checkable assumptions. If one fails, the executor
   posts a dissent instead of improvising.
 
-A plan that needs more than 8 steps is a scope decision and goes through the
+A handoff work-order that needs more than 8 steps is a scope decision and goes through the
 grill instead of a longer brief.
 
 Optional `Brief:` and `Executor-model:` lines under `## Verification` are observation only, not a gate.
