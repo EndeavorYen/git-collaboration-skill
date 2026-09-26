@@ -44,6 +44,17 @@ pstack: present <version> [hooks run] | absent | off
 
 Evidence class values match `references/review.md`. Inconclusive or wrong-surface is not a pass. A user-visible change proven only by tests records `Surface: none: <reason>`.
 
+### Optional observation
+
+Under `## Verification`, outside the Proof record, the PR/MR body may include:
+
+```
+Brief: followed | adjusted: <step ids> | dissent <comment id>
+Executor-model: <id or unknown>
+```
+
+`Brief:` is one of `followed`, `adjusted: <step ids>`, or `dissent <comment id>`. `Executor-model:` is a model id or `unknown`. Observation only, not a gate. A missing line does not fail the pre-submit gate.
+
 | Excuse | Reality |
 | --- | --- |
 | "I'll review the diff myself" | File pass is OCR coverage via `open-code-review-delegate`. |

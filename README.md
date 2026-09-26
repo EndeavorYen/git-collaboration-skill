@@ -112,6 +112,8 @@ weaker one. The brief is therefore a work order, not a summary:
 A plan that needs more than 8 steps is a scope decision and goes through the
 grill instead of a longer brief.
 
+Optional `Brief:` and `Executor-model:` lines under `## Verification` are observation only, not a gate.
+
 ## Read-then-write gate
 
 During issue implementation (`/git-issue-pr`), agents must not enter read-only
