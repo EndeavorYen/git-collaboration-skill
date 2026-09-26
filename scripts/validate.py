@@ -140,6 +140,12 @@ REFERENCE_PHRASES = {
         "### Interfaces",
         "### Test cases",
         "### Stop and dissent when",
+        "Decision card",
+        "nine bold fields",
+        "Do not include `### Execution plan`, `### Interfaces`, or `### Test cases`",
+        "another session, model, or agent",
+        "Do not add a `plan:on` / `plan:off` mode flag",
+        "Work-order / handoff",
         "Do not write function bodies",
         "No vague verbs",
         "more than 8 steps",
@@ -157,6 +163,11 @@ REFERENCE_PHRASES = {
         "out of mode",
         "at most one focused search",
         "it is the work order",
+        "decision card",
+        "interleaved loop",
+        "full work-order",
+        "another session, model, or agent",
+        "Do not add a `plan:on` / `plan:off` mode flag",
         "planned-at",
         "Stop and dissent when",
         "every brief Test case",
@@ -493,6 +504,105 @@ def validate_reference_phrases() -> None:
                     fail(f"references/{name}: recipe body belongs only in references/plan-issue.md")
 
 
+BRIEF_FIELDS = (
+    "**Goal:**",
+    "**Root cause:**",
+    "**Recommended change:**",
+    "**Out of scope:**",
+    "**Acceptance criteria:**",
+    "**Tests:**",
+    "**Proof:**",
+    "**Constraints:**",
+    "**Planned at:**",
+    "### Stop and dissent when",
+    "**Next:**",
+    "<!-- git-plan-issue -->",
+)
+
+WORK_ORDER_SECTIONS = (
+    "### Execution plan",
+    "### Interfaces",
+    "### Test cases",
+)
+
+MODE_FLAG_BAN = "Do not add a `plan:on` / `plan:off` mode flag."
+
+
+def implementation_brief_recipes(text: str) -> list[str]:
+    blocks = re.findall(r"````markdown\n(.*?)````", text, flags=re.S)
+    return [block for block in blocks if "## Implementation brief" in block]
+
+
+def validate_no_plan_mode_flag(text: str, label: str) -> None:
+    scrubbed = text.replace(MODE_FLAG_BAN, "")
+    if "plan:on" in scrubbed or "plan:off" in scrubbed:
+        fail(f"{label}: plan:on/off mode flag is not allowed")
+
+
+def validate_brief_profiles() -> None:
+    plan_path = ROOT / "references" / "plan-issue.md"
+    impl_path = ROOT / "references" / "implement.md"
+    if not plan_path.exists():
+        return
+    plan = plan_path.read_text(encoding="utf-8")
+    validate_no_plan_mode_flag(plan, "references/plan-issue.md")
+    recipes = implementation_brief_recipes(plan)
+    if len(recipes) != 2:
+        fail(
+            "references/plan-issue.md: expected 2 implementation brief recipes, "
+            f"found {len(recipes)}"
+        )
+        return
+    decision = [recipe for recipe in recipes if "### Execution plan" not in recipe]
+    work = [recipe for recipe in recipes if "### Execution plan" in recipe]
+    if len(decision) != 1 or len(work) != 1:
+        fail("references/plan-issue.md: expected one decision-card recipe and one work-order recipe")
+        return
+    card, order = decision[0], work[0]
+    if plan.find(card) > plan.find(order):
+        fail("references/plan-issue.md: decision card recipe must precede the work-order recipe")
+    for field in BRIEF_FIELDS:
+        if field not in card:
+            fail(f"references/plan-issue.md: decision card missing {field!r}")
+        if field not in order:
+            fail(f"references/plan-issue.md: work-order missing {field!r}")
+    for heading in WORK_ORDER_SECTIONS:
+        if heading in card:
+            fail(f"references/plan-issue.md: decision card must not include {heading!r}")
+        if heading not in order:
+            fail(f"references/plan-issue.md: work-order missing {heading!r}")
+    if not impl_path.exists():
+        return
+    impl = impl_path.read_text(encoding="utf-8")
+    validate_no_plan_mode_flag(impl, "references/implement.md")
+    if "\n6. " not in impl or "\n7. " not in impl or "\n10. " not in impl or "\n11. " not in impl:
+        fail("references/implement.md: missing step 6, 7, 10, or 11")
+        return
+    step6 = impl.split("\n6. ", 1)[1].split("\n7. ", 1)[0]
+    step10 = impl.split("\n10. ", 1)[1].split("\n11. ", 1)[0]
+    for phrase in (
+        "decision card",
+        "same session",
+        "handoff",
+        "full work-order",
+        "nine bold fields",
+    ):
+        if phrase not in step6:
+            fail(f"references/implement.md step 6 missing {phrase!r}")
+    for heading in WORK_ORDER_SECTIONS:
+        if heading in step6:
+            fail(f"references/implement.md step 6 must not paste {heading!r}")
+    for phrase in (
+        "it is the work order",
+        "derive the steps yourself",
+        "interleaved loop",
+        "Execution plan",
+        "do not revert them",
+    ):
+        if phrase not in step10:
+            fail(f"references/implement.md step 10 missing {phrase!r}")
+
+
 def validate_forge_references() -> None:
     github = ROOT / "references" / "github.md"
     gitlab = ROOT / "references" / "gitlab.md"
@@ -537,6 +647,7 @@ def validate_implement_profile() -> None:
         "references/pre-submit.md",
         "is not permission to merge",
         "chat reply has one `next step:` line",
+        "Default brief is a decision card; a handoff to another session, model, or agent gets the full work-order.",
     ):
         if phrase not in text:
             fail(f"README.md: minimal implement profile missing {phrase!r}")
@@ -876,6 +987,7 @@ def main() -> int:
     validate_prompts()
     validate_default_prompts_stay_strict()
     validate_reference_phrases()
+    validate_brief_profiles()
     validate_forge_references()
     validate_scheduled_ocr_gate()
     validate_implement_profile()

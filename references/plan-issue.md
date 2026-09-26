@@ -6,13 +6,41 @@ Read this file for `/git-plan-issue`. Also read one of `references/github.md` or
 
 Use this when the user explicitly invokes `/git-plan-issue` or clearly asks to analyze one issue and post an implementation brief. The write scope is updating the issue description when settled acceptance differs, opening follow-up forge issues for confirmed grill records with `status: "follow_up"`, plus one issue comment containing the implementation brief on the exact target; do not change code, commits, branches, labels, assignees, issue state, links, or any other forge object.
 
-The planner and the executor may be different models. Write the brief for an executor that did not do this analysis and may be a weaker model: it must be able to follow the brief without re-deriving the design. See **Executor-ready brief**.
+Infer the brief profile from handoff intent. Do not add a `plan:on` / `plan:off` mode flag.
+
+**Decision card** is the default for same-session plan and implement. Post the nine bold fields, `### Stop and dissent when`, and **Next**. **Planned at** is one of the nine. Do not include `### Execution plan`, `### Interfaces`, or `### Test cases`.
+
+**Work-order / handoff** is the full executor-ready recipe, including those three sections, when the user invoked `/git-plan-issue` for another session, model, or agent to execute, or explicitly asks for a full work-order or handoff brief. The planner and the executor may be different models. Write that recipe for an executor that did not do this analysis and may be a weaker model: it must be able to follow the brief without re-deriving the design. See **Executor-ready brief**.
 
 1. Resolve the exact project/issue. Reuse the authenticated user already resolved for this invocation.
 2. Take one issue snapshot: state, description, labels, assignees, links already on that payload, marker comments, and the latest non-system comments. The latest body stays whole. Do not search for related PRs/MRs.
 3. Read repo-local instructions and inspect the relevant code in the local checkout until the brief can name concrete files, symbols, behavior, signatures, test locations, and the validation commands the repo uses. Search, then open those symbols and their tests. Record `git rev-parse --short HEAD` and the current branch as the planned-at base. Do not paste existing source into the brief or the reply. Stay on Forge budget steps 3 and 4 and on Context budget. Do not read repository files through the forge.
 4. Classify whether a current implementation brief is still needed. A current brief exists when a comment contains `<!-- git-plan-issue -->` and later comments have not changed Goal, Recommended change, Out of scope, or Acceptance criteria. A current brief is still needed when none exists, later comments changed those fields, or the user asked to re-plan.
-5. Draft one issue comment using this recipe, in the issue language or the repo's documented language. Keep the bold field labels and `###` headings in English so the executor and checkers can find them:
+5. Select the profile from the handoff intent above, then draft one issue comment in the issue language or the repo's documented language. Keep the bold field labels and `###` headings in English so the executor and checkers can find them. The nine bold fields are Goal, Root cause, Recommended change, Out of scope, Acceptance criteria, Tests, Proof, Constraints, and Planned at.
+
+**Decision card** (default, same-session plan and implement):
+
+````markdown
+<!-- git-plan-issue -->
+## Implementation brief
+
+**Goal:** <one observable completion state>
+**Root cause:** <file and behavior evidence>
+**Recommended change:** <what to change, where, and why this shape; one line naming the rejected alternative>
+**Out of scope:** <work this issue will not do>
+**Acceptance criteria:** <summary of acceptance changes or deliverables; full checkable list lives in the issue description, do not duplicate the full checklist>
+**Tests:** <test files to add or change, and the exact commands to run>
+**Proof:** <verify skill and feature to drive, or command> | tests only: <reason>
+**Constraints:** <repo-local instructions or existing contracts>
+**Planned at:** `<branch>@<short SHA>`
+
+### Stop and dissent when
+- <an assumption this plan relies on, stated so the executor can check it>
+
+**Next:** `/git-issue-pr <exact issue URL>`
+````
+
+**Work-order / handoff** (another session, model, or agent will execute, or the user explicitly asks for a full work-order or handoff brief). This recipe adds `### Execution plan`, `### Interfaces`, and `### Test cases` to the decision card:
 
 ````markdown
 <!-- git-plan-issue -->
@@ -59,7 +87,7 @@ The brief is a proposal. `/git-issue-pr` follows it when the implementer agrees,
    - **Follow-ups:** when work is moved to a later issue during the grill, that disposition is recorded in machine-readable form with `status: "follow_up"`. Standalone `/gentle-grill-me` does not implement and does not open issues; the caller that loaded the grill does. Do not invent follow-ups from chat memory when the close log was not confirmed. A `skipped` record or still-open assumption does not become an issue by itself. After the user confirms the close log, search open issues in that project first to prevent duplicate creation. For each non-duplicate record, open a forge issue for each confirmed close log record with `status: "follow_up"` before the turn ends, linked to the source issue. The created follow-up issue states the pending work, reason for splitting, and source issue URL. List each new follow-up issue URL in the brief comment and description update. If any required follow-up issue was not opened, the turn does not report the plan complete; ending the turn with only `grill-log.jsonl` fails this mode when a `follow_up` record has no issue URL.
    - **Same session:** on this unsettled path, that confirmation authorizes opening those follow-up issues and the one brief comment in step 7 only when those four fields are settled decisions. The local grill log is not the issue comment. After the user confirms the close log, post that brief in the same session before the turn ends. `gentle-grill-me` saying this session must not implement does not skip the comment and does not end the turn at `.gentle-grill/grill-log.jsonl`.
    - **Scope:** `/git-plan-issue` stops after that comment. It does not authorize code, commits, pushes, or a PR/MR. Scheduled lifecycle, scheduled merge, and `/git-triage` do not load `gentle-grill-me`; recommend `/git-plan-issue` with the exact issue URL.
-7. When the issue is open, a current brief is still needed, the draft is grounded in the inspected checkout, the draft passes **Executor-ready brief**, and Goal, Recommended change, Out of scope, and Acceptance criteria are settled decisions, write that contract into the issue description before the turn ends whenever settled acceptance differs from the existing description. Keep the existing problem, actual-result, and expected-result sections. Replace the acceptance section so it matches the settled brief. Each checklist line must be checkable by a named test case (`T1`, ...) or an exact command. Do not leave the old checklist in place beside a contradictory comment. If any original acceptance line is no longer satisfied or satisfied only on a narrower surface, record each narrowed or dropped line in an `### Exceptions` block:
+7. When the issue is open, a current brief is still needed, the draft is grounded in the inspected checkout, the draft passes the checks for the selected profile (**Decision card**, or **Executor-ready brief** for a work-order), and Goal, Recommended change, Out of scope, and Acceptance criteria are settled decisions, write that contract into the issue description before the turn ends whenever settled acceptance differs from the existing description. Keep the existing problem, actual-result, and expected-result sections. Replace the acceptance section so it matches the settled brief. Each checklist line must be checkable by a named test case (`T1`, ...) or an exact command. Do not leave the old checklist in place beside a contradictory comment. If any original acceptance line is no longer satisfied or satisfied only on a narrower surface, record each narrowed or dropped line in an `### Exceptions` block:
 
 ```markdown
 ### Exceptions
@@ -78,9 +106,19 @@ Post one issue comment containing the brief. The description holds the checkable
 
 Do not post a duplicate brief. Do not implement or open a PR/MR. Do not post a brief while an unsettled product decision remains in those four fields. If the issue is closed, a current brief already exists and the user did not ask to re-plan, an open PR/MR already covers the issue and the user did not ask to re-plan, or the evidence is too thin for a grounded brief, perform no write and report the evidence. The operator reply still ends with one `next step:` line from the review handoff in `SKILL.md`.
 
+## Decision card
+
+Default profile for same-session plan and implement. The comment is the nine bold fields, then `### Stop and dissent when`, then **Next**. Do not include `### Execution plan`, `### Interfaces`, or `### Test cases`. Check this profile before step 7:
+
+- **Nine fields are concrete.** Each of the nine names file, behavior, command, or contract evidence from the inspected checkout. **Next** is `/git-issue-pr` plus the exact issue URL.
+- **No execution recipe.** This profile has no Execution plan, no Interfaces section, and no Test cases table. The same-session executor derives the steps.
+- **No vague verbs.** Replace "handle", "improve", "clean up", "as needed", "appropriate", "etc.", and "similar" with the exact behavior. If you cannot state the exact behavior, the evidence is too thin or a product decision is unsettled.
+- **Stop and dissent when** lists the assumptions the plan relies on that the executor can check: a symbol's current behavior, a caller count, a config default, a test that currently passes. If one fails, the executor dissents instead of improvising.
+- **Proof.** `tests only: <reason>` is allowed only when the change has no user-visible surface. Do not paste pstack artifacts into the brief.
+
 ## Executor-ready brief
 
-The brief is a work order. The executor reads it, opens the files named in step 1, and writes the first failing test. It should not need a second design pass. Check the draft against every rule before step 7:
+The work-order / handoff profile is a work order. The executor reads it, opens the files named in step 1, and writes the first failing test. It should not need a second design pass. Check the draft against every rule below before step 7. Do not apply the Execution plan, Interfaces, or Test cases requirements to a decision card:
 
 - **Paths and symbols exist.** Every `edit` path and symbol exists at the planned-at SHA. Every `create` path names the directory it goes in, following an existing neighbor.
 - **Steps are ordered and small.** The first step writes or changes the failing tests from Test cases. Each later step touches one concern and ends with a Verify command and its expected result. The last step runs the repo's full relevant check.
