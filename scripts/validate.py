@@ -214,7 +214,7 @@ REFERENCE_PHRASES = {
     ],
 }
 
-PSTACK_WORD_LIMIT = 900
+PSTACK_WORD_LIMIT = 918
 
 # Required Proof record labels. Brief: and Executor-model: are optional
 # observation lines under ## Verification. Do not add them here. A missing
@@ -964,11 +964,45 @@ def validate_pstack() -> None:
             fail("references/pstack.md: Plan step 5 must not name a fixed arena trigger")
     if "`arena` was used for this change" not in text:
         fail("references/pstack.md: missing arena-was-used interrogate trigger")
-    if (
-        "- Plan step 5. `architect`. Function boundary. Real rejected candidate. current step 5."
-        not in text
+    if "Always when present" in text:
+        fail("references/pstack.md: sequence-verifiable-units must not stay Always when present")
+    architect_row = (
+        "- Plan step 5. `architect`. Handoff profile only, function boundary. "
+        "Real rejected candidate. current step 5."
+    )
+    if architect_row not in text:
+        fail("references/pstack.md: missing handoff-only architect Plan step 5 row")
+    sequence_row = (
+        "- Plan step 5. **principle-sequence-verifiable-units**. "
+        "Execution plan (handoff/work-order profile). Verify on each step. current step 5."
+    )
+    if sequence_row not in text:
+        fail("references/pstack.md: missing handoff Execution-plan sequence row")
+    decision_lines = [line for line in text.splitlines() if "skip: decision card" in line]
+    if len(decision_lines) != 1:
+        fail("references/pstack.md: expected one decision-card skip line")
+    else:
+        decision = decision_lines[0]
+        for phrase in (
+            "Decision-card profile:",
+            "record `skip: decision card`",
+            "`architect`",
+            "**principle-sequence-verifiable-units**",
+            "not a silent-skip failure",
+        ):
+            if phrase not in decision:
+                fail(f"references/pstack.md: decision-card skip missing {phrase!r}")
+        for other in ("blast-radius", "`how`", "`why`", "Prototype"):
+            if other in decision:
+                fail(f"references/pstack.md: decision-card skip must not name {other}")
+    for row in (
+        "- Plan step 3. `how`. More than one subsystem. `file:line` in Root cause. current step 3.",
+        "- Plan step 3. `why`. Introducing commit. current step 3.",
+        "- Plan step 5. `blast-radius`. Shared contract, wire format, schema, or config default. Stop and dissent line. current step 5.",
+        "- Plan step 6. Prototype playbook. Observable by running code. Cited run. current step 6.",
     ):
-        fail("references/pstack.md: missing architect Plan step 5 row")
+        if row not in text:
+            fail(f"references/pstack.md: kept hook row missing {row!r}")
     if "record `how`, `architect`, and `arena`" in text:
         fail("references/pstack.md: brief skip must not list arena as a default hook")
     review = (ROOT / "references" / "review.md").read_text(encoding="utf-8")
@@ -1027,6 +1061,26 @@ def validate_pstack() -> None:
     ):
         if phrase not in compat:
             fail(f"references/pstack-compat.md: missing {phrase!r}")
+    named: list[str] = []
+    in_named = False
+    for line in compat.splitlines():
+        if line.startswith("## Named skills"):
+            in_named = True
+            continue
+        if in_named and line.startswith("## "):
+            break
+        if in_named and line.startswith("- "):
+            named.append(line)
+    for skill in (
+        "- how",
+        "- why",
+        "- architect",
+        "- blast-radius",
+        "- principle-sequence-verifiable-units",
+        "- principle-prove-it-works",
+    ):
+        if skill not in named:
+            fail(f"references/pstack-compat.md: named list missing {skill!r}")
 
 
 def main() -> int:

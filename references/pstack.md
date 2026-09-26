@@ -36,9 +36,10 @@ Columns: step, skill, when, evidence, fallback.
 - Pre-submit. `create-verification-skill`. Issue asks. Separate work. Recommend `/create-verification-skill`.
 - Plan step 3. `how`. More than one subsystem. `file:line` in Root cause. current step 3.
 - Plan step 3. `why`. Introducing commit. current step 3.
-- Plan step 5. `architect`. Function boundary. Real rejected candidate. current step 5.
+- Plan step 5. `architect`. Handoff profile only, function boundary. Real rejected candidate. current step 5.
 - Plan step 5. `blast-radius`. Shared contract, wire format, schema, or config default. Stop and dissent line. current step 5.
-- Plan step 5. **principle-sequence-verifiable-units**. Always when present. Verify on each step. current step 5.
+- Plan step 5. **principle-sequence-verifiable-units**. Execution plan (handoff/work-order profile). Verify on each step. current step 5.
+Decision-card profile: record `skip: decision card` for `architect` and **principle-sequence-verifiable-units**; not a silent-skip failure.
 - Plan step 6. Prototype playbook. Observable by running code. Cited run. current step 6.
 
 ## Record line
