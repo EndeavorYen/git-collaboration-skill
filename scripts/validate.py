@@ -33,6 +33,7 @@ REQUIRED_FILES = [
     ROOT / "references" / "request-review.md",
     ROOT / "references" / "status.md",
     ROOT / "references" / "triage.md",
+    ROOT / "references" / "pstack.md",
     ROOT / "prompts" / "git-review-pr.md",
     ROOT / "prompts" / "git-issue-pr.md",
     ROOT / "prompts" / "git-plan-issue.md",
@@ -188,7 +189,29 @@ REFERENCE_PHRASES = {
         "/git-plan-issue",
         "ask who to assign",
     ],
+    "pstack.md": [
+        "pstack:off",
+        "pstack:required",
+        "git-collaboration wins",
+        "never writes to the forge",
+        "Forge budget",
+    ],
 }
+
+PSTACK_WORD_LIMIT = 900
+
+PSTACK_FORBIDDEN_PROMPTS = (
+    "git-merge-approved.md",
+    "git-merge-approved-force.md",
+    "git-scheduled-lifecycle.md",
+    "git-scheduled-merge.md",
+    "git-triage.md",
+    "git-reply-issue.md",
+    "git-request-review.md",
+    "git-pr-status.md",
+)
+
+TRIAGE_LOAD_LINE = "Status or triage, including the aggressive run: read `references/triage.md`."
 
 # Numbered-procedure sentences. Prompts point at the home; they do not copy it.
 PROCEDURE_SENTENCES = [
@@ -514,6 +537,32 @@ def validate_implement_profile() -> None:
             fail(f"README.md: minimal implement profile missing {phrase!r}")
 
 
+def validate_pstack() -> None:
+    path = ROOT / "references" / "pstack.md"
+    if not path.exists():
+        fail("references/pstack.md: missing file")
+        return
+    text = path.read_text(encoding="utf-8")
+    words = len(text.split())
+    if words > PSTACK_WORD_LIMIT:
+        fail(f"references/pstack.md: {words} words exceeds {PSTACK_WORD_LIMIT}")
+    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8") if (ROOT / "SKILL.md").exists() else ""
+    for key in ("merge", "scheduled"):
+        sentence, _banned = LOAD_LINES[key]
+        for row in skill.splitlines():
+            if sentence in row and "references/pstack.md" in row:
+                fail(f"SKILL.md: {key} load line names references/pstack.md")
+    for row in skill.splitlines():
+        if TRIAGE_LOAD_LINE in row and "references/pstack.md" in row:
+            fail("SKILL.md: triage load line names references/pstack.md")
+    for name in PSTACK_FORBIDDEN_PROMPTS:
+        prompt = ROOT / "prompts" / name
+        if not prompt.exists():
+            continue
+        if "references/pstack.md" in prompt.read_text(encoding="utf-8"):
+            fail(f"prompts/{name} names references/pstack.md")
+
+
 def main() -> int:
     validate_files_exist()
     validate_no_leaks()
@@ -524,6 +573,7 @@ def main() -> int:
     validate_forge_references()
     validate_scheduled_ocr_gate()
     validate_implement_profile()
+    validate_pstack()
     if ERRORS:
         print("Validation failed:", file=sys.stderr)
         for error in ERRORS:

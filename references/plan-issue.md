@@ -1,6 +1,6 @@
 # Plan issue
 
-Read this file for `/git-plan-issue`. Also read one of `references/github.md` or `references/gitlab.md`. Do not read `references/pre-submit.md` for this mode.
+Read this file for `/git-plan-issue`. Also read one of `references/github.md` or `references/gitlab.md`. Do not read `references/pre-submit.md` for this mode. When detection says pstack is present and not off, read `references/pstack.md`.
 
 ## Plan Issue Workflow
 
