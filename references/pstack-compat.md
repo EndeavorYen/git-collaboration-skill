@@ -31,6 +31,8 @@ v1 named skills (pstack package only):
 
 Prose is off by default. `arena` is not a fixed hook-table trigger.
 
+Plan step 5 triggers for `architect` and `principle-sequence-verifiable-units` are the handoff profile only. Both stay on the named list.
+
 ## Agents
 
 - poteto-agent
