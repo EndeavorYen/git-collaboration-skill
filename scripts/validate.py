@@ -594,6 +594,45 @@ def validate_pstack() -> None:
         fail("references/pstack.md: delegate rule must say the parent reviews the diff")
     if "A silent skip fails the pre-submit gate" not in text:
         fail("references/pstack.md: missing silent-skip rule")
+    prose_lines = [line for line in text.splitlines() if "**Prose.**" in line]
+    if len(prose_lines) != 1:
+        fail("references/pstack.md: expected one Prose row")
+    else:
+        prose = prose_lines[0]
+        for phrase in (
+            "Default off",
+            "not in the default required set",
+            "pstack:prose",
+            "fix prose/copy",
+            "equivalent opt-in",
+            "not a silent-skip failure",
+            "Without opt-in",
+            "`technical-writing`",
+            "`unslop`",
+            "`/deslop`",
+            "`/no-comments`",
+            "only for",
+        ):
+            if phrase not in prose:
+                fail(f"references/pstack.md: Prose row missing {phrase!r}")
+    if "When installed, run `technical-writing`" in text:
+        fail("references/pstack.md: do not require the prose chain whenever skills are installed")
+    if re.search(r"\bevery PR\b|\beach PR\b|\bon every PR\b", text, re.I):
+        fail("references/pstack.md: do not require the prose chain on every PR")
+    if re.search(r"arena`? for two or more shapes", text):
+        fail("references/pstack.md: Plan step 5 must not trigger arena for two or more shapes")
+    for line in text.splitlines():
+        if "Plan step 5" in line and "arena" in line:
+            fail("references/pstack.md: Plan step 5 must not name a fixed arena trigger")
+    if "`arena` was used for this change" not in text:
+        fail("references/pstack.md: missing arena-was-used interrogate trigger")
+    if (
+        "- Plan step 5. `architect`. Function boundary. Real rejected candidate. current step 5."
+        not in text
+    ):
+        fail("references/pstack.md: missing architect Plan step 5 row")
+    if "record `how`, `architect`, and `arena`" in text:
+        fail("references/pstack.md: brief skip must not list arena as a default hook")
     review = (ROOT / "references" / "review.md").read_text(encoding="utf-8")
     if "An unproven load-bearing fact is a remaining gate" not in review:
         fail("references/review.md: missing remaining-gate ladder rule")
@@ -637,6 +676,10 @@ def validate_pstack() -> None:
         "contract unchanged",
         "Do not vendor pstack",
         "verify-<app>",
+        "- arena",
+        "- technical-writing",
+        "- unslop",
+        "- no-comments",
     ):
         if phrase not in compat:
             fail(f"references/pstack-compat.md: missing {phrase!r}")

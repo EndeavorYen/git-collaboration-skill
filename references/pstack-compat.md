@@ -29,6 +29,8 @@ v1 named skills (pstack package only):
 - principle-attack-the-premise
 - principle-fix-root-causes
 
+Prose is off by default. `arena` is not a fixed hook-table trigger.
+
 ## Agents
 
 - poteto-agent

@@ -51,6 +51,8 @@ git-collaboration gates win on conflict. pstack never merges and never polls the
 
 Consumers should dual-pin the git-collaboration tip SHA and the pstack version; before upgrading either side, run the checklist in `references/pstack-compat.md`.
 
+Prose is off by default. Add `pstack:prose`, or ask to fix prose, to run it.
+
 ## Install
 
 Copy or symlink this directory into your agent skills folder as
