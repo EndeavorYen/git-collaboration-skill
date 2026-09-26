@@ -13,6 +13,8 @@ After a successful `/git-revise-pr-force` push, the operator reply does not prin
 
 ## Updating An Existing PR/MR
 
+When `references/pstack.md` is loaded, apply its revise rows.
+
 Use this when addressing reviewer feedback on a PR/MR you authored or are maintaining.
 
 1. Run the PR/MR command preflight and continue only when the PR/MR is `owned` and either the primary state is `NEEDS_REVISION` or this invocation is `/git-revise-pr-force`. If `WRITE_NOT_AUTHORIZED`, stop without editing.

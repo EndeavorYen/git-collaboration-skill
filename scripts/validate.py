@@ -592,6 +592,12 @@ def validate_pstack() -> None:
     review = (ROOT / "references" / "review.md").read_text(encoding="utf-8")
     if "An unproven load-bearing fact is a remaining gate" not in review:
         fail("references/review.md: missing remaining-gate ladder rule")
+    routing = "pstack Babysit and Shipping never run under this skill."
+    if routing not in text:
+        fail("references/pstack.md: missing routing sentence")
+    drift = "Record the sweep result in the Proof record."
+    if "run a drift sweep" not in text or drift not in text:
+        fail("references/pstack.md: missing drift-sweep sentence")
 
 
 def main() -> int:
