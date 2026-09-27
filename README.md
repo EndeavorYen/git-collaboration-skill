@@ -91,7 +91,7 @@ python3 scripts/budget.py
 Each mode loads `SKILL.md` plus the references its load line names. The
 script prints the bytes and approximate tokens (bytes / 4) per mode, and
 `scripts/validate.py` fails when a mode exceeds its cap in `scripts/budget.py`.
-Caps only go down.
+Caps only go down; after a change shrinks a mode, run `python3 scripts/budget.py --lower-caps`.
 
 Baseline before the router and pstack cuts (#40):
 

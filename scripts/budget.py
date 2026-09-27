@@ -16,17 +16,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Bytes. Caps only go down: lower a cap when a change shrinks a mode.
 MODE_CAPS = {
-    "Review someone else's PR/MR": 45_908,
-    "Plan issue": 44_395,
-    "Implement issue then PR/MR": 51_866,
-    "Reply to issue": 21_829,
-    "Update own PR/MR after review": 28_651,
-    "Fix PR/MR conflicts": 27_520,
-    "Merge approved PR/MR": 32_540,
-    "Request PR/MR review": 21_682,
-    "Focused PR/MR status": 21_233,
-    "Status or triage, including the aggressive run": 26_353,
-    "Scheduled lifecycle or scheduled approved merge": 31_820,
+    "Review someone else's PR/MR": 45_768,
+    "Plan issue": 44_255,
+    "Implement issue then PR/MR": 51_726,
+    "Reply to issue": 21_689,
+    "Update own PR/MR after review": 28_511,
+    "Fix PR/MR conflicts": 27_380,
+    "Merge approved PR/MR": 32_400,
+    "Request PR/MR review": 21_542,
+    "Focused PR/MR status": 21_093,
+    "Status or triage, including the aggressive run": 26_213,
+    "Scheduled lifecycle or scheduled approved merge": 31_680,
 }
 
 LOAD_LINE = re.compile(r"^([A-Z][^|#\n]*?): read (.+)$", re.M)
@@ -75,8 +75,29 @@ def budget_errors(loads: dict[str, tuple[int, int]]) -> list[str]:
     return errors
 
 
+def lower_caps(loads: dict[str, tuple[int, int]]) -> None:
+    """Rewrite MODE_CAPS in this file down to the current totals. Never raises a cap."""
+    path = Path(__file__)
+    text = path.read_text(encoding="utf-8")
+    changed = False
+    for mode, cap in MODE_CAPS.items():
+        if mode in loads and loads[mode][0] < cap:
+            text, count = re.subn(
+                rf"({re.escape(chr(34) + mode + chr(34))}: )[0-9_]+",
+                lambda m: m.group(1) + f"{loads[mode][0]:_}",
+                text,
+            )
+            if count != 1:
+                raise SystemExit(f"budget: cap for {mode!r} not found in {path.name}")
+            changed = True
+    if changed:
+        path.write_text(text, encoding="utf-8")
+
+
 def main() -> int:
     loads = mode_loads()
+    if "--lower-caps" in sys.argv[1:]:
+        lower_caps(loads)
     print(f"{'mode':<50} {'bytes':>7} {'~tokens':>8} {'+pstack':>8}")
     for mode, (total, with_pstack) in loads.items():
         print(f"{mode:<50} {total:>7} {total // 4:>8} {with_pstack // 4:>8}")

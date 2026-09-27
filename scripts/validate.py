@@ -1083,6 +1083,28 @@ def validate_pstack() -> None:
             fail(f"references/pstack-compat.md: named list missing {skill!r}")
 
 
+DESCRIPTION_LIMIT = 700
+DESCRIPTION_BANNED = ("branches", "commits", "pushes")
+
+
+def validate_description() -> None:
+    skill = ROOT / "SKILL.md"
+    text = skill.read_text(encoding="utf-8") if skill.exists() else ""
+    front = text.split("---", 2)[1] if text.startswith("---") else ""
+    line = next((l for l in front.splitlines() if l.startswith("description:")), "")
+    if not line:
+        fail("SKILL.md: missing description")
+        return
+    if len(line) > DESCRIPTION_LIMIT:
+        fail(f"SKILL.md: description is {len(line)} chars, limit {DESCRIPTION_LIMIT}")
+    lowered = line.lower()
+    for word in DESCRIPTION_BANNED:
+        if word in lowered:
+            fail(f"SKILL.md: description triggers on local git {word!r}")
+    if "local-only git" not in lowered:
+        fail("SKILL.md: description must exclude local-only git")
+
+
 def validate_budget() -> None:
     sys.path.insert(0, str(ROOT / "scripts"))
     try:
@@ -1114,6 +1136,7 @@ def main() -> int:
     validate_scheduled_ocr_gate()
     validate_implement_profile()
     validate_pstack()
+    validate_description()
     validate_budget()
     if ERRORS:
         print("Validation failed:", file=sys.stderr)
