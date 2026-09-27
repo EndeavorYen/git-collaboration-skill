@@ -1083,6 +1083,23 @@ def validate_pstack() -> None:
             fail(f"references/pstack-compat.md: named list missing {skill!r}")
 
 
+def validate_budget() -> None:
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import budget
+    except ImportError:
+        fail("scripts/budget.py: missing")
+        return
+    loads = budget.mode_loads()
+    for error in budget.budget_errors(loads):
+        fail(error)
+    mode = next(iter(budget.MODE_CAPS))
+    decoy = dict(loads)
+    decoy[mode] = (budget.MODE_CAPS[mode] + 1, budget.MODE_CAPS[mode] + 1)
+    if not budget.budget_errors(decoy):
+        fail("budget check accepted a mode over its cap")
+
+
 def main() -> int:
     validate_files_exist()
     validate_no_leaks()
@@ -1097,6 +1114,7 @@ def main() -> int:
     validate_scheduled_ocr_gate()
     validate_implement_profile()
     validate_pstack()
+    validate_budget()
     if ERRORS:
         print("Validation failed:", file=sys.stderr)
         for error in ERRORS:
