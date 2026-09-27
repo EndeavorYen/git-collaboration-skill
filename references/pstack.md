@@ -57,11 +57,11 @@ Decision-card profile: record `skip: decision card` for `architect` and **princi
 
 ## Pre-submit and review hooks
 
-Run `blast-radius` when the diff changes an exported or public signature, a schema or migration, a wire or JSON payload shape, a config default or CLI flag, or an auth, security, or data-deletion path, deletes or renames a symbol used from another module, or the user asks for blast radius.
+Run `blast-radius` when the diff changes an exported or public signature, a schema or migration, a wire or JSON payload shape, a config default or CLI flag, or an auth, security, or data-deletion path, deletes or renames a symbol used from another module, or the user asks.
 
-Run `interrogate` when a dissent was settled by a third way, `arena` was used for this change, a thorough-review trigger from `references/review.md` is present, or the user asks for interrogate or adversarial review.
+Run `interrogate` when a dissent was settled by a third way, `arena` was used for this change, a thorough-review trigger from `references/review.md` is present, or the user asks.
 
-With pstack present and a trigger hit, the hook runs, or the Proof record says `skip: <reason>`. A silent skip fails the pre-submit gate. The OCR file pass runs first and is never replaced. `interrogate` reviewers are readonly and receive no forge snapshot. Map findings to Critical, High, Medium, or Low. Critical and High block pre-submit. The human-only waiver is unchanged. No auto-apply. No `arena` in review.
+With pstack present and a trigger hit, the hook runs, or the Proof record says `skip: <reason>`. A silent skip fails the pre-submit gate. OCR runs first and is never replaced; pstack output is evidence, not a verdict. `interrogate` reviewers are readonly and receive no forge snapshot. Map findings to the OCR severity scale. Critical and High block pre-submit. The human-only waiver is unchanged. No auto-apply. No `arena` in review.
 
 ## Revise rows
 
