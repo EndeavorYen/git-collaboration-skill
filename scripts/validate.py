@@ -101,6 +101,14 @@ REFERENCE_PHRASES = {
         "Blanket ship language is not a waiver",
         "Critical and High findings are submit blockers",
         "do not push, do not open or update the PR/MR",
+        "### Review tier",
+        "**Light tier**",
+        "**Full tier**",
+        "at most 3 files and at most 60 changed lines",
+        "Scheduled runs always use the full tier",
+        "Critical/High blocking and the waiver rules are the same in both tiers",
+        "recompute the tier",
+        "An unproven load-bearing fact is a remaining gate",
     ],
     "review.md": [
         "references/pre-submit.md",
@@ -233,6 +241,7 @@ PROOF_RECORD_LABELS = (
     "Evidence class:",
     "Surface:",
     "Load-bearing fact:",
+    "Review tier:",
     "pstack:",
 )
 OPTIONAL_OBSERVATION_LABELS = ("Brief:", "Executor-model:")
@@ -656,6 +665,7 @@ def validate_scheduled_ocr_gate() -> None:
         "pre-submit gate",
         "open-code-review-delegate",
         "cannot waive Critical/High",
+        "full review tier",
         "do not push",
         "does not inherit force",
     ):
@@ -1035,10 +1045,10 @@ def validate_pstack() -> None:
         fail("references/review.md: missing remaining-gate ladder rule")
     review_labels = (
         "The labels are `Proof:`, `Evidence class:`, `Surface:`, "
-        "`Load-bearing fact:`, and `pstack:`."
+        "`Load-bearing fact:`, `Review tier:`, and `pstack:`."
     )
     if review_labels not in review:
-        fail("references/review.md: Proof five labels changed")
+        fail("references/review.md: Proof labels differ from the pre-submit record")
     routing = "pstack Babysit and Shipping never run under this skill."
     if routing not in text:
         fail("references/pstack.md: missing routing sentence")

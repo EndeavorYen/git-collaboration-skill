@@ -12,7 +12,7 @@ accounts, or a default reviewer.
 - Reads each issue or PR/MR once, trimmed to the fields that decide the next action, then plans and edits from the local checkout.
 - Reviews, revises, conflict-repairs, and merges PRs/MRs under live actor gates.
 - Dedicated `/git-review-pr-force`, `/git-revise-pr-force`, and `/git-merge-approved-force` for solo self-review, owned iteration without `NEEDS_REVISION`, and second-person-approval waiver. Triage and scheduled runs do not inherit force.
-- Uses `open-code-review-delegate` for the file-by-file pass. `/git-review-pr` maps findings onto forge comments. Push and open/update PR/MR run a fail-closed pre-submit gate via a fresh `requesting-code-review` subagent.
+- Uses `open-code-review-delegate` for the file-by-file pass. `/git-review-pr` maps findings onto forge comments. Push and open/update PR/MR run a fail-closed pre-submit gate: a fresh `requesting-code-review` subagent, or an inline file pass for a light-tier diff (at most 3 files and 60 lines).
 - Plans an issue (`/git-plan-issue`), then implements (`/git-issue-pr`) with
   optional dissent on the issue instead of silently following a weak plan.
 - Triage and optional scheduled allowlist runs. Scheduled runs never invent a

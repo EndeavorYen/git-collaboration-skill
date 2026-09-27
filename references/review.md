@@ -85,7 +85,7 @@ Blocking versus non-blocking:
 - Put blockers in unresolved inline diff discussions on the exact changed line when possible.
 - Put non-blocking findings in a concise PR/MR comment marked as follow-up or optional.
 
-Proof re-run. Both `/git-review-pr` and `/git-review-pr-force` run this check after the structured file pass and OCR mapping, and before the verdict. Read the pre-submit Proof record from the PR/MR body under `## Verification`. The labels are `Proof:`, `Evidence class:`, `Surface:`, `Load-bearing fact:`, and `pstack:`.
+Proof re-run. Both `/git-review-pr` and `/git-review-pr-force` run this check after the structured file pass and OCR mapping, and before the verdict. Read the pre-submit Proof record from the PR/MR body under `## Verification`. The labels are `Proof:`, `Evidence class:`, `Surface:`, `Load-bearing fact:`, `Review tier:`, and `pstack:`.
 
 Re-run the `Proof:` command on the current review head checkout. Use the same checkout as "Use the current head". If the command can run, record the actual result. Compare that result to the author's `-> <observed result>`. If the actual result contradicts the recorded observed result, treat that contradiction as an Evidence class mismatch.
 
