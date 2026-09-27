@@ -39,6 +39,7 @@ references/scheduled-automation.md
 references/pstack.md
 prompts/git-*.md                 # mode name, actor gate, reference path
 scripts/validate.py              # leak + contract checks
+scripts/budget.py                # per-mode instruction bytes and caps
 ```
 
 ## Optional pstack companion
@@ -80,6 +81,36 @@ python3 scripts/validate.py
 
 The validator fails closed on company paths, personal accounts, local-only
 binaries, and a missing dual-forge contract.
+
+## Instruction budget
+
+```bash
+python3 scripts/budget.py
+```
+
+Each mode loads `SKILL.md` plus the references its load line names. The
+script prints the bytes and approximate tokens (bytes / 4) per mode, and
+`scripts/validate.py` fails when a mode exceeds its cap in `scripts/budget.py`.
+Caps only go down.
+
+Baseline before the router and pstack cuts (#40):
+
+| Mode | Bytes | ~Tokens | +pstack |
+| --- | ---: | ---: | ---: |
+| Review | 45,908 | 11,477 | 13,051 |
+| Plan issue | 44,395 | 11,098 | 12,672 |
+| Implement | 51,866 | 12,966 | 14,540 |
+| Reply | 21,829 | 5,457 | 5,457 |
+| Revise | 28,651 | 7,162 | 8,736 |
+| Conflict | 27,520 | 6,880 | 8,454 |
+| Merge | 32,540 | 8,135 | 8,135 |
+| Request review | 21,682 | 5,420 | 5,420 |
+| Status | 21,233 | 5,308 | 5,308 |
+| Triage | 26,353 | 6,588 | 6,588 |
+| Scheduled | 31,820 | 7,955 | 7,955 |
+
+A new behavior rule lands with a validator check that fails without it, and
+it must fit the cap. Prefer a check or a script over another paragraph.
 
 ## Reviewer policy
 
