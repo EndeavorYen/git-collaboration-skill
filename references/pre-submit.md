@@ -47,7 +47,7 @@ Evidence class: live job / real artifact bytes | executable unit tests | source-
 Surface: <verify skill and feature driven> | none: <reason>
 Load-bearing fact: <fact> (level 1-5) | n/a
 Review tier: light | full
-pstack: present <version> [hooks run] | absent | off
+pstack: present [hooks] | absent | off
 ```
 
 Evidence class values match `references/review.md`. Inconclusive or wrong-surface is not a pass. An unproven load-bearing fact is a remaining gate; do not write it closed. A user-visible change proven only by tests records `Surface: none: <reason>`.
