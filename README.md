@@ -48,7 +48,7 @@ scripts/budget.py                # per-mode instruction bytes and caps
 
 pstack is optional. Modes keep their current behavior when it is absent, apart from the Proof record.
 
-Detection runs once and makes no forge call. `pstack:off` turns pstack off for that invocation. `pstack:required` stops before the first write and names the missing skills when detection fails. Otherwise the runtime skill list, then one filesystem probe, decides whether pstack is present.
+Detection runs once and makes no forge call. `pstack:off` turns pstack off for that invocation. `pstack:required` stops before the first write and names the missing skills when detection fails. Otherwise the runtime skill list, then one filesystem probe, decides whether pstack is present. A hook loads its pstack skill only when its trigger fires, and the supported version range is a maintainer upgrade check, not a per-run gate. git-collaboration keeps the forge gates; pstack supplies the rigor (`principle-prove-it-works`, `blast-radius`, `interrogate`, `tdd`, `principle-fix-root-causes`).
 
 git-collaboration gates win on conflict. pstack never merges and never polls the forge under this skill.
 

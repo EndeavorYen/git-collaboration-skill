@@ -10,6 +10,8 @@ Pin content is `0.15.5`. The supported range lives in this file, not in `.pstack
 
 ## Named skills
 
+Detection matches the runtime skill list against this list. The supported range is a maintainer upgrade check, not a per-run gate.
+
 v1 named skills (pstack package only):
 
 - poteto-mode
@@ -52,7 +54,7 @@ Not probed by this contract:
 
 1. Read the local or fleet pstack `plugin.json` version.
 2. Inside supported: may only bump `.pstack-pin`. Recheck that the v1 named skills are still present.
-3. Outside supported: Detection treats the install as unsupported. To widen the range, edit this file in a tip PR first, then bump the pin.
+3. Outside supported: do not bump the pin. To widen the range, edit this file in a tip PR first, then bump the pin.
 4. git-collab-only bump: check the companion and compat diff; if contract unchanged, OK to merge.
 
 ## Vendor

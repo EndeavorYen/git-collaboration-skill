@@ -6,7 +6,7 @@ When the PR/MR is not `CONFLICTED` or the user is not the author or assignee, st
 
 ## Fix PR/MR Conflicts
 
-When `references/pstack.md` is loaded, apply its conflict rows.
+When `references/pstack.md` is loaded, apply its conflict hook.
 
 Use this when the user asks to fix a conflict or invokes `/git-fix-conflict`.
 
