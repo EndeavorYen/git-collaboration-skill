@@ -1,6 +1,6 @@
 ---
 name: git-collaboration
-description: Use when working with GitHub or GitLab issues, pull/merge requests, reviews, CI, branches, commits, pushes, releases, labels, conflicts, or gh/glab workflows. Trigger for /git-review-pr, /git-review-pr-force, /git-plan-issue, /git-issue-pr, /git-reply-issue, /git-revise-pr, /git-revise-pr-force, /git-fix-conflict, /git-merge-approved, /git-merge-approved-force, /git-request-review, /git-pr-status, /git-triage, /git-scheduled-lifecycle, and /git-scheduled-merge.
+description: Use for GitHub or GitLab collaboration: planning or implementing an issue, reviewing, revising, conflict-repairing, or merging a pull/merge request, its CI, review requests, issue replies, triage, a pasted issue or PR/MR URL, and any /git-* command. Local-only git (commit, branch, stash, log, diff) does not need this skill.
 ---
 
 # Git Collaboration
