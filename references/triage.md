@@ -17,7 +17,7 @@ Mode selection (same rules as the `git-triage` prompt):
 
 ### Todo triage workflow
 
-Build a forge-global personal inbox from metadata lists only: one for notifications or todos, one for PRs/MRs where the user is a reviewer, one for PRs/MRs where the user is author or assignee, and one for open issues assigned to or authored by the user. Context budget defines the fields. Do not request comment or review bodies on a list.
+Build a forge-global personal inbox from metadata lists only: one for notifications or todos, one for PRs/MRs where the user is a reviewer, one for PRs/MRs where the user is author or assignee, and one for open issues assigned to or authored by the user. Context budget defines the fields. Do not request comment or review bodies on a list. Open one trimmed snapshot only for an item you are about to write, or the one item the user named.
 
 Treat notifications as signals, not conversational source of truth. Another user speaking last is necessary but insufficient to require a reply. Rank from list fields. If a row still cannot be classified, take one trimmed snapshot of that one item, and only when it is in the top three you might recommend.
 

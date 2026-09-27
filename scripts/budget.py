@@ -2,7 +2,7 @@
 """Print and cap the instruction bytes each mode loads.
 
 A mode loads SKILL.md plus the references its load line in SKILL.md names.
-"one of github.md or gitlab.md" counts the larger file. pstack.md counts in
+"the forge reference" counts the larger of github.md and gitlab.md. pstack.md counts in
 the pstack column when a loaded file points at it. Tokens are bytes / 4.
 CRLF counts as LF so a Windows checkout measures the same.
 """
@@ -16,21 +16,21 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Bytes. Caps only go down: lower a cap when a change shrinks a mode.
 MODE_CAPS = {
-    "Review someone else's PR/MR": 45_768,
-    "Plan issue": 44_255,
-    "Implement issue then PR/MR": 51_726,
-    "Reply to issue": 21_689,
-    "Update own PR/MR after review": 28_511,
-    "Fix PR/MR conflicts": 27_380,
-    "Merge approved PR/MR": 32_400,
-    "Request PR/MR review": 21_542,
-    "Focused PR/MR status": 21_093,
-    "Status or triage, including the aggressive run": 26_213,
-    "Scheduled lifecycle or scheduled approved merge": 31_680,
+    "Review someone else's PR/MR": 44_555,
+    "Plan issue": 35_586,
+    "Implement issue then PR/MR": 43_070,
+    "Reply to issue": 13_007,
+    "Update own PR/MR after review": 27_285,
+    "Fix PR/MR conflicts": 26_167,
+    "Merge approved PR/MR": 31_186,
+    "Request PR/MR review": 20_316,
+    "Focused PR/MR status": 18_632,
+    "Status or triage, including the aggressive run": 23_851,
+    "Scheduled lifecycle or scheduled approved merge": 29_219,
 }
 
 LOAD_LINE = re.compile(r"^([A-Z][^|#\n]*?): read (.+)$", re.M)
-REF = re.compile(r"`(references/[a-z0-9-]+\.md)`")
+REF = re.compile(r"`(?:references/)?([a-z0-9-]+\.md)`")
 FORGE_PAIR = ("references/github.md", "references/gitlab.md")
 PSTACK = "references/pstack.md"
 CRLF = bytes([13, 10])
@@ -47,13 +47,15 @@ def mode_loads() -> dict[str, tuple[int, int]]:
     skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     loads: dict[str, tuple[int, int]] = {}
     for mode, rest in LOAD_LINE.findall(skill):
-        refs = list(dict.fromkeys(REF.findall(rest)))
+        refs = list(dict.fromkeys(f"references/{name}" for name in REF.findall(rest)))
+        if "the forge reference" in rest:
+            refs.append(FORGE_PAIR[0])
         forge = [ref for ref in refs if ref in FORGE_PAIR]
         files = [ref for ref in refs if ref not in FORGE_PAIR]
         total = size("SKILL.md") + sum(size(ref) for ref in files)
         if forge:
             total += max(size(ref) for ref in FORGE_PAIR)
-        read = [ROOT / "SKILL.md", *(ROOT / ref for ref in files + forge)]
+        read = [ROOT / "SKILL.md", *(ROOT / ref for ref in files + (list(FORGE_PAIR) if forge else []))]
         points = PSTACK not in files and any(
             PSTACK in p.read_text(encoding="utf-8") for p in read if p.exists()
         )

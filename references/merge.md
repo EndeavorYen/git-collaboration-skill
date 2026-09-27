@@ -1,8 +1,8 @@
 # Merge
 
-Read this file for `/git-merge-approved` and `/git-merge-approved-force`. Also read one of `references/github.md` or `references/gitlab.md`. The approving-reviewer definition stays in `SKILL.md`.
+Read this file for `/git-merge-approved` and `/git-merge-approved-force`. Also read one of `references/github.md` or `references/gitlab.md`. The approving-reviewer definition is in `references/preflight.md`.
 
-When `/git-merge-approved` is not `READY_TO_MERGE` or the user is not the author or assignee, stop. For `MERGE_NOT_AUTHORIZED`, only the author or an assignee may merge. The reply uses the review handoff in `SKILL.md`.
+When `/git-merge-approved` is not `READY_TO_MERGE` or the user is not the author or assignee, stop. For `MERGE_NOT_AUTHORIZED`, only the author or an assignee may merge. The reply uses the review handoff in `references/handoff.md`.
 
 When `/git-merge-approved-force` fails a technical gate, stop. `MERGE_NOT_AUTHORIZED` still blocks.
 
