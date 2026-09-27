@@ -34,6 +34,8 @@ REQUIRED_FILES = [
     ROOT / "references" / "status.md",
     ROOT / "references" / "triage.md",
     ROOT / "references" / "pstack.md",
+    ROOT / "references" / "preflight.md",
+    ROOT / "references" / "handoff.md",
     ROOT / "references" / "pstack-compat.md",
     ROOT / "prompts" / "git-review-pr.md",
     ROOT / "prompts" / "git-issue-pr.md",
@@ -53,9 +55,21 @@ REQUIRED_FILES = [
 ]
 
 SKILL_PHRASES = [
+    "<!-- git-force-review -->",
+    "references/preflight.md",
+    "references/handoff.md",
     "Detect the forge",
     "GitHub",
     "GitLab",
+    "next step:",
+    "Forge budget",
+    "Context budget",
+    "local checkout",
+    "write response is the read-back",
+    "Do not read repository files",
+]
+
+PREFLIGHT_PHRASES = [
     "Never invent a reviewer",
     "no hard-coded reviewer",
     "approving reviewer",
@@ -64,21 +78,16 @@ SKILL_PHRASES = [
     "WRITE_NOT_AUTHORIZED",
     "MERGE_NOT_AUTHORIZED",
     "self_authored_head",
+    "Solo override",
+    "does not print the Solo override block",
+    "does not inherit force",
+    "Explicit force",
     "/git-review-pr-force",
     "/git-merge-approved-force",
     "/git-revise-pr-force",
-    "<!-- git-force-review -->",
-    "Solo override",
-    "next step:",
-    "does not print the Solo override block",
-    "does not inherit force",
-    "Forge budget",
-    "Context budget",
-    "local checkout",
-    "write response is the read-back",
-    "Do not read repository files",
-    "Explicit force",
 ]
+
+SKILL_BYTE_LIMIT = 10_240
 
 SKILL_WORD_LIMIT = 3000
 
@@ -239,7 +248,7 @@ PSTACK_FORBIDDEN_PROMPTS = (
     "git-pr-status.md",
 )
 
-TRIAGE_LOAD_LINE = "Status or triage, including the aggressive run: read `references/triage.md`."
+TRIAGE_LOAD_LINE = "Status or triage, including the aggressive run: read `preflight.md` and `triage.md`."
 
 # Numbered-procedure sentences. Prompts point at the home; they do not copy it.
 PROCEDURE_SENTENCES = [
@@ -341,24 +350,24 @@ PROMPT_PHRASES = {
 
 LOAD_LINES = {
     "review": (
-        "Review someone else's PR/MR: read `references/review.md` and `references/pre-submit.md`, and one of `references/github.md` or `references/gitlab.md`.",
-        ("references/plan-issue.md", "references/implement.md", "references/merge.md", "references/triage.md"),
+        "Review someone else's PR/MR: read `preflight.md`, `review.md`, `pre-submit.md`, `handoff.md`, and the forge reference.",
+        ("`plan-issue.md`", "`implement.md`", "`merge.md`", "`triage.md`"),
     ),
     "plan": (
-        "Plan issue: read `references/plan-issue.md` and one of `references/github.md` or `references/gitlab.md`.",
-        ("references/pre-submit.md",),
+        "Plan issue: read `plan-issue.md`, `handoff.md`, and the forge reference.",
+        ("`pre-submit.md`", "`preflight.md`"),
     ),
     "implement": (
-        "Implement issue then PR/MR: read `references/implement.md`, `references/plan-issue.md` for the brief and dissent recipe, and `references/pre-submit.md` before push.",
-        ("references/merge.md", "references/review.md", "references/triage.md", "references/scheduled-automation.md"),
+        "Implement issue then PR/MR: read `implement.md`, `plan-issue.md` for the brief and dissent recipe, `handoff.md`, and `pre-submit.md` before push.",
+        ("`merge.md`", "`review.md`", "`triage.md`", "`scheduled-automation.md`", "`preflight.md`"),
     ),
     "merge": (
-        "Merge approved PR/MR: read `references/merge.md` and one of `references/github.md` or `references/gitlab.md`.",
-        ("references/pre-submit.md", "references/review.md"),
+        "Merge approved PR/MR: read `preflight.md`, `merge.md`, `handoff.md`, and the forge reference.",
+        ("`pre-submit.md`", "`review.md`"),
     ),
     "scheduled": (
-        "Scheduled lifecycle or scheduled approved merge: read `references/scheduled-automation.md`.",
-        ("references/triage.md", "references/review.md"),
+        "Scheduled lifecycle or scheduled approved merge: read `preflight.md` and `scheduled-automation.md`.",
+        ("`triage.md`", "`review.md`"),
     ),
 }
 
@@ -410,6 +419,14 @@ def validate_skill_contract() -> None:
     for phrase in SKILL_PHRASES:
         if phrase not in text:
             fail(f"SKILL.md: missing {phrase!r}")
+    preflight_path = ROOT / "references" / "preflight.md"
+    preflight = preflight_path.read_text(encoding="utf-8") if preflight_path.exists() else ""
+    for phrase in PREFLIGHT_PHRASES:
+        if phrase not in preflight:
+            fail(f"references/preflight.md: missing {phrase!r}")
+    size = len(text.encode("utf-8"))  # read_text already turns CRLF into LF
+    if size > SKILL_BYTE_LIMIT:
+        fail(f"SKILL.md: {size} bytes exceeds {SKILL_BYTE_LIMIT}")
     if "expected reviewer" in text:
         fail("SKILL.md: still names an expected reviewer; use an approving reviewer with no default")
     if "Traditional Chinese" in text:
@@ -720,7 +737,11 @@ def force_stop_errors(text: str) -> list[str]:
             errors.append(f"SKILL.md {mode} Force clause missing verdict: or forge approval:")
     if SIX_ROW_MARKER in text:
         errors.append("SKILL.md contains the six-row next-step table")
-    for pointer in ("references/review.md", "references/revise.md", "references/merge.md"):
+    preflight_path = ROOT / "references" / "preflight.md"
+    preflight = preflight_path.read_text(encoding="utf-8") if preflight_path.exists() else ""
+    if "Each force command's waiver is in its mode reference" not in preflight:
+        errors.append("references/preflight.md missing the force waiver pointer")
+    for pointer in ("`review.md`", "`revise.md`", "`merge.md`"):
         if pointer not in text:
             errors.append(f"SKILL.md missing {pointer}")
     return errors
@@ -728,7 +749,7 @@ def force_stop_errors(text: str) -> list[str]:
 
 def reply_order_errors(text: str, label: str) -> list[str]:
     errors: list[str] = []
-    if label == "SKILL.md":
+    if label == "references/preflight.md":
         start = text.find("### Solo override")
         end = text.find("```", start if start >= 0 else 0)
         if start < 0 or end < 0:
@@ -770,7 +791,7 @@ def validate_force_reply_stops() -> None:
                 "while the phrase remained elsewhere"
             )
     for label, path in (
-        ("SKILL.md", ROOT / "SKILL.md"),
+        ("references/preflight.md", ROOT / "references" / "preflight.md"),
         ("references/revise.md", ROOT / "references" / "revise.md"),
         ("references/merge.md", ROOT / "references" / "merge.md"),
     ):
@@ -805,32 +826,36 @@ HANDOFF_PROMPTS = (
 def validate_review_handoff() -> None:
     skill_path = ROOT / "SKILL.md"
     text = skill_path.read_text(encoding="utf-8") if skill_path.exists() else ""
+    handoff_path = ROOT / "references" / "handoff.md"
+    handoff = handoff_path.read_text(encoding="utf-8") if handoff_path.exists() else ""
+    preflight_path = ROOT / "references" / "preflight.md"
+    preflight = preflight_path.read_text(encoding="utf-8") if preflight_path.exists() else ""
     for phrase in (
         "review handoff",
         "next step: /git-review-pr-force <url>",
         "next step: /git-request-review <url>",
         "next step: /git-issue-pr <url>",
-        "Its recommended next command is never a force command.",
         "next step: none",
     ):
-        if phrase not in text:
-            fail(f"SKILL.md review handoff missing {phrase!r}")
+        if phrase not in handoff.lower() and phrase not in handoff:
+            fail(f"references/handoff.md missing {phrase!r}")
+    if "Its recommended next command is never a force command." not in preflight:
+        fail("references/preflight.md: /git-pr-status may recommend a force command")
     stops = {mode: stop for mode, _intent, _writes, stop in task_mode_rows(text)}
     implement_stop = stops.get("Implement issue then PR/MR", "")
     if "next step:" not in implement_stop:
         fail("SKILL.md implement stop missing next step:")
-    start = text.find("### Review handoff")
-    end = text.find("```", start if start >= 0 else 0)
-    section = text[start:end] if start >= 0 and end >= 0 else ""
+    start = handoff.find("First match:")
+    section = handoff[start:] if start >= 0 else ""
     plain_review = section.find("Plain `/git-review-pr`")
     denied = section.find("REVIEW_NOT_AUTHORIZED")
     if denied < 0 or plain_review < 0 or denied > plain_review:
-        fail("SKILL.md review handoff checks plain review before REVIEW_NOT_AUTHORIZED")
+        fail("references/handoff.md checks plain review before REVIEW_NOT_AUTHORIZED")
     for line in section.splitlines():
         if "opened no PR/MR" in line and (
             "/git-issue-pr" not in line or "/git-revise-pr" in line or "/git-fix-conflict" in line
         ):
-            fail("SKILL.md review handoff applies opened-no-PR outside /git-issue-pr")
+            fail("references/handoff.md applies opened-no-PR outside /git-issue-pr")
     review = ROOT / "references" / "review.md"
     review_text = review.read_text(encoding="utf-8") if review.exists() else ""
     if "Print Solo override." in review_text:
@@ -884,10 +909,10 @@ def validate_pstack() -> None:
     for key in ("merge", "scheduled"):
         sentence, _banned = LOAD_LINES[key]
         for row in skill.splitlines():
-            if sentence in row and "references/pstack.md" in row:
+            if sentence in row and "pstack.md" in row:
                 fail(f"SKILL.md: {key} load line names references/pstack.md")
     for row in skill.splitlines():
-        if TRIAGE_LOAD_LINE in row and "references/pstack.md" in row:
+        if TRIAGE_LOAD_LINE in row and "pstack.md" in row:
             fail("SKILL.md: triage load line names references/pstack.md")
     for name in PSTACK_FORBIDDEN_PROMPTS:
         prompt = ROOT / "prompts" / name
