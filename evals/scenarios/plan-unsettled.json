@@ -1,0 +1,39 @@
+{
+  "id": "plan-unsettled",
+  "why": "An open product choice in the Goal means no brief is posted.",
+  "command": "/git-plan-issue https://github.com/acme/widget/issues/21",
+  "user": "alice",
+  "snapshot": {
+    "number": 21,
+    "url": "https://github.com/acme/widget/issues/21",
+    "state": "OPEN",
+    "author": "dave",
+    "assignees": [],
+    "labels": [
+      "enhancement"
+    ],
+    "body": "When a session expires mid-edit, we lose the draft. Either redirect to login and restore the draft afterwards, or show an inline re-login modal that keeps the page. Product has not picked one.",
+    "comments": [
+      {
+        "author": "erin",
+        "body": "I prefer the modal, but the PM wants the redirect. Needs a decision."
+      }
+    ],
+    "linkedPullRequests": []
+  },
+  "extra": "Local checkout evidence: src/session.ts:40 clears the editor state on 401. No repo-local instructions. The human is not available to answer questions in this dry run, so no close log can be confirmed.",
+  "expect": {
+    "writes_must_not": [
+      "gh issue comment",
+      "gh issue edit",
+      "gh issue create",
+      "/comments",
+      "gh api"
+    ],
+    "next": "next step: none"
+  },
+  "self_test": {
+    "pass": "Unsettled product decision: redirect vs modal.\nSTATE: n/a\nWRITES:\n- none\nNEXT: next step: none",
+    "fail": "STATE: n/a\nWRITES:\n- gh issue comment 21 --body-file brief.md\nNEXT: next step: /git-issue-pr https://github.com/acme/widget/issues/21"
+  }
+}

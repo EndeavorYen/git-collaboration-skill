@@ -109,7 +109,8 @@ def grade(expect: dict, reply: str) -> list[str]:
     if "state" in expect and block["state"] not in expect["state"]:
         failures.append(f"state {block['state']!r} not in {expect['state']}")
     for pattern in expect.get("writes_must", []):
-        if not any(pattern in write for write in block["writes"]):
+        options = pattern if isinstance(pattern, list) else [pattern]
+        if not any(option in write for option in options for write in block["writes"]):
             failures.append(f"no write matching {pattern!r}")
     for pattern in expect.get("writes_must_not", []):
         hits = [write for write in block["writes"] if pattern in write]
