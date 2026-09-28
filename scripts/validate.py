@@ -36,6 +36,7 @@ REQUIRED_FILES = [
     ROOT / "references" / "pstack.md",
     ROOT / "references" / "preflight.md",
     ROOT / "references" / "handoff.md",
+    ROOT / "references" / "work-order.md",
     ROOT / "references" / "pstack-compat.md",
     ROOT / "prompts" / "git-review-pr.md",
     ROOT / "prompts" / "git-issue-pr.md",
@@ -152,11 +153,7 @@ REFERENCE_PHRASES = {
         'status: "follow_up"',
         'open a forge issue for each confirmed close log record with `status: "follow_up"`',
         'fails this mode when a `follow_up` record has no issue URL',
-        "## Executor-ready brief",
         "**Planned at:**",
-        "### Execution plan",
-        "### Interfaces",
-        "### Test cases",
         "### Stop and dissent when",
         "Decision card",
         "nine bold fields",
@@ -164,11 +161,18 @@ REFERENCE_PHRASES = {
         "another session, model, or agent",
         "Do not add a `plan:on` / `plan:off` mode flag",
         "Work-order / handoff",
-        "Do not write function bodies",
         "No vague verbs",
+        "also an unsettled product decision about Out of scope",
+    ],
+    "work-order.md": [
+        "## Executor-ready brief",
+        "### Execution plan",
+        "### Interfaces",
+        "### Test cases",
+        "Do not write function bodies",
         "more than 8 steps",
         "never the line's text",
-        "also an unsettled product decision about Out of scope",
+        "`references/plan-issue.md`",
     ],
     "implement.md": [
         "Do not ask the user to invoke `/git-issue-pr` again",
@@ -585,6 +589,17 @@ def validate_brief_profiles() -> None:
         return
     plan = plan_path.read_text(encoding="utf-8")
     validate_no_plan_mode_flag(plan, "references/plan-issue.md")
+    order_path = ROOT / "references" / "work-order.md"
+    work_order = order_path.read_text(encoding="utf-8") if order_path.exists() else ""
+    impl_text = impl_path.read_text(encoding="utf-8") if impl_path.exists() else ""
+    if "`references/work-order.md`" not in impl_text:
+        fail("references/implement.md: step 10 must point at references/work-order.md")
+    if "`references/work-order.md`" not in plan:
+        fail("references/plan-issue.md: must point at references/work-order.md for the handoff recipe")
+    for heading in ("### Execution plan" + chr(10) + "1.", "## Executor-ready brief"):
+        if heading in plan:
+            fail(f"references/plan-issue.md: {heading.splitlines()[0]!r} belongs in references/work-order.md")
+    plan = plan + chr(10) + work_order
     recipes = implementation_brief_recipes(plan)
     if len(recipes) != 2:
         fail(
