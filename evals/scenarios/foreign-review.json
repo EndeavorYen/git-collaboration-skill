@@ -1,0 +1,53 @@
+{
+  "id": "foreign-review",
+  "why": "A plain review of someone else's clean PR posts a verdict and never merges.",
+  "command": "/git-review-pr https://github.com/acme/widget/pull/8",
+  "user": "alice",
+  "snapshot": {
+    "number": 8,
+    "url": "https://github.com/acme/widget/pull/8",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "bob",
+    "assignees": [
+      "bob"
+    ],
+    "reviewRequests": [
+      "alice"
+    ],
+    "reviewDecision": "REVIEW_REQUIRED",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "2222222222222222222222222222222222222222",
+    "commits": [
+      {
+        "oid": "2222222",
+        "author": {
+          "login": "bob",
+          "name": "Bob"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": []
+  },
+  "extra": "Local file pass already done on the checkout: open-code-review-delegate covered 2/2 files (src/parse.py, tests/test_parse.py) with no findings. Proof record in the PR body re-runs green.",
+  "expect": {
+    "writes_must": [
+      "gh pr review"
+    ],
+    "writes_must_not": [
+      "gh pr merge"
+    ],
+    "next": "next step: none"
+  },
+  "self_test": {
+    "pass": "STATE: WAITING_FOR_REVIEW\nWRITES:\n- gh pr review 8 --approve --body-file verdict.md\nNEXT: next step: none",
+    "fail": "STATE: READY_TO_MERGE\nWRITES:\n- gh pr review 8 --approve\n- gh pr merge 8 --squash\nNEXT: next step: none"
+  }
+}

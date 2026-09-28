@@ -1,0 +1,28 @@
+{
+  "id": "tier-light",
+  "why": "A 2-file, 20-line submit range runs the pre-submit file pass inline.",
+  "command": "/git-issue-pr https://github.com/acme/widget/issues/12 (you are at the pre-submit gate; the commit is made and tests pass)",
+  "user": "alice",
+  "snapshot": {
+    "number": 12,
+    "url": "https://github.com/acme/widget/issues/12",
+    "state": "OPEN",
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ]
+  },
+  "extra": "Submit range `git diff --shortstat origin/main..HEAD`: 2 files changed, 14 insertions(+), 6 deletions(-). Paths: src/util.py, tests/test_util.py. State which pre-submit review tier applies and print the Proof record you would write.",
+  "expect": {
+    "reply_must_re": [
+      "^\\s*Review tier:\\s*light\\s*$"
+    ],
+    "reply_must_not_re": [
+      "^\\s*Review tier:\\s*full\\s*$"
+    ]
+  },
+  "self_test": {
+    "pass": "Proof: pytest -> 12 passed\nReview tier: light\nSTATE: n/a\nWRITES:\n- git push -u origin HEAD\nNEXT: none",
+    "fail": "Review tier: light | full\nSTATE: n/a\nWRITES:\n- none\nNEXT: none"
+  }
+}
