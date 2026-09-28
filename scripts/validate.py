@@ -1185,8 +1185,8 @@ def validate_evals() -> None:
     except Exception as error:  # noqa: BLE001 - report any import-time failure as a validation error
         fail(f"scripts/eval.py: import failed: {error}")
         return
-    if len(evals.load_scenarios()) < 6:
-        fail("evals/scenarios: expected at least 6 scenarios")
+    if len(evals.load_scenarios()) < 10:
+        fail("evals/scenarios: expected at least 10 scenarios")
     for error in evals.self_test_errors():
         fail(error)
 

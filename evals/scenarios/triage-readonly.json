@@ -1,0 +1,83 @@
+{
+  "id": "triage-readonly",
+  "why": "Plain /git-triage ranks the inbox and recommends commands without writing.",
+  "command": "/git-triage",
+  "user": "alice",
+  "snapshot": {
+    "review_requested": [
+      {
+        "number": 8,
+        "url": "https://github.com/acme/widget/pull/8",
+        "title": "Parse records",
+        "author": "bob",
+        "isDraft": false,
+        "reviewDecision": "REVIEW_REQUIRED",
+        "mergeable": "MERGEABLE",
+        "updatedAt": "2026-09-20T10:00:00Z"
+      }
+    ],
+    "authored_or_assigned": [
+      {
+        "number": 10,
+        "url": "https://github.com/acme/widget/pull/10",
+        "title": "Retry uploads",
+        "author": "alice",
+        "assignees": [
+          "alice"
+        ],
+        "isDraft": false,
+        "reviewDecision": "APPROVED",
+        "mergeable": "MERGEABLE",
+        "updatedAt": "2026-09-21T10:00:00Z"
+      },
+      {
+        "number": 12,
+        "url": "https://github.com/acme/widget/pull/12",
+        "title": "Bump deps",
+        "author": "alice",
+        "assignees": [
+          "alice"
+        ],
+        "isDraft": false,
+        "reviewDecision": "",
+        "mergeable": "CONFLICTING",
+        "updatedAt": "2026-09-19T10:00:00Z"
+      }
+    ],
+    "issues": [
+      {
+        "number": 20,
+        "url": "https://github.com/acme/widget/issues/20",
+        "title": "parse_date accepts Feb 30",
+        "author": "carol",
+        "assignees": [
+          "alice"
+        ],
+        "updatedAt": "2026-09-18T10:00:00Z"
+      }
+    ]
+  },
+  "expect": {
+    "writes_must_not": [
+      "gh pr merge",
+      "gh pr review",
+      "gh pr edit",
+      "gh pr comment",
+      "gh issue comment",
+      "gh issue edit",
+      "git push",
+      "--method POST",
+      "--method PATCH",
+      "-X POST",
+      "glab mr"
+    ],
+    "reply_must_re": [
+      "/git-fix-conflict\\s+\\S*/pull/12\\b",
+      "/git-review-pr\\s+\\S*/pull/8\\b"
+    ]
+  },
+  "self_test": {
+    "pass": "1. /git-review-pr https://github.com/acme/widget/pull/8\n2. /git-fix-conflict https://github.com/acme/widget/pull/12\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
+    "fail": "1. /git-merge-approved https://github.com/acme/widget/pull/10\nSTATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: none"
+  }
+}

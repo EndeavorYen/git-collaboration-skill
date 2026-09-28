@@ -1,0 +1,38 @@
+{
+  "id": "plan-decision-card",
+  "why": "A settled bug with checkout evidence gets one decision-card brief and hands off to /git-issue-pr.",
+  "command": "/git-plan-issue https://github.com/acme/widget/issues/20",
+  "user": "alice",
+  "snapshot": {
+    "number": 20,
+    "url": "https://github.com/acme/widget/issues/20",
+    "state": "OPEN",
+    "author": "carol",
+    "assignees": [],
+    "labels": [
+      "bug"
+    ],
+    "body": "## Problem\nparse_date('2024-02-30') returns March 1 instead of raising.\n\n## Expected\nInvalid calendar dates raise ValueError.\n\n## Acceptance\n- [ ] parse_date raises ValueError for 2024-02-30\n- [ ] Valid dates still parse",
+    "comments": [],
+    "linkedPullRequests": []
+  },
+  "extra": "Local checkout evidence (main@abc1234): src/dates.py:14 parse_date builds datetime via timedelta arithmetic from the first of the month, so day overflow rolls into the next month. tests/test_dates.py has test_parse_valid but no invalid-date test. Run tests with `pytest tests/test_dates.py`. No repo-local instructions. The same session will implement; nobody asked for a handoff brief. Goal, change shape, scope, and acceptance are not in dispute.",
+  "expect": {
+    "writes_must": [
+      [
+        "gh issue comment 20",
+        "/issues/20/comments"
+      ]
+    ],
+    "next": "next step: /git-issue-pr https://github.com/acme/widget/issues/20",
+    "reply_must_not_re": [
+      "^\\s*### Execution plan\\s*$",
+      "^\\s*### Interfaces\\s*$",
+      "^\\s*### Test cases\\s*$"
+    ]
+  },
+  "self_test": {
+    "pass": "**Goal:** parse_date raises ValueError\nSTATE: n/a\nWRITES:\n- gh api --method POST repos/acme/widget/issues/20/comments --field body=@brief.md\nNEXT: next step: /git-issue-pr https://github.com/acme/widget/issues/20",
+    "fail": "### Execution plan\n1. **Write the test**\nSTATE: n/a\nWRITES:\n- gh issue comment 20 --body-file brief.md\nNEXT: next step: /git-issue-pr https://github.com/acme/widget/issues/20"
+  }
+}
