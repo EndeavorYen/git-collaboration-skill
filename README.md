@@ -42,6 +42,8 @@ references/pstack.md
 prompts/git-*.md                 # mode name, actor gate, reference path
 scripts/validate.py              # leak + contract checks
 scripts/budget.py                # per-mode instruction bytes and caps
+scripts/eval.py                  # behavior scenarios through claude -p
+evals/scenarios/*.json           # snapshot, command, expected decision
 ```
 
 ## Optional pstack companion
@@ -84,6 +86,24 @@ python3 scripts/validate.py
 The validator fails closed on company paths, personal accounts, local-only
 binaries, and a missing dual-forge contract.
 
+## Behavior evals
+
+```bash
+python3 scripts/eval.py --self-test          # offline: grade the fixtures
+python3 scripts/eval.py                      # live: run every scenario on this checkout
+python3 scripts/eval.py --ref <sha> --out r.json
+```
+
+Each file in `evals/scenarios/` holds one forge snapshot, a command, and the
+expected result block (`STATE:`, `WRITES:`, `NEXT:`). The live run sends it
+through `claude -p` with only the Read tool and no user settings, MCP servers,
+or slash commands, so nothing touches a forge. It prints pass or fail and the
+input tokens per scenario. `--ref` evaluates an older commit from a temporary
+worktree. `scripts/validate.py` runs the offline self-test.
+
+A new behavior rule lands with a validator check or a scenario that fails
+without it.
+
 ## Instruction budget
 
 ```bash
@@ -111,8 +131,8 @@ Baseline before the router and pstack cuts (#40):
 | Triage | 26,353 | 6,588 | 6,588 |
 | Scheduled | 31,820 | 7,955 | 7,955 |
 
-A new behavior rule lands with a validator check that fails without it, and
-it must fit the cap. Prefer a check or a script over another paragraph.
+A new behavior rule must fit the cap. Prefer a check, a scenario, or a script
+over another paragraph.
 
 ## Reviewer policy
 

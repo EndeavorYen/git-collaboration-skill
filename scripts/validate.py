@@ -393,7 +393,7 @@ def iter_text_files() -> list[Path]:
             continue
         if any(part in skip_parts for part in path.parts):
             continue
-        if path.suffix.lower() not in {".md", ".yml", ".yaml", ".py", ".txt"} and path.name != "LICENSE":
+        if path.suffix.lower() not in {".md", ".yml", ".yaml", ".py", ".txt", ".json"} and path.name != "LICENSE":
             continue
         files.append(path)
     return files
@@ -1162,6 +1162,24 @@ def validate_budget() -> None:
             fail("budget check accepted a cap raised above the base ref")
 
 
+def validate_evals() -> None:
+    import importlib
+
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        evals = importlib.import_module("eval")
+    except ModuleNotFoundError:
+        fail("scripts/eval.py: missing")
+        return
+    except Exception as error:  # noqa: BLE001 - report any import-time failure as a validation error
+        fail(f"scripts/eval.py: import failed: {error}")
+        return
+    if len(evals.load_scenarios()) < 6:
+        fail("evals/scenarios: expected at least 6 scenarios")
+    for error in evals.self_test_errors():
+        fail(error)
+
+
 def main() -> int:
     validate_files_exist()
     validate_no_leaks()
@@ -1178,6 +1196,7 @@ def main() -> int:
     validate_pstack()
     validate_description()
     validate_budget()
+    validate_evals()
     if ERRORS:
         print("Validation failed:", file=sys.stderr)
         for error in ERRORS:

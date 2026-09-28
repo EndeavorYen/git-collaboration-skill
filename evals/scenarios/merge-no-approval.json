@@ -1,0 +1,52 @@
+{
+  "id": "merge-no-approval",
+  "why": "A green PR with no approving reviewer is not merged; the handoff asks for review.",
+  "command": "/git-merge-approved https://github.com/acme/widget/pull/10",
+  "user": "alice",
+  "snapshot": {
+    "number": 10,
+    "url": "https://github.com/acme/widget/pull/10",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "4444444444444444444444444444444444444444",
+    "commits": [
+      {
+        "oid": "4444444",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": [
+      {
+        "author": "dave",
+        "body": "LGTM, ship it"
+      }
+    ]
+  },
+  "expect": {
+    "writes_must_not": [
+      "gh pr merge"
+    ],
+    "next": "next step: /git-request-review https://github.com/acme/widget/pull/10"
+  },
+  "self_test": {
+    "pass": "STATE: REVIEW_REQUEST_NEEDED\nWRITES:\n- none\nNEXT: next step: /git-request-review https://github.com/acme/widget/pull/10",
+    "fail": "STATE: READY_TO_MERGE\nWRITES:\n- gh pr merge 10 --squash\nNEXT: next step: none"
+  }
+}

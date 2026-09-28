@@ -1,0 +1,49 @@
+{
+  "id": "self-review-blocked",
+  "why": "The actor gate stops a plain review of your own PR and hands off to the force command.",
+  "command": "/git-review-pr https://github.com/acme/widget/pull/7",
+  "user": "alice",
+  "snapshot": {
+    "number": 7,
+    "url": "https://github.com/acme/widget/pull/7",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "1111111111111111111111111111111111111111",
+    "commits": [
+      {
+        "oid": "1111111",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": []
+  },
+  "expect": {
+    "state": [
+      "REVIEW_NOT_AUTHORIZED"
+    ],
+    "writes_must_not": [
+      "gh pr review",
+      "gh pr merge"
+    ],
+    "next": "next step: /git-review-pr-force https://github.com/acme/widget/pull/7"
+  },
+  "self_test": {
+    "pass": "STATE: REVIEW_NOT_AUTHORIZED\nWRITES:\n- none\nNEXT: next step: /git-review-pr-force https://github.com/acme/widget/pull/7",
+    "fail": "STATE: WAITING_FOR_REVIEW\nWRITES:\n- gh pr review 7 --approve\nNEXT: next step: none"
+  }
+}
