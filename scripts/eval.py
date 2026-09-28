@@ -135,6 +135,13 @@ def self_test_errors() -> list[str]:
             errors.append(f"evals: {scenario['id']} pass fixture fails: {failures[0]}")
         if not grade(scenario["expect"], fixtures["fail"]):
             errors.append(f"evals: {scenario['id']} fail fixture passes")
+    sample = [
+        {"id": "a", "run": 0, "failures": [], "cost_usd": 0.1, "input_tokens": 100},
+        {"id": "a", "run": 1, "failures": ["x"], "cost_usd": 0.3, "input_tokens": 300},
+    ]
+    rows = summarize(sample)
+    if "1/2 pass  cost $0.100/$0.200/$0.300" not in rows[0] or "$0.100/$0.200/$0.300" not in rows[-1]:
+        errors.append(f"evals: summarize is wrong: {rows}")
     return errors
 
 
@@ -193,6 +200,33 @@ def checkout(ref: str) -> Path:
     return path
 
 
+def summarize(results: list[dict]) -> list[str]:
+    """One row per scenario plus a total: passes, then min/mean/max of cost and input tokens."""
+
+    def spread(values: list[float]) -> tuple[float, float, float]:
+        return (min(values), sum(values) / len(values), max(values)) if values else (0, 0, 0)
+
+    rows: list[str] = []
+    by_id: dict[str, list[dict]] = {}
+    for result in results:
+        by_id.setdefault(result["id"], []).append(result)
+    for sid, runs in by_id.items():
+        passes = sum(1 for r in runs if not r["failures"])
+        lo, mean, hi = spread([r.get("cost_usd") or 0 for r in runs])
+        tokens = spread([r.get("input_tokens", 0) for r in runs])
+        rows.append(
+            f"{sid:<22} {passes}/{len(runs)} pass  cost ${lo:.3f}/${mean:.3f}/${hi:.3f}  "
+            f"in {tokens[0]:.0f}/{tokens[1]:.0f}/{tokens[2]:.0f}"
+        )
+    totals: dict[int, float] = {}
+    for result in results:
+        totals[result.get("run", 0)] = totals.get(result.get("run", 0), 0) + (result.get("cost_usd") or 0)
+    lo, mean, hi = spread(list(totals.values()))
+    passes = sum(1 for r in results if not r["failures"])
+    rows.append(f"{'total per run':<22} {passes}/{len(results)} pass  cost ${lo:.3f}/${mean:.3f}/${hi:.3f} (min/mean/max)")
+    return rows
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--ref", help="evaluate the skill at this git ref instead of the checkout")
@@ -201,19 +235,22 @@ def main() -> int:
     parser.add_argument("--out", help="write the full results, replies included, to this JSON file")
     parser.add_argument("--self-test", action="store_true", help="grade the fixtures offline and exit")
     parser.add_argument("--regrade", help="grade the replies saved in an --out file against the current scenarios")
+    parser.add_argument("--repeat", type=int, default=1, help="run each scenario this many times")
     args = parser.parse_args()
+    if args.repeat < 1:
+        parser.error("--repeat must be at least 1")
 
     if args.regrade:
         expects = {s["id"]: s["expect"] for s in load_scenarios()}
         saved = json.loads(Path(args.regrade).read_text(encoding="utf-8"))
-        passed = 0
         for result in saved:
             failures = grade(expects[result["id"]], result.get("reply", "")) if result["id"] in expects else ["unknown scenario"]
-            passed += not failures
+            result["failures"] = failures
             verdict = "PASS" if not failures else "FAIL " + "; ".join(failures)
             print(f"{result['id']:<22} in={result.get('input_tokens', 0):>7} {verdict}")
-        print(f"{passed}/{len(saved)} passed")
-        return 0 if passed == len(saved) else 1
+        for row in summarize(saved):
+            print(row)
+        return 0 if all(not r["failures"] for r in saved) else 1
 
     if args.self_test:
         errors = self_test_errors()
@@ -234,8 +271,9 @@ def main() -> int:
     results = []
     try:
         with tempfile.TemporaryDirectory(prefix="gitcollab-eval-cwd-") as workdir:
-            for scenario in scenarios:
+            for run, scenario in ((r, s) for r in range(args.repeat) for s in scenarios):
                 result = run_one(skill, scenario, args.model, Path(workdir))
+                result["run"] = run
                 results.append(result)
                 verdict = "PASS" if not result["failures"] else "FAIL " + "; ".join(result["failures"])
                 print(
@@ -251,6 +289,9 @@ def main() -> int:
     total_in = sum(r.get("input_tokens", 0) for r in results)
     total_cost = sum(r.get("cost_usd") or 0 for r in results)
     print(f"{passed}/{len(results)} passed, {total_in} input tokens, ${total_cost:.3f}")
+    if args.repeat > 1:
+        for row in summarize(results):
+            print(row)
     if args.out:
         Path(args.out).write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
     return 0 if passed == len(results) else 1
