@@ -24,6 +24,7 @@ accounts, or a default reviewer.
 SKILL.md                         # router: forge, budgets, mode table, load map
 references/preflight.md          # actor gate, primary state, explicit force
 references/handoff.md            # one next step per mode
+references/work-order.md         # handoff brief recipe and checks
 references/github.md             # gh CLI and GitHub approval APIs
 references/gitlab.md             # glab CLI and GitLab approval APIs
 references/pre-submit.md         # file pass and waiver rules
@@ -185,7 +186,7 @@ exploration loops:
 For consumers who only need issue implementation into a PR/MR (`/git-issue-pr`), load only the minimal implement set instead of the full router or secondary workflow files:
 
 - **Always:** Forge budget and Context budget from `SKILL.md`, plus `references/handoff.md` for the reply.
-- **Mode:** `references/implement.md` + `references/plan-issue.md` (brief and dissent recipe only) + `references/pre-submit.md` + one forge reference (`references/github.md` or `references/gitlab.md`).
+- **Mode:** `references/implement.md` + `references/plan-issue.md` (brief and dissent recipe only) + `references/work-order.md` (when the brief has an Execution plan) + `references/pre-submit.md` + one forge reference (`references/github.md` or `references/gitlab.md`).
 - **Never for implement-only:** `references/merge.md`, `references/review.md`, `references/triage.md`, `references/scheduled-automation.md`, and force variants (`/git-review-pr-force`, `/git-revise-pr-force`, `/git-merge-approved-force`).
 - **Optional add-on:** `references/pstack.md`. The profile works without it. When vendored, vendor the file whole.
 
