@@ -108,7 +108,7 @@ REFERENCE_PHRASES = {
         "**Full tier**",
         "at most 3 files and at most 60 changed lines",
         "Scheduled runs always use the full tier",
-        "Critical/High blocking and the waiver rules are the same in both tiers",
+        "same in both tiers",
         "recompute the tier",
         "An unproven load-bearing fact is a remaining gate",
     ],
@@ -127,8 +127,9 @@ REFERENCE_PHRASES = {
         "agree or disagree",
         "Re-run the `Proof:` command on the current review head",
         "cannot re-run",
-        "An Evidence class mismatch is `verdict: request-changes` with severity High",
-        "Do not require rerunning a protected live job before approval",
+        "Evidence class mismatch",
+        "with severity High",
+        "rerunning a protected live job",
     ],
     "plan-issue.md": [
         "<!-- git-plan-issue -->",
@@ -137,7 +138,7 @@ REFERENCE_PHRASES = {
         "gentle-grill-me",
         "confirms the close log",
         "unsettled product decision",
-        "Do not post a brief while an unsettled product decision remains",
+        "unsettled product decision remains",
         "already settled",
         "Load `gentle-grill-me` only when",
         "The local grill log is not the issue comment",
@@ -151,13 +152,13 @@ REFERENCE_PHRASES = {
         "description holds the checkable acceptance checklist",
         "do not duplicate the full checklist",
         'status: "follow_up"',
-        'open a forge issue for each confirmed close log record with `status: "follow_up"`',
+        'open a forge issue for each confirmed close log record',
         'fails this mode when a `follow_up` record has no issue URL',
         "**Planned at:**",
         "### Stop and dissent when",
         "Decision card",
         "nine bold fields",
-        "Do not include `### Execution plan`, `### Interfaces`, or `### Test cases`",
+        "Do not include `### Execution plan`",
         "another session, model, or agent",
         "Do not add a `plan:on` / `plan:off` mode flag",
         "Work-order / handoff",
@@ -702,7 +703,8 @@ def validate_implement_profile() -> None:
         "references/pre-submit.md",
         "is not permission to merge",
         "chat reply has one `next step:` line",
-        "Default brief is a decision card; a handoff to another session, model, or agent gets the full work-order.",
+        "Default brief is a decision card",
+        "gets the full work-order",
     ):
         if phrase not in text:
             fail(f"README.md: minimal implement profile missing {phrase!r}")
@@ -714,11 +716,7 @@ MODE_STOPS = (
     ("Merge approved PR/MR", "/git-merge-approved", "/git-merge-approved-force", False),
 )
 
-REVIEW_STOP = (
-    "Plain `/git-review-pr`: posted visible verdict and read back SHA, pipeline, discussions, "
-    "and approval/request-changes state. Force `/git-review-pr-force`: that read-back, and the "
-    "reply prints `verdict:`, `forge approval:`, and one `next step:` line."
-)
+REVIEW_NEXT_CLAUSE = " and one `next step:` line"
 SOLO_PROHIBITION = "does not print the Solo override block"
 SIX_ROW_MARKER = "`owned` → `next step:`"
 
@@ -805,8 +803,9 @@ def validate_force_reply_stops() -> None:
     text = skill.read_text(encoding="utf-8") if skill.exists() else ""
     for error in force_stop_errors(text):
         fail(error)
-    if REVIEW_STOP in text:
-        decoy = text.replace(" and one `next step:` line", "", 1)
+    review_stop = {mode: stop for mode, _i, _w, stop in task_mode_rows(text)}.get("Review someone else's PR/MR", "")
+    if REVIEW_NEXT_CLAUSE in review_stop:
+        decoy = text.replace(review_stop, review_stop.replace(REVIEW_NEXT_CLAUSE, "", 1), 1)
         decoy_errors = force_stop_errors(decoy)
         if not any(
             "Review someone else's PR/MR" in error and "next step:" in error
@@ -967,11 +966,8 @@ def validate_pstack() -> None:
     plan = (ROOT / "references" / "plan-issue.md").read_text(encoding="utf-8")
     if "**Proof:**" not in plan:
         fail("references/plan-issue.md: missing **Proof:**")
-    fork = (
-        "A fork whose answer can be observed by running code is settled by a recorded "
-        "local run (pstack's Prototype playbook, or an equivalent script), not by the grill."
-    )
-    if fork not in plan:
+    fork_lines = [line for line in plan.splitlines() if "observed by running code" in line]
+    if not any("recorded local run" in line and "not by the grill" in line for line in fork_lines):
         fail("references/plan-issue.md: missing observable-fork sentence")
     if plan.count("references/pre-submit.md") != 1 or "Do not read `references/pre-submit.md`" not in plan:
         fail("references/plan-issue.md: pre-submit mention must stay the Do not read sentence")
@@ -1017,7 +1013,8 @@ def validate_pstack() -> None:
         fail("references/pstack.md: missing arena-was-used interrogate trigger")
     if "Always when present" in text:
         fail("references/pstack.md: sequence-verifiable-units must not stay Always when present")
-    if "Handoff profile only: `architect` and **principle-sequence-verifiable-units**." not in text:
+    handoff_lines = [line for line in text.splitlines() if "Handoff profile only" in line]
+    if not any("`architect`" in line and "principle-sequence-verifiable-units" in line for line in handoff_lines):
         fail("references/pstack.md: architect and sequence-verifiable-units must stay handoff-only")
     decision_lines = [line for line in text.splitlines() if "skip: decision card" in line]
     if len(decision_lines) != 1:
@@ -1063,11 +1060,9 @@ def validate_pstack() -> None:
     review = (ROOT / "references" / "review.md").read_text(encoding="utf-8")
     if "An unproven load-bearing fact is a remaining gate" not in review:
         fail("references/review.md: missing remaining-gate ladder rule")
-    review_labels = (
-        "The labels are `Proof:`, `Evidence class:`, `Surface:`, "
-        "`Load-bearing fact:`, `Review tier:`, and `pstack:`."
-    )
-    if review_labels not in review:
+    label_lines = [line for line in review.splitlines() if "The labels are" in line]
+    listed = re.findall(r"`([A-Za-z -]+:)`", label_lines[0].split("The labels are", 1)[1].split(".", 1)[0]) if label_lines else []
+    if listed != list(PROOF_RECORD_LABELS):
         fail("references/review.md: Proof labels differ from the pre-submit record")
     routing = "pstack Babysit and Shipping never run under this skill."
     if routing not in text:

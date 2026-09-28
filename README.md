@@ -103,7 +103,8 @@ input tokens per scenario. `--ref` evaluates an older commit from a temporary
 worktree. `scripts/validate.py` runs the offline self-test.
 
 A new behavior rule lands with a validator check or a scenario that fails
-without it.
+without it. Validator checks match key phrases or parse structure, not whole
+sentences, so rewording a rule does not mean editing the validator.
 
 ## Instruction budget
 
