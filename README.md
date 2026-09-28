@@ -93,6 +93,7 @@ binaries, and a missing dual-forge contract.
 python3 scripts/eval.py --self-test          # offline: grade the fixtures
 python3 scripts/eval.py                      # live: run every scenario on this checkout
 python3 scripts/eval.py --ref <sha> --out r.json
+python3 scripts/eval.py --repeat 3             # min/mean/max per scenario
 ```
 
 Each file in `evals/scenarios/` holds one forge snapshot, a command, and the
@@ -101,6 +102,11 @@ through `claude -p` with only the Read tool and no user settings, MCP servers,
 or slash commands, so nothing touches a forge. It prints pass or fail and the
 input tokens per scenario. `--ref` evaluates an older commit from a temporary
 worktree. `scripts/validate.py` runs the offline self-test.
+
+Noise (`--repeat 3` on 10 scenarios, default model, #61): input tokens vary
+about 1% between runs of the same scenario, while cost per run ranged
+$1.81-$2.27 (mean $1.98, about +/-13%). Compare input tokens across versions;
+treat a cost change under about 15% as noise.
 
 A new behavior rule lands with a validator check or a scenario that fails
 without it. Validator checks match key phrases or parse structure, not whole
