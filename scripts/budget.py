@@ -8,7 +8,9 @@ CRLF counts as LF so a Windows checkout measures the same.
 """
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -75,6 +77,34 @@ def budget_errors(loads: dict[str, tuple[int, int]]) -> list[str]:
         if mode not in MODE_CAPS:
             errors.append(f"budget: {mode!r} has no cap in scripts/budget.py")
     return errors
+
+
+CAP_LINE = re.compile(r'^    "(.+?)": ([0-9_]+),$', re.M)
+
+
+def base_ref() -> str:
+    return os.environ.get("BUDGET_BASE", "origin/main")
+
+
+def base_caps() -> dict[str, int] | None:
+    """MODE_CAPS as written at the base ref, or None when unreadable."""
+    try:
+        text = subprocess.run(
+            ["git", "show", f"{base_ref()}:scripts/budget.py"],
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8", check=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    caps = {mode: int(value.replace("_", "")) for mode, value in CAP_LINE.findall(text)}
+    return caps or None
+
+
+def cap_raise_errors(caps: dict[str, int], base: dict[str, int]) -> list[str]:
+    return [
+        f"budget: cap for {mode!r} rose from {base[mode]} to {cap} (caps only go down)"
+        for mode, cap in caps.items()
+        if mode in base and cap > base[mode]
+    ]
 
 
 def lower_caps(loads: dict[str, tuple[int, int]]) -> None:

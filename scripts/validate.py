@@ -1151,6 +1151,15 @@ def validate_budget() -> None:
     decoy[mode] = (budget.MODE_CAPS[mode] + 1, budget.MODE_CAPS[mode] + 1)
     if not budget.budget_errors(decoy):
         fail("budget check accepted a mode over its cap")
+    base = budget.base_caps()
+    if base is None:
+        print(f"note: no base caps at {budget.base_ref()}; skipped the caps-only-go-down check")
+    else:
+        for error in budget.cap_raise_errors(budget.MODE_CAPS, base):
+            fail(error)
+        probe = {mode: 1}
+        if not budget.cap_raise_errors({mode: 2}, probe):
+            fail("budget check accepted a cap raised above the base ref")
 
 
 def main() -> int:
