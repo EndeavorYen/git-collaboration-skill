@@ -55,6 +55,7 @@ REQUIRED_FILES = [
 ]
 
 SKILL_PHRASES = [
+    "in one batch of parallel reads",
     "<!-- git-force-review -->",
     "references/preflight.md",
     "references/handoff.md",

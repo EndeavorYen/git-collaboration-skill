@@ -63,7 +63,7 @@ Related PRs/MRs come from snapshot links. Search the forge only when the user as
 
 When the wording is ambiguous, choose the safer mode. A review-only request never implies permission to push, update the PR/MR description, create follow-up issues, or merge. Plain `/git-triage` stays read-only; only `run` / `aggressive` / `execute` authorizes the aggressive sweep.
 
-Load only the files for the mode, all under `references/`. The forge reference is `github.md` or `gitlab.md`, whichever matches.
+Read only the mode's files under `references/`, in one batch of parallel reads before acting. The forge reference is `github.md` or `gitlab.md`.
 
 Review someone else's PR/MR: read `preflight.md`, `review.md`, `pre-submit.md`, `handoff.md`, and the forge reference.
 
@@ -94,7 +94,7 @@ PR/MR modes run `references/preflight.md` before any write. Do not review or app
 ## Safety Defaults
 
 - Inspect `git status --short --branch` before making commits, pushes, or PR/MR changes.
-- Treat a dirty worktree as user-owned unless you made the change. Do not revert unrelated changes.
+- Treat a dirty worktree as user-owned; do not revert changes you did not make.
 - Do not push, open/update PRs/MRs, close issues, or comment unless the user asks or the request clearly requires it.
 - Do not target `main` or `master` for feature work unless the user explicitly says so. Prefer the repo's documented development branch, then the default branch.
 - Never store forge tokens in the repo, docs, or shell history.
