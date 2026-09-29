@@ -85,21 +85,13 @@ Blocking versus non-blocking:
 - Put blockers in unresolved inline diff discussions on the exact changed line when possible.
 - Put non-blocking findings in a concise PR/MR comment marked as follow-up or optional.
 
-Proof re-run. Both `/git-review-pr` and `/git-review-pr-force` run this check after the structured file pass and OCR mapping, and before the verdict. Read the pre-submit Proof record from the PR/MR body under `## Verification`. The labels are `Proof:`, `Evidence class:`, `Surface:`, `Load-bearing fact:`, `Review tier:`, and `pstack:`.
+Proof re-run. Both review commands run it. After the file pass and OCR mapping, and before the verdict, read claimed validation from the PR/MR body and the latest validation comment in any heading or prose. A `## Verification` block and its labeled lines are one optional shape. Missing, renamed, reordered, or prose-only validation is not a finding and is not `verdict: request-changes`. Do not ask the author to rewrite the description into that shape.
 
-Re-run the `Proof:` command on the current review head checkout. Use the same checkout as "Use the current head". If the command can run, record the actual result. Compare that result to the author's `-> <observed result>`. If the actual result contradicts the recorded observed result, treat that contradiction as an Evidence class mismatch.
+When the author stated a command and a result, re-run that command on the current review head checkout. Record the actual result when it can run. A result that contradicts the stated result is an Evidence class mismatch.
 
-If the command cannot re-run, write the reason in the verdict and in the evidence. The command cannot re-run when any of these is true.
+If no command was stated, or the command cannot re-run, write the reason in the verdict and continue the other gates. It cannot re-run when no command was stated, the environment is missing, the command is non-deterministic, a secret is required, or the job is a protected live job. Never pretend the command ran. Judge that job from the snapshot and the checkout.
 
-- `Proof:` is missing.
-- The environment is missing.
-- The command is non-deterministic.
-- A secret is required.
-- The job is a protected live job.
-
-Never pretend the command ran. Still run the Evidence class check for a protected live job.
-
-Check `Evidence class:` against the actual evidence and the re-run result. Use the class table below. A missing `Evidence class:` label is an Evidence class mismatch. An Evidence class mismatch is `verdict: request-changes` with severity High. When the inline rules allow a comment on the changed line, post that High finding as a blocking inline discussion. Otherwise put High on the verdict main table.
+Name the strongest class you actually used, from the table below. A stated class stronger than the evidence is an Evidence class mismatch. A missing class label is not a mismatch. An Evidence class mismatch is `verdict: request-changes` with severity High. When inline rules allow a comment on the changed line, post that High finding as a blocking inline discussion. Otherwise put High on the verdict main table.
 
 Evidence class. Every approve or block verdict must label the strongest evidence used. Classes, strongest first:
 
