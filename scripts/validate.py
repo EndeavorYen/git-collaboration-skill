@@ -125,10 +125,13 @@ REFERENCE_PHRASES = {
         "同意",
         "不同意",
         "agree or disagree",
-        "Re-run the `Proof:` command on the current review head",
+        "re-run that command on the current review head checkout",
         "cannot re-run",
         "Evidence class mismatch",
         "with severity High",
+        "is not a finding and is not `verdict: request-changes`",
+        "Do not ask the author to rewrite the description into that shape",
+        "A missing class label is not a mismatch",
         "rerunning a protected live job",
     ],
     "plan-issue.md": [
@@ -1060,10 +1063,12 @@ def validate_pstack() -> None:
     review = (ROOT / "references" / "review.md").read_text(encoding="utf-8")
     if "An unproven load-bearing fact is a remaining gate" not in review:
         fail("references/review.md: missing remaining-gate ladder rule")
-    label_lines = [line for line in review.splitlines() if "The labels are" in line]
-    listed = re.findall(r"`([A-Za-z -]+:)`", label_lines[0].split("The labels are", 1)[1].split(".", 1)[0]) if label_lines else []
-    if listed != list(PROOF_RECORD_LABELS):
-        fail("references/review.md: Proof labels differ from the pre-submit record")
+    if "The labels are" in review:
+        fail("references/review.md: do not require a Proof label list")
+    if "A missing `Evidence class:` label is an Evidence class mismatch" in review:
+        fail("references/review.md: a missing Evidence class label is not a mismatch")
+    if "under `## Verification`" in review:
+        fail("references/review.md: do not require the ## Verification heading")
     routing = "pstack Babysit and Shipping never run under this skill."
     if routing not in text:
         fail("references/pstack.md: missing routing sentence")
