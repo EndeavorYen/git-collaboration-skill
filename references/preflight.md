@@ -21,7 +21,7 @@ Actor gates, evaluated before `CONFLICTED` / `NEEDS_REVISION` / review-state rou
 | Requested command | Actor gate | Failure state |
 | --- | --- | --- |
 | `/git-review-pr` | must not be `owned`; must not be `self_authored_head` | `REVIEW_NOT_AUTHORIZED` |
-| `/git-review-pr-force` | PR/MR is open | none |
+| `/git-review-pr-force` | none | none |
 | `/git-fix-conflict` | must be `owned` | `WRITE_NOT_AUTHORIZED` |
 | `/git-revise-pr` | must be `owned` | `WRITE_NOT_AUTHORIZED` |
 | `/git-revise-pr-force` | must be `owned` | `WRITE_NOT_AUTHORIZED` |

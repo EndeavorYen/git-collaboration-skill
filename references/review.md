@@ -2,13 +2,17 @@
 
 Read this file for `/git-review-pr` and `/git-review-pr-force`. File pass: `references/pre-submit.md`. Also read one of `references/github.md` or `references/gitlab.md`. Do not read other mode files.
 
-When `/git-review-pr` is not open or is `REVIEW_NOT_AUTHORIZED`, stop without posting review feedback. Do not approve. The reply uses the review handoff in `references/handoff.md`.
+When `/git-review-pr` is closed unmerged or is `REVIEW_NOT_AUTHORIZED`, stop without posting review feedback. Do not approve. The reply uses the review handoff in `references/handoff.md`.
 
-When `/git-review-pr-force` is not open, stop without posting. `MERGED_OR_CLOSED` stays blocked.
+When `/git-review-pr-force` is closed unmerged, stop without posting.
+
+### Post-merge review
+
+When the human names a merged PR/MR, review the merged head SHA in a detached worktree: file pass, Proof re-run, Evidence class. Post one comment, no native review event or inline discussion. It opens with `<!-- git-post-merge-review -->`, `head: <full sha>`, and `verdict: approve` or `verdict: request-changes`. Each blocker names the follow-up fix; create no issue unless asked. Reply: the `verdict:` line and `next step: none`. Triage and scheduled runs skip merged items.
 
 ### `/git-review-pr-force`
 
-Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must still be open. Run the structured file pass and post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
+Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. Run the structured file pass and post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
 
 Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or `reject` as the status.
 
@@ -59,13 +63,11 @@ OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local
 
 When the user asks to review a GitHub or GitLab PR/MR, treat that as permission to post the review result unless repo-local instructions say otherwise. Keep review-only work read-only: do not push, merge, update the description, or create follow-up issues unless the user explicitly asks.
 
-Run the actor gate first. Do not review or approve a PR/MR that is `owned` or `self_authored_head` unless this invocation is `/git-review-pr-force`. Classify `REVIEW_NOT_AUTHORIZED` and stop without posting a verdict. Reviewer assignment plus a named IID does not authorize self-review. Under `/git-review-pr-force`, continue with the file pass and verdict.
-
 For `review again`, take one new snapshot instead of continuing from the old verdict. If there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
 
 Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree. Do not push review-only branches.
 
-Run the structured file review pass (`open-code-review-delegate`) on that head, map findings with the `/git-review-pr` mapping, then continue the layers below. OCR Step 7 Fix stays off.
+Run the structured file review pass (`open-code-review-delegate`) on that head, map findings with the `/git-review-pr` mapping, then continue the layers below.
 
 Review in this order:
 
@@ -113,7 +115,7 @@ A regex tripwire on an install or deploy command is not package-manager or runti
 Approval rules:
 
 - Never approve from a snapshot taken before the file pass. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
-- Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`. Under force, use the `/git-review-pr-force` verdict: try native `APPROVE` or `REQUEST_CHANGES` on the reviewed SHA; if the forge rejects that native event, post the opening lines on the current SHA.
+- Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`.
 - Do not approve if any active blocker remains unresolved, blocking discussions are unresolved, or relevant CI is failed/unknown without a clear non-code explanation.
 - An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed.
 - Do not require rerunning a protected live job before approval.
