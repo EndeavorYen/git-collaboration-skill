@@ -1,0 +1,60 @@
+{
+  "id": "post-merge-review",
+  "why": "A merged PR the human names gets one post-merge review comment, not a stop and not a native review event.",
+  "command": "/git-review-pr https://github.com/acme/widget/pull/9",
+  "user": "bob",
+  "snapshot": {
+    "number": 9,
+    "url": "https://github.com/acme/widget/pull/9",
+    "state": "MERGED",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "UNKNOWN",
+    "headRefOid": "5555555555555555555555555555555555555555",
+    "commits": [
+      {
+        "oid": "5555555",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": []
+  },
+  "extra": "Local file pass already done on the merged head checkout: open-code-review-delegate covered 2/2 files (src/units.py, tests/test_units.py). One high finding: src/units.py:41 returns millivolts where callers expect volts. The Proof record in the PR body re-runs green.",
+  "expect": {
+    "writes_must": [
+      [
+        "gh pr comment",
+        "gh api"
+      ]
+    ],
+    "writes_must_not": [
+      "gh pr review",
+      "gh pr merge",
+      "gh issue create"
+    ],
+    "reply_must_re": [
+      "git-post-merge-review",
+      "verdict: request-changes"
+    ],
+    "next": "next step: none"
+  },
+  "self_test": {
+    "pass": "<!-- git-post-merge-review -->\nhead: 5555555555555555555555555555555555555555\nverdict: request-changes\nSTATE: MERGED_OR_CLOSED\nWRITES:\n- gh pr comment 9 --body-file post-merge.md\nNEXT: next step: none",
+    "fail": "MERGED_OR_CLOSED stays blocked; nothing posted.\nSTATE: MERGED_OR_CLOSED\nWRITES:\n- none\nNEXT: next step: none"
+  }
+}
