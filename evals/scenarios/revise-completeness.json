@@ -1,0 +1,68 @@
+{
+  "id": "revise-completeness",
+  "why": "No actionable feedback is not done: a plain revise lists unmet acceptance items and hands off to force instead of a bare stop.",
+  "command": "/git-revise-pr https://github.com/acme/widget/pull/11",
+  "user": "alice",
+  "snapshot": {
+    "number": 11,
+    "url": "https://github.com/acme/widget/pull/11",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "6666666666666666666666666666666666666666",
+    "body": "Keep the pending scope selection on reload.\n\nCloses #12",
+    "closingIssuesReferences": [
+      {
+        "number": 12,
+        "url": "https://github.com/acme/widget/issues/12"
+      }
+    ],
+    "commits": [
+      {
+        "oid": "6666666",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [
+      {
+        "author": "dave",
+        "state": "COMMENTED",
+        "commit": "6666666",
+        "body": "Looks fine to me."
+      }
+    ],
+    "comments": []
+  },
+  "extra": "Issue #12 snapshot, body acceptance checklist:\n- [ ] Reloading the page keeps the pending scope selection\n- [ ] A unit test covers the reload path\n\nLocal checkout of the head: src/auth/scope.ts:58 restores the pending selection from sessionStorage on load. No test file references the reload path (searched tests/ for reload and sessionStorage).",
+  "expect": {
+    "writes_must_not": [
+      "git commit",
+      "git push",
+      "gh pr comment",
+      "gh pr review"
+    ],
+    "reply_must_re": [
+      "(?i)not done"
+    ],
+    "next": "next step: /git-revise-pr-force https://github.com/acme/widget/pull/11"
+  },
+  "self_test": {
+    "pass": "- Reload keeps pending selection: done (src/auth/scope.ts:58)\n- Unit test for reload: not done (no test)\nSTATE: REVIEW_REQUEST_NEEDED\nWRITES:\n- none\nNEXT: next step: /git-revise-pr-force https://github.com/acme/widget/pull/11",
+    "fail": "No actionable reviewer feedback; nothing to revise.\nSTATE: REVIEW_REQUEST_NEEDED\nWRITES:\n- none\nNEXT: next step: /git-request-review https://github.com/acme/widget/pull/11"
+  }
+}
