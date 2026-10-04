@@ -12,7 +12,7 @@ When the human names a merged PR/MR, review the merged head SHA in a detached wo
 
 ### `/git-review-pr-force`
 
-Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. Run the structured file pass and post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
+Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. File pass: when the PR/MR body's Proof record has `Review tier: full` with a reviewed range ending at the current head SHA, skip it and say so in the verdict. When the head moved past the last reviewed SHA, run it on `<last reviewed SHA>..<head>` only. A light tier or no reviewed range keeps the full file pass. Proof re-run, Evidence class, CI, discussions, and remaining gates always run. Post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
 
 Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or `reject` as the status.
 
@@ -67,7 +67,7 @@ For `review again`, take one new snapshot instead of continuing from the old ver
 
 Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree. Do not push review-only branches.
 
-Run the structured file review pass (`open-code-review-delegate`) on that head, map findings with the `/git-review-pr` mapping, then continue the layers below.
+Run the file pass (`open-code-review-delegate`) on that head, except where `/git-review-pr-force` above skips or narrows it; map findings, then continue the layers below.
 
 Review in this order:
 
@@ -76,9 +76,9 @@ Review in this order:
 3. Docs, generated types, schemas, and frontend/backend contracts.
 4. CI, pipeline artifacts, deployment, and environment risks. Separate required PR/MR jobs from a named live job. Agents must not treat a generic verify job as named live-job success.
 
-For forge-facing review text, match the issue/PR language or the repo's documented language. Keep comments concrete enough for the author to fix without a follow-up question.
+For forge-facing review text, match the issue/PR language or the repo's documented language.
 
-Review comments must be specific, clear, and actionable. Each finding should name the concrete problem or open question, its impact and whether it blocks merge, the expected fix direction or decision needed, and the validation, test, command, or evidence required before re-review. When multiple findings exist, use concise bullets or a Markdown table such as `Item`, `Impact`, `Required action`, and `Validation`.
+Each finding names the problem or open question, its impact and whether it blocks merge, the fix direction or decision needed, and the evidence required before re-review. For several findings, use bullets or an `Item` / `Impact` / `Required action` / `Validation` table.
 
 Blocking versus non-blocking:
 
@@ -137,7 +137,4 @@ For failing CI:
 
 - Use check conclusions already in the snapshot. Download one log for the failing job, keep the failing command and the error lines, and drop the rest.
 - Distinguish forge-native jobs from external providers.
-- Summarize failure context before implementing fixes.
 - Do not install forge tooling with system package managers unless the user asks.
-
-For review feedback that becomes tracked work later, separate immediate code changes from backlog/process items.
