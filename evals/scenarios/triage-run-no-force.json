@@ -94,7 +94,13 @@
       "gh pr merge 10",
       "gh pr merge https://github.com/acme/widget/pull/10",
       "gh pr merge 8",
-      "gh pr merge https://github.com/acme/widget/pull/8"
+      "gh pr merge https://github.com/acme/widget/pull/8",
+      "gh pr review 10",
+      "gh pr review https://github.com/acme/widget/pull/10",
+      "git-force-review"
+    ],
+    "reply_must_not_re": [
+      "/git-(merge-approved|review-pr|revise-pr)-force\\s+\\S*/pull/10\\b"
     ]
   },
   "self_test": {

@@ -20,4 +20,4 @@ Use this when the user asks to fix a conflict or invokes `/git-fix-conflict`.
 8. Commit with the repo's normal style. Run the **pre-submit gate**. Stop before push if Critical/High remain unfixed and unwaived. Then push the source branch.
 9. The push response is the read-back for the new head SHA. One confirm view only when it omits head SHA, conflict or mergeability state, pipeline, unresolved discussions, or reviewer state. Bundle any missing fields into that one view.
 
-After resolving conflicts, still do not merge until live approval reports an approving reviewer on the current head, or the user separately invokes `/git-merge-approved-force`. The operator reply ends with one `next step:` line from the review handoff in `references/handoff.md`. Do not print the Solo override block.
+After resolving conflicts, do not merge until live approval reports an approving reviewer on the current head, or the user invokes `/git-merge-approved-force` or `/git-triage-force`. The operator reply ends with one `next step:` line from the review handoff in `handoff.md`. Do not print the Solo override block.

@@ -10,12 +10,12 @@ Force covers only `owned` PRs/MRs and issues that are unassigned or assigned to 
 
 ## Plan
 
-Classify with **Project triage workflow** and order with **Plan order** in `triage.md`. Each owned PR/MR gets a chain; each issue gets `/git-plan-issue` then `/git-issue-pr`, then its new PR/MR's chain.
+Classify with **Project triage workflow** and order with **Plan order** in `triage.md`. Plan order step 4 becomes `/git-review-pr-force`. Each owned PR/MR gets a chain; each issue gets `/git-plan-issue` then `/git-issue-pr`, then its new PR/MR's chain.
 
 | Live state | Next command in the chain |
 | --- | --- |
 | `CONFLICTED` | `/git-fix-conflict` |
-| `NEEDS_REVISION`, or a relevant failed job | `/git-revise-pr-force` |
+| `NEEDS_REVISION`, a relevant failed job, or `verdict: request-changes` on the current head | `/git-revise-pr-force` |
 | no `verdict: approve` on the current head | `/git-review-pr-force` |
 | `verdict: approve` on the current head, required CI green | `/git-merge-approved-force` (skip on `no-merge`) |
 

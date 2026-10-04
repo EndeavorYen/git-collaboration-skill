@@ -1,0 +1,83 @@
+{
+  "id": "triage-force-dry-run",
+  "why": "/git-triage-force dry-run prints the force chain for owned items and plain review for a foreign PR, with no writes.",
+  "command": "/git-triage-force dry-run",
+  "user": "alice",
+  "snapshot": {
+    "project": "acme/widget",
+    "pull_requests": [
+      {
+        "number": 12,
+        "url": "https://github.com/acme/widget/pull/12",
+        "title": "Bump deps",
+        "state": "OPEN",
+        "isDraft": false,
+        "author": "alice",
+        "assignees": [
+          "alice"
+        ],
+        "reviewDecision": "",
+        "mergeable": "CONFLICTING",
+        "baseRefName": "main",
+        "headRefOid": "1212121212121212121212121212121212121212",
+        "updatedAt": "2026-09-19T10:00:00Z"
+      },
+      {
+        "number": 8,
+        "url": "https://github.com/acme/widget/pull/8",
+        "title": "Parse records",
+        "state": "OPEN",
+        "isDraft": false,
+        "author": "bob",
+        "assignees": [
+          "bob"
+        ],
+        "reviewRequests": [
+          "alice"
+        ],
+        "reviewDecision": "REVIEW_REQUIRED",
+        "mergeable": "MERGEABLE",
+        "baseRefName": "main",
+        "headRefOid": "8888888888888888888888888888888888888888",
+        "updatedAt": "2026-09-20T10:00:00Z"
+      }
+    ],
+    "issues": [
+      {
+        "number": 20,
+        "url": "https://github.com/acme/widget/issues/20",
+        "title": "parse_date accepts Feb 30",
+        "author": "carol",
+        "assignees": [],
+        "updatedAt": "2026-09-18T10:00:00Z",
+        "comments": []
+      }
+    ]
+  },
+  "expect": {
+    "writes_must_not": [
+      "gh pr merge",
+      "gh pr review",
+      "gh pr comment",
+      "gh pr edit",
+      "gh issue comment",
+      "gh issue edit",
+      "gh api",
+      "git push",
+      "git merge",
+      "git rebase"
+    ],
+    "reply_must_re": [
+      "/git-fix-conflict\\s+\\S*/pull/12\\b",
+      "/git-plan-issue\\s+\\S*/issues/20\\b",
+      "/git-review-pr\\s+\\S*/pull/8\\b"
+    ],
+    "reply_must_not_re": [
+      "/git-(review-pr|revise-pr|merge-approved)-force\\s+\\S*/pull/8\\b"
+    ]
+  },
+  "self_test": {
+    "pass": "1. /git-fix-conflict https://github.com/acme/widget/pull/12\n2. /git-review-pr-force https://github.com/acme/widget/pull/12\n3. /git-merge-approved-force https://github.com/acme/widget/pull/12\n4. /git-review-pr https://github.com/acme/widget/pull/8\n5. /git-plan-issue https://github.com/acme/widget/issues/20\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
+    "fail": "1. /git-fix-conflict https://github.com/acme/widget/pull/12\n2. /git-review-pr-force https://github.com/acme/widget/pull/8\n3. /git-plan-issue https://github.com/acme/widget/issues/20\nSTATE: n/a\nWRITES:\n- git merge origin/main\nNEXT: none"
+  }
+}

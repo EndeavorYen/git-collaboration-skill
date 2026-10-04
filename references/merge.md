@@ -13,7 +13,7 @@ After `/git-merge-approved-force`, the operator reply ends with one `next step:`
 
 ## Merge Approved PR/MR
 
-Use this only when the user explicitly asks to merge a specific PR/MR, or when `/git-triage run` reaches an owned item whose live primary state is `READY_TO_MERGE` (unless `no-merge` was requested). `/git-triage run` does not inherit force.
+Use this only when the user asks to merge one PR/MR, or when `/git-triage run` reaches an owned `READY_TO_MERGE` item or `/git-triage-force` reaches an owned item, unless `no-merge` was given. `/git-triage run` does not inherit force.
 
 Before merging:
 
