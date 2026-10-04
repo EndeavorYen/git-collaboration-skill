@@ -112,6 +112,10 @@ REFERENCE_PHRASES = {
         "Scheduled runs always use the full tier",
         "same in both tiers",
         "recompute the tier",
+        "Only a Critical or High fix starts another file pass",
+        "the fix range",
+        "A Medium/Low-only fix re-runs the tests",
+        "<each reviewed range>",
         "An unproven load-bearing fact is a remaining gate",
     ],
     "review.md": [

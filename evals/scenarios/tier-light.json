@@ -15,10 +15,11 @@
   "extra": "Submit range `git diff --shortstat origin/main..HEAD`: 2 files changed, 14 insertions(+), 6 deletions(-). Paths: src/util.py, tests/test_util.py. State which pre-submit review tier applies and print the Proof record you would write.",
   "expect": {
     "reply_must_re": [
-      "^\\s*Review tier:\\s*light\\s*$"
+      "^\\s*Review tier:\\s*light\\b"
     ],
     "reply_must_not_re": [
-      "^\\s*Review tier:\\s*full\\s*$"
+      "^\\s*Review tier:\\s*full\\b",
+      "^\\s*Review tier:\\s*\\w+\\s*\\|"
     ]
   },
   "self_test": {
