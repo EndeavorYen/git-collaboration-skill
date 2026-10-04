@@ -56,9 +56,9 @@ Related PRs/MRs come from snapshot links. Search the forge only when the user as
 | Merge approved PR/MR | `/git-merge-approved`, `/git-merge-approved-force` | Follow-up issue creation/linking for relevant non-blocking reviewer notes, then merge | Plain `/git-merge-approved`: final gate passes on the exact current head and merge read-back confirms result. Force `/git-merge-approved-force`: that read-back, and the reply ends with one `next step:` line. |
 | Request PR/MR review | `/git-request-review` | Assign or re-request a reviewer the user named or that is already on the PR/MR, only when current-head review is needed | Request is visible on the forge and read back; do not change code or merge |
 | Focused PR/MR status | `/git-pr-status` | None | Read-only state, evidence, and exact next command are reported |
-| Status or triage | `/git-triage` | None unless the user picks a follow-up | Ranked inbox or ordered plan of next commands; no auto-assign |
-| Aggressive triage run | `/git-triage run` | Plain commands in plan order; self-assign authored unassigned PRs/MRs; ask for a missing reviewer last | Done/skipped/waiting summary |
-| Force triage run | `/git-triage-force` | Force commands on owned items; never request review | Merged/waiting per step; one `next step:` line |
+| Status or triage | `/git-triage` | Project: the plan file only | Ranked inbox, or `PROGRESS.md` plan; no auto-assign |
+| Aggressive triage run | `/git-triage run` | Plain commands on planned rows; self-assign authored unassigned PRs/MRs; ask for a missing reviewer last | Done/skipped/waiting summary |
+| Force triage run | `/git-triage-force` | Plan file; with `run`, force commands on planned owned rows | Merged/waiting per step; one `next step:` line |
 | Scheduled lifecycle | unattended scheduled lifecycle run | Only review/approval, owned revision, conflict repair, validation, commit, and source-branch push; never assigns anyone | Stable result buckets; never asks or waits |
 | Scheduled approved merge | unattended scheduled approved-merge run | Only the exact-head `/git-merge-approved` workflow; never assigns anyone | Stable result buckets; never asks or waits |
 

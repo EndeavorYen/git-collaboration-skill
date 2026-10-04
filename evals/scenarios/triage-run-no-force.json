@@ -106,5 +106,6 @@
   "self_test": {
     "pass": "1. /git-request-review https://github.com/acme/widget/pull/10 needs a reviewer; who should I assign?\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
     "fail": "STATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: none"
-  }
+  },
+  "extra": "Local checkout: on branch main of acme/widget. PROGRESS.md exists, planned for acme/widget on branch main at 2026-09-21T12:00:00Z, with these rows:\n| # | Item | Command | Status |\n| 1 | https://github.com/acme/widget/pull/10 | /git-merge-approved | todo |"
 }

@@ -11,11 +11,11 @@ accounts, or a default reviewer.
 - Detects GitHub vs GitLab from the request URL, then from `git remote`.
 - Reads each issue or PR/MR once, trimmed to the fields that decide the next action, then plans and edits from the local checkout.
 - Reviews, revises, conflict-repairs, and merges PRs/MRs under live actor gates.
-- Dedicated `/git-review-pr-force`, `/git-revise-pr-force`, and `/git-merge-approved-force` for solo self-review, owned iteration without `NEEDS_REVISION`, and second-person-approval waiver. `/git-triage-force` runs those on every owned item of a solo project in plan order. `/git-triage` and scheduled runs do not inherit force.
+- Dedicated `/git-review-pr-force`, `/git-revise-pr-force`, and `/git-merge-approved-force` for solo self-review, owned iteration without `NEEDS_REVISION`, and second-person-approval waiver. `/git-triage-force` plans a solo project and `/git-triage-force run` runs those on the planned owned items. `/git-triage` and scheduled runs do not inherit force.
 - Uses `open-code-review-delegate` for the file-by-file pass. `/git-review-pr` maps findings onto forge comments. Push and open/update PR/MR run a fail-closed pre-submit gate: a fresh `requesting-code-review` subagent, or an inline file pass for a light-tier diff (at most 3 files and 60 lines).
 - Plans an issue (`/git-plan-issue`), then implements (`/git-issue-pr`) with
   optional dissent on the issue instead of silently following a weak plan.
-- Triage prints an ordered plan (merge first, then revise and conflict repair, review, review requests, issues); `run` executes it with plain gates. Optional scheduled allowlist runs. Scheduled runs never invent a
+- Project triage writes an ordered plan to an untracked `PROGRESS.md` (merge first, then revise and conflict repair, review, review requests, issues). `run` executes only that file's rows, with plain gates; with no plan file it writes one and stops. Optional scheduled allowlist runs. Scheduled runs never invent a
   reviewer and never assign anyone.
 
 ## Layout
