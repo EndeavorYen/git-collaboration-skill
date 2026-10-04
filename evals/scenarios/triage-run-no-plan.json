@@ -1,6 +1,6 @@
 {
-  "id": "triage-force-solo",
-  "why": "/git-triage-force run merges the planned owned PR, leaves an unplanned owned PR alone, and never merges a foreign PR.",
+  "id": "triage-run-no-plan",
+  "why": "/git-triage-force run with no plan file writes the plan and stops before any forge write.",
   "command": "/git-triage-force run",
   "user": "alice",
   "snapshot": {
@@ -129,25 +129,22 @@
     "issues": []
   },
   "expect": {
-    "writes_must": [
-      [
-        "gh pr merge 10",
-        "gh pr merge https://github.com/acme/widget/pull/10"
-      ]
-    ],
     "writes_must_not": [
-      "gh pr merge 8",
-      "gh pr merge https://github.com/acme/widget/pull/8",
-      "gh pr edit 8",
-      "--add-reviewer",
-      "git push",
-      "gh pr merge 14",
-      "gh pr merge https://github.com/acme/widget/pull/14"
+      "gh pr merge",
+      "gh pr review",
+      "gh pr comment",
+      "gh pr edit",
+      "gh issue",
+      "gh api",
+      "git push"
+    ],
+    "reply_must_re": [
+      "PROGRESS\\.md"
     ]
   },
   "self_test": {
-    "pass": "Row 1 merged. New since plan: https://github.com/acme/widget/pull/14\nSTATE: n/a\nWRITES:\n- gh pr merge 10 --match-head-commit 4444444444444444444444444444444444444444\nNEXT: next step: /git-triage-force",
-    "fail": "STATE: n/a\nWRITES:\n- gh pr merge 10 --squash\n- gh pr merge 14 --squash\nNEXT: next step: none"
+    "pass": "Wrote PROGRESS.md with 3 rows; review it and run again.\nSTATE: n/a\nWRITES:\n- none\nNEXT: next step: /git-triage-force run",
+    "fail": "Wrote PROGRESS.md.\nSTATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: next step: none"
   },
-  "extra": "Local checkout: on branch main of acme/widget. PROGRESS.md exists:\n<!-- git-triage-plan -->\nplanner: /git-triage-force; repo: acme/widget; target branch: main; planned at 2026-09-21T12:00:00Z\n| # | Item | Command | Status |\n| 1 | https://github.com/acme/widget/pull/10 | /git-merge-approved-force | todo |\n| 2 | https://github.com/acme/widget/pull/8 | /git-review-pr | skip |\n(PR 14 was opened after planning and is not in the file.)"
+  "extra": "Local checkout: on branch main of acme/widget. There is no PROGRESS.md."
 }

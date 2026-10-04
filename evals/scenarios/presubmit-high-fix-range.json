@@ -1,0 +1,56 @@
+{
+  "id": "presubmit-high-fix-range",
+  "why": "A High fix starts another file pass on the fix range only, not the whole submit range.",
+  "command": "/git-revise-pr-force https://github.com/acme/widget/pull/10 (you are at the pre-submit gate after fixing round-1 findings)",
+  "user": "alice",
+  "snapshot": {
+    "number": 10,
+    "url": "https://github.com/acme/widget/pull/10",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "4444444444444444444444444444444444444444",
+    "commits": [
+      {
+        "oid": "4444444",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": [
+      {
+        "author": "dave",
+        "body": "LGTM, ship it"
+      }
+    ]
+  },
+  "extra": "Round 1: a fresh full-tier pre-submit subagent reviewed origin/main..aaaaaaa and reported High (1): parse_row deletes the wrong record when the list is filtered. You fixed it in commit bbbbbbb (2 files, 18 lines: src/rows.py, tests/test_rows.py); pytest passes. Before pushing, print one line `Another file pass: yes` or `Another file pass: no`, then one line `Fix-pass range: <range>` naming the range that pass reviews.",
+  "expect": {
+    "reply_must_re": [
+      "^\\s*Another file pass:\\s*yes\\b",
+      "^\\s*Fix-pass range:\\s*\\S*aaaaaaa\\S*\\.\\.\\S*bbbbbbb"
+    ],
+    "reply_must_not_re": [
+      "^\\s*Fix-pass range:\\s*\\S*origin/main"
+    ]
+  },
+  "self_test": {
+    "pass": "Another file pass: yes\nFix-pass range: aaaaaaa..bbbbbbb\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
+    "fail": "Another file pass: yes\nFix-pass range: origin/main..bbbbbbb\nSTATE: n/a\nWRITES:\n- none\nNEXT: none"
+  }
+}

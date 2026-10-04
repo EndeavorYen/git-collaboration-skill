@@ -1,7 +1,7 @@
 {
   "id": "triage-force-dry-run",
-  "why": "/git-triage-force dry-run prints the force chain for owned items and plain review for a foreign PR, with no writes.",
-  "command": "/git-triage-force dry-run",
+  "why": "Bare /git-triage-force only plans: force chain for owned items, plain review for a foreign PR, and no forge write.",
+  "command": "/git-triage-force",
   "user": "alice",
   "snapshot": {
     "project": "acme/widget",

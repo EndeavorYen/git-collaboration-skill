@@ -1,6 +1,6 @@
 # Pre-submit gate
 
-Read this file for the file pass and the waiver rules. Review reads it with `references/review.md`. Implement, revise, and conflict read it before a source-branch push. Scheduled lifecycle keeps its unattended override in `references/scheduled-automation.md`. When detection says pstack is present and not off, read `references/pstack.md`.
+Read this file for the file pass and the waiver rules. Implement, revise, and conflict read it before a source-branch push. Scheduled lifecycle keeps its unattended override in `references/scheduled-automation.md`. When detection says pstack is present and not off, read `references/pstack.md`.
 
 ## Structured file review
 
@@ -25,10 +25,10 @@ Applies before push and before opening or updating a PR/MR on `/git-issue-pr`, `
 3. Critical and High findings are submit blockers until each is fixed in the tree or waived.
 4. A waiver is valid only when the **human in this conversation** names the path, the issue, and a reason. **Blanket ship language is not a waiver.** The agent does not waive. Unattended scheduled runs have no human in the conversation, so they cannot waive.
 5. Record each waiver in the commit body or PR/MR description.
-6. After fixes, recompute the tier and run the file pass again on the new range until no unwaived Critical/High remain.
+6. Only a Critical or High fix starts another file pass. Commit the fix; the pass covers the fix range, `<last reviewed SHA>..<new head>` plus callers that diff touches; recompute the tier on that range. Repeat until no unwaived Critical/High remain. A Medium/Low-only fix re-runs the tests, not the file pass.
 7. A failed file pass, leftover unwaived Critical/High, a missing waiver record, or a missing Proof record → do not push, do not open or update the PR/MR.
 
-Medium and Low do not block submit. Mention them in the PR/MR description when useful.
+Medium and Low do not block submit.
 
 ### Review tier
 
@@ -46,11 +46,11 @@ Proof: <command or skill run> -> <observed result>
 Evidence class: live job / real artifact bytes | executable unit tests | source-contract / regex tripwire | docs alignment
 Surface: <verify skill and feature driven> | none: <reason>
 Load-bearing fact: <fact> (level 1-5) | n/a
-Review tier: light | full
+Review tier: <light|full> <base sha>..<head sha>[; <light|full> <sha>..<sha> ...]
 pstack: present [hooks] | absent | off
 ```
 
-Evidence class values match `references/review.md`. Inconclusive or wrong-surface is not a pass. An unproven load-bearing fact is a remaining gate; do not write it closed. A user-visible change proven only by tests records `Surface: none: <reason>`.
+Evidence class values match `references/review.md`. Inconclusive or wrong-surface is not a pass. An unproven load-bearing fact is a remaining gate; do not write it closed. For a user-visible output (video, image, audio, UI), the observed result names the content checked, such as frames viewed and what they showed. An output that only exists or is non-empty leaves that fact a remaining gate. A user-visible change proven only by tests records `Surface: none: <reason>`.
 
 ### Optional observation
 
@@ -61,14 +61,11 @@ Brief: followed | adjusted: <step ids> | dissent <comment id>
 Executor-model: <id or unknown>
 ```
 
-`Brief:` is one of `followed`, `adjusted: <step ids>`, or `dissent <comment id>`. `Executor-model:` is a model id or `unknown`. Observation only, not a gate. A missing line does not fail the pre-submit gate.
+Observation only, not a gate. A missing line does not fail the pre-submit gate.
 
 | Excuse | Reality |
 | --- | --- |
 | "I'll review the diff myself" | File pass is OCR coverage via `open-code-review-delegate`. |
 | "Tests passed so the diff is fine" | `verification-before-completion` is not the file pass. |
 | "I'll waive this High finding" | Only the human in this conversation waives, with path + issue + reason. |
-| "I wrote this code, I know it's correct" | Above the light tier, pre-submit uses a fresh subagent. |
-| "It is only 4 files, call it light" | Light tier is at most 3 files and at most 60 changed lines. |
 | "pstack is not installed, so proof is n/a" | The Proof record is required anyway. pstack only raises the ceiling. |
-| "I will create the verify skill in this PR" | That is its own issue unless this issue asks for it. |

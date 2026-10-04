@@ -12,11 +12,11 @@ When the human names a merged PR/MR, review the merged head SHA in a detached wo
 
 ### `/git-review-pr-force`
 
-Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. Run the structured file pass and post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
+Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. File pass: when the Proof record's `Review tier:` ranges chain from the merge-base, the first is full tier, and the last ends at the current head SHA, skip it and say so in the verdict. When those hold except the chain ends at an ancestor of the head (`git merge-base --is-ancestor`), run it on `<last reviewed SHA>..<head>` only. Any other case, or no ranges, keeps the full file pass. Proof re-run, Evidence class, CI, discussions, and remaining gates always run. Post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
 
 Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or `reject` as the status.
 
-- `verdict: approve` — file pass done, no unresolved blocker, relevant CI is not failed or unknown.
+- `verdict: approve` — file pass done or skipped as above, no unresolved blocker, relevant CI is not failed or unknown.
 - `verdict: request-changes` — any remaining blocker, including a failed file pass.
 
 Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines below. Do not also post a comment. If the forge rejects that native event (`APPROVE` or `REQUEST_CHANGES`), post one current-head comment that starts with the same lines. A comment never sets `forge approval: present`.
@@ -61,13 +61,13 @@ OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local
 
 ## Review Workflow
 
-When the user asks to review a GitHub or GitLab PR/MR, treat that as permission to post the review result unless repo-local instructions say otherwise. Keep review-only work read-only: do not push, merge, update the description, or create follow-up issues unless the user explicitly asks.
+When the user asks to review a GitHub or GitLab PR/MR, treat that as permission to post the review result unless repo-local instructions say otherwise.
 
-For `review again`, take one new snapshot instead of continuing from the old verdict. If there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
+For `review again`, if there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
 
-Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree. Do not push review-only branches.
+Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree.
 
-Run the structured file review pass (`open-code-review-delegate`) on that head, map findings with the `/git-review-pr` mapping, then continue the layers below.
+Run the file pass (`open-code-review-delegate`) on that head, except where `/git-review-pr-force` above skips or narrows it; map findings, then continue the layers below.
 
 Review in this order:
 
@@ -76,9 +76,9 @@ Review in this order:
 3. Docs, generated types, schemas, and frontend/backend contracts.
 4. CI, pipeline artifacts, deployment, and environment risks. Separate required PR/MR jobs from a named live job. Agents must not treat a generic verify job as named live-job success.
 
-For forge-facing review text, match the issue/PR language or the repo's documented language. Keep comments concrete enough for the author to fix without a follow-up question.
+For forge-facing review text, match the issue/PR language or the repo's documented language.
 
-Review comments must be specific, clear, and actionable. Each finding should name the concrete problem or open question, its impact and whether it blocks merge, the expected fix direction or decision needed, and the validation, test, command, or evidence required before re-review. When multiple findings exist, use concise bullets or a Markdown table such as `Item`, `Impact`, `Required action`, and `Validation`.
+Each finding names the problem or open question, its impact and whether it blocks merge, the fix direction or decision needed, and the evidence required before re-review. For several findings, use bullets or an `Item` / `Impact` / `Required action` / `Validation` table.
 
 Blocking versus non-blocking:
 
@@ -99,14 +99,14 @@ Evidence class. Every approve or block verdict must label the strongest evidence
 
 | Class | Meaning |
 | --- | --- |
-| live job / real artifact bytes | Named live job or inspected artifact bytes |
+| live job / real artifact bytes | Named live job, or artifact content inspected |
 | executable unit tests | Tests that actually run the behavior |
 | source-contract / regex tripwire | String or schema lock, not runtime proof |
 | docs alignment | Text matches intended policy |
 
 Blast-radius level to Evidence class: 5 live job / real artifact bytes, 4 executable unit tests, 2 and 3 source-contract / regex tripwire, 1 no evidence. An unproven load-bearing fact is a remaining gate. Do not write it closed.
 
-Approve must not treat tripwire as live proof. A policy change that keeps old host config must say in the verdict that testing scope shrinks.
+Approve must not treat tripwire as live proof. A live-job claim for a user-visible output whose proof shows only that the output exists, not its content, is an Evidence class mismatch. A policy change that keeps old host config must say in the verdict that testing scope shrinks.
 
 Thorough-review triggers in the user text or invocation arguments include thorough, don't rubber-stamp, 徹底, 抓出來, and 不要放水. Thorough review does not promote style to blocking. It must put remaining gates, policy cost, and the evidence class in the verdict main table, and must not hide remaining gates in a non-blocking note.
 
@@ -114,7 +114,7 @@ A regex tripwire on an install or deploy command is not package-manager or runti
 
 Approval rules:
 
-- Never approve from a snapshot taken before the file pass. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
+- Never approve from a snapshot taken before the file pass or its skip check. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
 - Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`.
 - Do not approve if any active blocker remains unresolved, blocking discussions are unresolved, or relevant CI is failed/unknown without a clear non-code explanation.
 - An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed.
@@ -136,8 +136,4 @@ After posting blockers or approval, the write response is the read-back. Report 
 For failing CI:
 
 - Use check conclusions already in the snapshot. Download one log for the failing job, keep the failing command and the error lines, and drop the rest.
-- Distinguish forge-native jobs from external providers.
-- Summarize failure context before implementing fixes.
 - Do not install forge tooling with system package managers unless the user asks.
-
-For review feedback that becomes tracked work later, separate immediate code changes from backlog/process items.

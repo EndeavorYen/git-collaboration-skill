@@ -1,0 +1,55 @@
+{
+  "id": "presubmit-medium-only",
+  "why": "A pre-submit fix that only addresses Medium/Low findings re-runs the tests, not another file pass.",
+  "command": "/git-revise-pr-force https://github.com/acme/widget/pull/10 (you are at the pre-submit gate after fixing round-1 findings)",
+  "user": "alice",
+  "snapshot": {
+    "number": 10,
+    "url": "https://github.com/acme/widget/pull/10",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "4444444444444444444444444444444444444444",
+    "commits": [
+      {
+        "oid": "4444444",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": [
+      {
+        "author": "dave",
+        "body": "LGTM, ship it"
+      }
+    ]
+  },
+  "extra": "Round 1: a fresh full-tier pre-submit subagent reviewed origin/main..aaaaaaa and reported Medium (2): missing None check in parse_row, unclear error text; Low (1): typo. No Critical or High. You fixed both Mediums in commit bbbbbbb; pytest passes (40 passed). Before pushing, print one line `Another file pass: yes` or `Another file pass: no`, then the Proof record you would write.",
+  "expect": {
+    "reply_must_re": [
+      "^\\s*Another file pass:\\s*no\\b"
+    ],
+    "writes_must": [
+      "git push"
+    ]
+  },
+  "self_test": {
+    "pass": "Another file pass: no\nProof: pytest -> 40 passed\nReview tier: full, origin/main..aaaaaaa\nSTATE: n/a\nWRITES:\n- git push origin HEAD\nNEXT: next step: /git-review-pr-force https://github.com/acme/widget/pull/10",
+    "fail": "Another file pass: yes\nSTATE: n/a\nWRITES:\n- none\nNEXT: none"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "force-review-same-head",
+  "why": "/git-review-pr-force skips the file pass when a full-tier pre-submit reviewed exactly the current head, but still re-runs the Proof.",
+  "command": "/git-review-pr-force https://github.com/acme/widget/pull/10",
+  "user": "alice",
+  "snapshot": {
+    "number": 10,
+    "url": "https://github.com/acme/widget/pull/10",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "4444444444444444444444444444444444444444",
+    "commits": [
+      {
+        "oid": "4444444",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": [],
+    "body": "Retry uploads on 5xx.\n\nCloses #9\n\n## Verification\n\n```\nProof: pytest -> 40 passed\nEvidence class: executable unit tests\nSurface: none: library change\nLoad-bearing fact: n/a\nReview tier: full 1111111..4444444\npstack: absent\n```\n\nPre-submit: a fresh subagent reviewed the range; no Critical/High."
+  },
+  "extra": "Local checkout: the merge-base with main is 1111111; the checkout is at the PR head; pytest passes (40 passed). Before the verdict, print one line `File pass: skipped`, `File pass: full`, or `File pass: <range>` for the range you would review.",
+  "expect": {
+    "reply_must_re": [
+      "^\\s*File pass:\\s*skipped\\b",
+      "(?i)\\b(re-?ran|re-?run|reran)\\b"
+    ],
+    "reply_must_not_re": [
+      "^\\s*File pass:\\s*full\\b"
+    ]
+  },
+  "self_test": {
+    "pass": "File pass: skipped\nRe-ran pytest -> 40 passed.\nverdict: approve\nSTATE: n/a\nWRITES:\n- gh pr comment 10 --body-file v.md\nNEXT: next step: /git-merge-approved-force https://github.com/acme/widget/pull/10",
+    "fail": "File pass: full\nProof: pytest -> 40 passed\nverdict: approve\nSTATE: n/a\nWRITES:\n- gh pr comment 10 --body-file v.md\nNEXT: none"
+  }
+}
