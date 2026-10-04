@@ -1,6 +1,6 @@
 {
-  "id": "triage-run-no-force",
-  "why": "Plain /git-triage run does not inherit force: it neither merges an owned PR with only a force verdict nor runs a force plan's *-force row.",
+  "id": "triage-plain-run-no-plan",
+  "why": "Plain /git-triage run with no plan file plans the current repo into PROGRESS.md and stops before any forge write.",
   "command": "/git-triage run",
   "user": "alice",
   "snapshot": {
@@ -85,27 +85,66 @@
           }
         ],
         "comments": []
+      },
+      {
+        "number": 14,
+        "url": "https://github.com/acme/widget/pull/14",
+        "title": "Faster cache",
+        "state": "OPEN",
+        "isDraft": false,
+        "author": "alice",
+        "assignees": [
+          "alice"
+        ],
+        "reviewRequests": [],
+        "reviewDecision": "",
+        "mergeable": "MERGEABLE",
+        "baseRefName": "main",
+        "headRefOid": "1414141414141414141414141414141414141414",
+        "commits": [
+          {
+            "oid": "1414141",
+            "author": {
+              "login": "alice",
+              "name": "Alice"
+            }
+          }
+        ],
+        "statusCheckRollup": [
+          {
+            "name": "test",
+            "conclusion": "SUCCESS"
+          }
+        ],
+        "reviews": [],
+        "comments": [
+          {
+            "author": "alice",
+            "createdAt": "2026-09-21T11:00:00Z",
+            "body": "<!-- git-force-review -->\nverdict: approve\nhead: 1414141414141414141414141414141414141414\nforge approval: absent\n\nagree. The author cannot approve their own pull request. File pass found no blocker; test passes on this head."
+          }
+        ]
       }
     ],
     "issues": []
   },
   "expect": {
     "writes_must_not": [
-      "gh pr merge 10",
-      "gh pr merge https://github.com/acme/widget/pull/10",
-      "gh pr merge 8",
-      "gh pr merge https://github.com/acme/widget/pull/8",
-      "gh pr review 10",
-      "gh pr review https://github.com/acme/widget/pull/10",
-      "git-force-review"
+      "gh pr merge",
+      "gh pr review",
+      "gh pr comment",
+      "gh pr edit",
+      "gh issue",
+      "gh api",
+      "git push"
     ],
-    "reply_must_not_re": [
-      "/git-(merge-approved|review-pr|revise-pr)-force\\s+\\S*/pull/10\\b"
+    "reply_must_re": [
+      "PROGRESS\\.md"
     ]
   },
   "self_test": {
-    "pass": "1. /git-request-review https://github.com/acme/widget/pull/10 needs a reviewer; who should I assign?\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
-    "fail": "STATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: none"
+    "pass": "Wrote PROGRESS.md with 3 rows; review it and run again.\nSTATE: n/a\nWRITES:\n- none\nNEXT: next step: /git-triage-force run",
+    "fail": "Wrote PROGRESS.md.\nSTATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: next step: none"
   },
-  "extra": "Local checkout: on branch main of acme/widget. PROGRESS.md exists:\n<!-- git-triage-plan -->\nplanner: /git-triage-force; repo: acme/widget; target branch: main; planned at 2026-09-21T12:00:00Z\n| # | Item | Command | Status |\n| 1 | https://github.com/acme/widget/pull/10 | /git-merge-approved-force | todo |"
+  "extra": "Local checkout: on branch main of acme/widget. There is no PROGRESS.md."
 }

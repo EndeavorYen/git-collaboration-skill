@@ -1,5 +1,5 @@
 ---
-description: Sweep a solo-owned GitHub or GitLab project, then plan, fix, force-review, and force-merge each owned item
+description: Plan a solo-owned GitHub or GitLab project; with run, fix, force-review, and force-merge each planned owned item
 ---
 
 `/git-triage-force`: read `references/triage.md` and `references/triage-force.md`.

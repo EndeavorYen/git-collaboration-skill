@@ -40,12 +40,12 @@
     ],
     "reviews": [],
     "comments": [],
-    "body": "Retry uploads on 5xx.\n\nCloses #9\n\n## Verification\n\n```\nProof: pytest -> 40 passed\nEvidence class: executable unit tests\nSurface: none: library change\nLoad-bearing fact: n/a\nReview tier: full, origin/main..aaaaaaa\npstack: absent\n```\n\nPre-submit: a fresh subagent reviewed the range; no Critical/High."
+    "body": "Retry uploads on 5xx.\n\nCloses #9\n\n## Verification\n\n```\nProof: pytest -> 40 passed\nEvidence class: executable unit tests\nSurface: none: library change\nLoad-bearing fact: n/a\nReview tier: full origin/main..aaaaaaa\npstack: absent\n```\n\nPre-submit: a fresh subagent reviewed the range; no Critical/High."
   },
   "extra": "Local checkout is at the PR head 4444444; aaaaaaa is its parent; pytest passes (40 passed). Before the verdict, print one line `File pass: skipped`, `File pass: full`, or `File pass: <range>` for the range you would review.",
   "expect": {
     "reply_must_re": [
-      "^\\s*File pass:\\s*\\S*aaaaaaa\\S*\\.\\.\\S*4444444"
+      "^\\s*File pass:\\s*\\S*aaaaaaa\\S*\\.\\.\\S*(4444444|HEAD)"
     ],
     "reply_must_not_re": [
       "^\\s*File pass:\\s*(skipped|full)\\b",

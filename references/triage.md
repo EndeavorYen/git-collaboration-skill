@@ -21,7 +21,7 @@ Notifications are signals, not conversational source of truth. Another user spea
 
 Classify into Ready to review, Ready to fix conflicts, Ready to revise, Ready to merge, Merge handoff needed, Ready to reply, Acknowledge or route, No reply needed, Needs semantic review, Ready to implement, Review request needed, and Waiting or blocked. A named foreign conflicted PR/MR is `WRITE_NOT_AUTHORIZED`, not ready to fix.
 
-Ready to implement: an open issue assigned to me, not blocked, not covered by an active PR/MR, with a current `<!-- git-plan-issue -->` brief whose Goal, Recommended change, Out of scope, and Acceptance criteria hold no unsettled product decision. Otherwise recommend `/git-plan-issue` with the exact issue URL. An unresolved `<!-- git-plan-issue-dissent -->` waits for a human decision. `/git-triage` does not load `gentle-grill-me`.
+Ready to implement: an open issue assigned to me, not blocked, not covered by an active PR/MR, with a current `<!-- git-plan-issue -->` brief whose Goal, Recommended change, Out of scope, and Acceptance criteria hold no unsettled product decision. Otherwise recommend `/git-plan-issue` with the exact issue URL. An unresolved `<!-- git-plan-issue-dissent -->` waits for a human decision.
 
 Report each actionable item with reason, live evidence, remaining gate, and exact next command. End with a compact top three and ask which item to handle next.
 
@@ -35,7 +35,7 @@ Write the actionable items to the **Plan file** in **Plan order**, then ask whet
 
 ### Plan file
 
-`PROGRESS.md` at the repository root, added to `.git/info/exclude`, never committed. Header: repo, branch, planned-at time. One row per step: item URL, exact command, status (`todo` / `done` / `waiting` / `skip`), evidence. Todo triage writes no file.
+`PROGRESS.md` at the root of the main checkout, added to `.git/info/exclude`, never committed. Its first line is `<!-- git-triage-plan -->`; never overwrite a `PROGRESS.md` without it, stop and ask. Header: planner (`/git-triage` or `/git-triage-force`), repo, target branch, planned-at time. One row per step: item URL, exact command, status (`todo` / `done` / `waiting` / `skip`), evidence. Todo triage writes no file.
 
 ### Plan order
 
@@ -51,15 +51,14 @@ Within a step, oldest update first. A PR/MR whose base branch is another open PR
 
 ## Aggressive Triage Run
 
-Use this for `/git-triage run` (aliases `aggressive` / `execute`). `/git-triage run` does not inherit force; `/git-triage-force run` is the solo sweep.
+`/git-triage run` (aliases `aggressive` / `execute`) does not inherit force; `/git-triage-force run` is the solo sweep.
 
-1. Resolve the authenticated user and scope. Modifiers: `no-merge`, `merge-only`, `include-drafts`, `with-issues`, and an explicit `reviewer:USERNAME` (user-chosen, never hard-coded). `dry-run` means the bare command.
-2. No **Plan file**, or one planned for another repo or branch: write it with the matching triage workflow and stop with no forge write. The owner reviews it and runs again.
-3. Otherwise the file is the only target list. Run its rows in file order from the first row not `done`; skip rows the owner deleted or marked `skip`. Do not touch an item missing from the file; report it as **new since plan**. Never auto-post replies or briefs.
-4. A reviewer comes only from `reviewer:` in this run. Repo docs may inform suggestions, never an assignment.
-5. **Assignee hygiene (early):** assign yourself to planned PRs/MRs you **authored** with **empty assignees**. Never assign yourself elsewhere or replace a non-empty list.
-6. Row commands unless `merge-only`: Ready to review → `/git-review-pr`; owned conflicts → `/git-fix-conflict`; owned revision → `/git-revise-pr`; owned Ready to merge → `/git-merge-approved` (skip on `no-merge`); owned current-head re-request with an existing reviewer → `/git-request-review`.
-7. **Missing reviewers last.** With `reviewer:USERNAME`, assign and request review. Otherwise list those PRs/MRs and **ask who to assign**; wait, do not guess.
-8. Before every write, take one new snapshot and re-run the command preflight. Live state overrides the row: reroute within that item or mark it `waiting`, never add an item.
-9. Do not auto-implement issues unless `with-issues` is present.
-10. After each step, write its status and evidence to its row, so a rerun resumes.
+1. Resolve the authenticated user. Scope is project triage: the current repo, or a project in arguments. Modifiers: `no-merge`, `merge-only`, `include-drafts`, `with-issues`, and an explicit `reviewer:USERNAME`. `dry-run` means the bare command.
+2. No **Plan file**, or one from another planner, repo, or target branch: write it and stop with no forge write.
+3. Otherwise the file is the only target list. Run its rows in file order from the first row not `done`; skip rows the owner deleted or marked `skip`. Do not touch an item missing from the file; report it as **new since plan**. Plain `run` never runs a `*-force` row. Never auto-post replies or briefs.
+4. **Assignee hygiene (early):** assign yourself to planned PRs/MRs you **authored** with **empty assignees**. Never assign yourself elsewhere or replace a non-empty list.
+5. Row commands unless `merge-only`: Ready to review → `/git-review-pr`; owned conflicts → `/git-fix-conflict`; owned revision → `/git-revise-pr`; owned Ready to merge → `/git-merge-approved` (skip on `no-merge`); owned current-head re-request with an existing reviewer → `/git-request-review`.
+6. **Missing reviewers last.** With `reviewer:USERNAME`, assign and request review. Otherwise list those PRs/MRs and **ask who to assign**; wait, do not guess.
+7. Before every write, take one new snapshot and re-run the command preflight. Live state overrides the row: reroute within that item or mark it `waiting`, never add an item.
+8. Do not auto-implement issues unless `with-issues` is present.
+9. After each step, write its status and evidence to its row, so a rerun resumes.

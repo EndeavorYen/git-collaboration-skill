@@ -12,11 +12,11 @@ When the human names a merged PR/MR, review the merged head SHA in a detached wo
 
 ### `/git-review-pr-force`
 
-Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. File pass: when the PR/MR body's Proof record has `Review tier: full` with a reviewed range ending at the current head SHA, skip it and say so in the verdict. When the head moved past the last reviewed SHA, run it on `<last reviewed SHA>..<head>` only. A light tier or no reviewed range keeps the full file pass. Proof re-run, Evidence class, CI, discussions, and remaining gates always run. Post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
+Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. File pass: when the Proof record's `Review tier:` ranges chain from the merge-base, the first is full tier, and the last ends at the current head SHA, skip it and say so in the verdict. When the chain ends at an ancestor of the head (`git merge-base --is-ancestor`), run it on `<last reviewed SHA>..<head>` only. Any other case, or no ranges, keeps the full file pass. Proof re-run, Evidence class, CI, discussions, and remaining gates always run. Post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
 
 Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or `reject` as the status.
 
-- `verdict: approve` — file pass done, no unresolved blocker, relevant CI is not failed or unknown.
+- `verdict: approve` — file pass done or skipped as above, no unresolved blocker, relevant CI is not failed or unknown.
 - `verdict: request-changes` — any remaining blocker, including a failed file pass.
 
 Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines below. Do not also post a comment. If the forge rejects that native event (`APPROVE` or `REQUEST_CHANGES`), post one current-head comment that starts with the same lines. A comment never sets `forge approval: present`.
@@ -63,7 +63,7 @@ OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local
 
 When the user asks to review a GitHub or GitLab PR/MR, treat that as permission to post the review result unless repo-local instructions say otherwise.
 
-For `review again`, take one new snapshot instead of continuing from the old verdict. If there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
+For `review again`, if there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
 
 Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree. Do not push review-only branches.
 
@@ -114,7 +114,7 @@ A regex tripwire on an install or deploy command is not package-manager or runti
 
 Approval rules:
 
-- Never approve from a snapshot taken before the file pass. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
+- Never approve from a snapshot taken before the file pass or its skip check. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
 - Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`.
 - Do not approve if any active blocker remains unresolved, blocking discussions are unresolved, or relevant CI is failed/unknown without a clear non-code explanation.
 - An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed.
@@ -136,5 +136,4 @@ After posting blockers or approval, the write response is the read-back. Report 
 For failing CI:
 
 - Use check conclusions already in the snapshot. Download one log for the failing job, keep the failing command and the error lines, and drop the rest.
-- Distinguish forge-native jobs from external providers.
 - Do not install forge tooling with system package managers unless the user asks.

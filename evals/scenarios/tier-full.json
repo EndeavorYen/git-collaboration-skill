@@ -15,7 +15,7 @@
   "extra": "Submit range `git diff --shortstat origin/main..HEAD`: 5 files changed, 48 insertions(+), 10 deletions(-). Paths: .github/workflows/ci.yml, src/a.py, src/b.py, tests/test_a.py, tests/test_b.py. State which pre-submit review tier applies and print the Proof record you would write.",
   "expect": {
     "reply_must_re": [
-      "^\\s*Review tier:\\s*full\\b"
+      "^\\s*Review tier:\\s*full\\s+\\S+\\.\\.\\S+"
     ],
     "reply_must_not_re": [
       "^\\s*Review tier:\\s*light\\b",
@@ -23,7 +23,7 @@
     ]
   },
   "self_test": {
-    "pass": "Review tier: full\nSTATE: n/a\nWRITES:\n- git push -u origin HEAD\nNEXT: none",
+    "pass": "Review tier: full origin/main..HEAD\nSTATE: n/a\nWRITES:\n- git push -u origin HEAD\nNEXT: none",
     "fail": "Review tier: light\nSTATE: n/a\nWRITES:\n- none\nNEXT: none"
   }
 }

@@ -25,10 +25,10 @@ Applies before push and before opening or updating a PR/MR on `/git-issue-pr`, `
 3. Critical and High findings are submit blockers until each is fixed in the tree or waived.
 4. A waiver is valid only when the **human in this conversation** names the path, the issue, and a reason. **Blanket ship language is not a waiver.** The agent does not waive. Unattended scheduled runs have no human in the conversation, so they cannot waive.
 5. Record each waiver in the commit body or PR/MR description.
-6. Only a Critical or High fix starts another file pass. It covers the fix range, `<last reviewed SHA>..<new head>` plus callers that diff touches; recompute the tier on that range. Repeat until no unwaived Critical/High remain. A Medium/Low-only fix re-runs the tests, not the file pass.
+6. Only a Critical or High fix starts another file pass. Commit the fix; the pass covers the fix range, `<last reviewed SHA>..<new head>` plus callers that diff touches; recompute the tier on that range. Repeat until no unwaived Critical/High remain. A Medium/Low-only fix re-runs the tests, not the file pass.
 7. A failed file pass, leftover unwaived Critical/High, a missing waiver record, or a missing Proof record → do not push, do not open or update the PR/MR.
 
-Medium and Low do not block submit. Mention them in the PR/MR description when useful.
+Medium and Low do not block submit.
 
 ### Review tier
 
@@ -46,7 +46,7 @@ Proof: <command or skill run> -> <observed result>
 Evidence class: live job / real artifact bytes | executable unit tests | source-contract / regex tripwire | docs alignment
 Surface: <verify skill and feature driven> | none: <reason>
 Load-bearing fact: <fact> (level 1-5) | n/a
-Review tier: light | full, <each reviewed range>
+Review tier: <light|full> <range>[; <light|full> <range> ...]
 pstack: present [hooks] | absent | off
 ```
 
