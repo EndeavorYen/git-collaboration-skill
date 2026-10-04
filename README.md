@@ -11,11 +11,11 @@ accounts, or a default reviewer.
 - Detects GitHub vs GitLab from the request URL, then from `git remote`.
 - Reads each issue or PR/MR once, trimmed to the fields that decide the next action, then plans and edits from the local checkout.
 - Reviews, revises, conflict-repairs, and merges PRs/MRs under live actor gates.
-- Dedicated `/git-review-pr-force`, `/git-revise-pr-force`, and `/git-merge-approved-force` for solo self-review, owned iteration without `NEEDS_REVISION`, and second-person-approval waiver. Triage and scheduled runs do not inherit force.
+- Dedicated `/git-review-pr-force`, `/git-revise-pr-force`, and `/git-merge-approved-force` for solo self-review, owned iteration without `NEEDS_REVISION`, and second-person-approval waiver. `/git-triage-force` runs those on every owned item of a solo project in plan order. `/git-triage` and scheduled runs do not inherit force.
 - Uses `open-code-review-delegate` for the file-by-file pass. `/git-review-pr` maps findings onto forge comments. Push and open/update PR/MR run a fail-closed pre-submit gate: a fresh `requesting-code-review` subagent, or an inline file pass for a light-tier diff (at most 3 files and 60 lines).
 - Plans an issue (`/git-plan-issue`), then implements (`/git-issue-pr`) with
   optional dissent on the issue instead of silently following a weak plan.
-- Triage and optional scheduled allowlist runs. Scheduled runs never invent a
+- Triage prints an ordered plan (merge first, then revise and conflict repair, review, review requests, issues); `run` executes it with plain gates. Optional scheduled allowlist runs. Scheduled runs never invent a
   reviewer and never assign anyone.
 
 ## Layout
@@ -37,7 +37,8 @@ references/merge.md              # approved merge
 references/reply.md              # issue reply
 references/request-review.md
 references/status.md
-references/triage.md             # read-only triage and aggressive run
+references/triage.md             # read-only triage, plan order, aggressive run
+references/triage-force.md       # solo force sweep
 references/scheduled-automation.md
 references/pstack.md
 prompts/git-*.md                 # mode name, actor gate, reference path
@@ -150,7 +151,7 @@ to the user. CODEOWNERS may be listed as options. Memory, prior runs, and
 hard-coded names do not create a reviewer.
 
 Solo override is a dedicated command: `/git-review-pr-force <url>`,
-`/git-revise-pr-force <url>`, and `/git-merge-approved-force <url>`. Repo docs
+`/git-revise-pr-force <url>`, and `/git-merge-approved-force <url>`; `/git-triage-force` runs them across a project. Repo docs
 and "this is a solo project" do not create force.
 
 A `/git-review-pr-force` review that GitHub will not accept as APPROVE still leaves `verdict: approve` or `verdict: request-changes` on the pull request, and the chat reply has one `next step:` line.

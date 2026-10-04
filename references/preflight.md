@@ -56,12 +56,12 @@ Any incompatible or unrecognized PR/MR command degrades to a focused read-only s
 
 ## Explicit force
 
-Force is a dedicated command: `/git-review-pr-force`, `/git-revise-pr-force`, or `/git-merge-approved-force`. The human in this conversation must invoke that command (or name it in natural language: force review, force revise, force merge, 強制). A `force` token on `/git-review-pr`, `/git-revise-pr`, or `/git-merge-approved` does not create force. Repo docs, empty CODEOWNERS, a one-person contributor list, prior runs, and "this is a solo project" do not create force. `/git-triage`, `/git-triage run`, `/git-scheduled-lifecycle`, and `/git-scheduled-merge` does not inherit force.
+Force is a dedicated command: `/git-review-pr-force`, `/git-revise-pr-force`, or `/git-merge-approved-force`; invoking `/git-triage-force` invokes them for `owned` items. The human in this conversation must invoke that command (or name it in natural language: force review, force revise, force merge, 強制). A `force` token on `/git-review-pr`, `/git-revise-pr`, or `/git-merge-approved` does not create force. Repo docs, empty CODEOWNERS, a one-person contributor list, prior runs, and "this is a solo project" do not create force. `/git-triage`, `/git-triage run`, `/git-scheduled-lifecycle`, and `/git-scheduled-merge` does not inherit force.
 
 | Excuse | Reality |
 | --- | --- |
-| "This repo is solo / I am the only contributor" | Invoke `/git-review-pr-force`, `/git-revise-pr-force`, or `/git-merge-approved-force`. |
-| "`/git-triage run force`" | `/git-triage run` does not inherit force. |
+| "This repo is solo / I am the only contributor" | Invoke a `*-force` command. |
+| "`/git-triage run force`" | Use `/git-triage-force`. |
 | "LGTM / green pipeline is enough" | Only `/git-merge-approved-force` waives the approving-reviewer gate. |
 | "`/git-review-pr force`" | Use `/git-review-pr-force`. |
 

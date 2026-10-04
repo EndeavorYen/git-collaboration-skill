@@ -33,6 +33,7 @@ REQUIRED_FILES = [
     ROOT / "references" / "request-review.md",
     ROOT / "references" / "status.md",
     ROOT / "references" / "triage.md",
+    ROOT / "references" / "triage-force.md",
     ROOT / "references" / "pstack.md",
     ROOT / "references" / "preflight.md",
     ROOT / "references" / "handoff.md",
@@ -48,6 +49,7 @@ REQUIRED_FILES = [
     ROOT / "prompts" / "git-request-review.md",
     ROOT / "prompts" / "git-pr-status.md",
     ROOT / "prompts" / "git-triage.md",
+    ROOT / "prompts" / "git-triage-force.md",
     ROOT / "prompts" / "git-scheduled-lifecycle.md",
     ROOT / "prompts" / "git-scheduled-merge.md",
     ROOT / "prompts" / "git-review-pr-force.md",
@@ -230,6 +232,18 @@ REFERENCE_PHRASES = {
         "does not inherit force",
         "/git-plan-issue",
         "ask who to assign",
+        "### Plan order",
+        "rebuilds the plan from live state",
+    ],
+    "triage-force.md": [
+        "`owned`",
+        "`dry-run`",
+        "never revised, conflict-repaired, or merged",
+        "Force waives only the human gates",
+        "Every technical gate stays",
+        "Never request review",
+        "**waiting**",
+        "next step:",
     ],
     "pstack.md": [
         "pstack:off",
@@ -264,6 +278,7 @@ PSTACK_FORBIDDEN_PROMPTS = (
     "git-reply-issue.md",
     "git-request-review.md",
     "git-pr-status.md",
+    "git-triage-force.md",
 )
 
 TRIAGE_LOAD_LINE = "Status or triage, including the aggressive run: read `preflight.md` and `triage.md`."
@@ -356,6 +371,14 @@ PROMPT_PHRASES = {
         "does not inherit force",
         "references/triage.md",
     ],
+    "git-triage-force.md": [
+        "references/triage.md",
+        "references/triage-force.md",
+        "`owned`",
+        "does not inherit force",
+        "Never invent a reviewer",
+        "next step:",
+    ],
     "git-scheduled-lifecycle.md": [
         "does not inherit force",
         "references/scheduled-automation.md",
@@ -382,6 +405,10 @@ LOAD_LINES = {
     "merge": (
         "Merge approved PR/MR: read `preflight.md`, `merge.md`, `handoff.md`, and the forge reference.",
         ("`pre-submit.md`", "`review.md`"),
+    ),
+    "force-triage": (
+        "Force triage run: read `preflight.md`, `triage.md`, and `triage-force.md`.",
+        ("`review.md`", "`merge.md`", "`scheduled-automation.md`", "`pstack.md`"),
     ),
     "scheduled": (
         "Scheduled lifecycle or scheduled approved merge: read `preflight.md` and `scheduled-automation.md`.",
@@ -510,6 +537,7 @@ DEFAULT_PROMPT_FORBIDDEN = {
     "git-review-pr.md": ("/git-review-pr force",),
     "git-merge-approved.md": ("/git-merge-approved force",),
     "git-revise-pr.md": ("/git-revise-pr force",),
+    "git-triage.md": ("/git-triage run force",),
 }
 
 
