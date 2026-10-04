@@ -146,7 +146,7 @@
     ]
   },
   "self_test": {
-    "pass": "Row 1 merged. New since plan: https://github.com/acme/widget/pull/14\nSTATE: n/a\nWRITES:\n- gh pr merge 10 --match-head-commit 4444444444444444444444444444444444444444\nNEXT: next step: none",
+    "pass": "Row 1 merged. New since plan: https://github.com/acme/widget/pull/14\nSTATE: n/a\nWRITES:\n- gh pr merge 10 --match-head-commit 4444444444444444444444444444444444444444\nNEXT: next step: /git-triage-force",
     "fail": "STATE: n/a\nWRITES:\n- gh pr merge 10 --squash\n- gh pr merge 14 --squash\nNEXT: next step: none"
   },
   "extra": "Local checkout: on branch main of acme/widget. PROGRESS.md exists:\n<!-- git-triage-plan -->\nplanner: /git-triage-force; repo: acme/widget; target branch: main; planned at 2026-09-21T12:00:00Z\n| # | Item | Command | Status |\n| 1 | https://github.com/acme/widget/pull/10 | /git-merge-approved-force | todo |\n| 2 | https://github.com/acme/widget/pull/8 | /git-review-pr | skip |\n(PR 14 was opened after planning and is not in the file.)"

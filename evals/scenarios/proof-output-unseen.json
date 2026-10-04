@@ -33,10 +33,10 @@
     ],
     "reviews": [],
     "comments": [],
-    "body": "Add a draft quality tier to the video renderer.\n\nCloses #9\n\n## Verification\n\n```\nProof: python render.py --tier draft --prompt 'a red ball' -> out.mp4 written (12 MB, 48 frames)\nEvidence class: live job / real artifact bytes\nSurface: render.py draft tier\nLoad-bearing fact: draft tier renders a correct video (level 5)\nReview tier: full origin/main..4444444\npstack: absent\n```",
+    "body": "Add a draft quality tier to the video renderer.\n\nCloses #9\n\n## Verification\n\n```\nProof: python render.py --tier draft --prompt 'a red ball' -> out.mp4 written (12 MB, 48 frames)\nEvidence class: live job / real artifact bytes\nSurface: render.py draft tier\nLoad-bearing fact: draft tier renders a correct video (level 5)\nReview tier: full 1111111..4444444\npstack: absent\n```",
     "title": "Draft-tier video render"
   },
-  "extra": "Local checkout is at the PR head. The render needs a GPU this environment does not have, so the Proof command cannot re-run here; unit tests pass (40 passed).",
+  "extra": "Local checkout: the merge-base with main is 1111111; the checkout is at the PR head. The render needs a GPU this environment does not have, so the Proof command cannot re-run here; unit tests pass (40 passed).",
   "expect": {
     "reply_must_re": [
       "verdict:\\s*request-changes",

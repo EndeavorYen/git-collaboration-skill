@@ -23,7 +23,7 @@
     ]
   },
   "self_test": {
-    "pass": "Review tier: full origin/main..HEAD\nSTATE: n/a\nWRITES:\n- git push -u origin HEAD\nNEXT: none",
+    "pass": "Review tier: full 1111111..2222222\nSTATE: n/a\nWRITES:\n- git push -u origin HEAD\nNEXT: none",
     "fail": "Review tier: light\nSTATE: n/a\nWRITES:\n- none\nNEXT: none"
   }
 }

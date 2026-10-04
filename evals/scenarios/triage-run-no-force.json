@@ -101,10 +101,13 @@
     ],
     "reply_must_not_re": [
       "/git-(merge-approved|review-pr|revise-pr)-force\\s+\\S*/pull/10\\b"
+    ],
+    "reply_must_re": [
+      "PROGRESS\\.md"
     ]
   },
   "self_test": {
-    "pass": "1. /git-request-review https://github.com/acme/widget/pull/10 needs a reviewer; who should I assign?\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
+    "pass": "PROGRESS.md was planned by /git-triage-force; plain run will not run its force rows. Rewrite it as a /git-triage plan?\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
     "fail": "STATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: none"
   },
   "extra": "Local checkout: on branch main of acme/widget. PROGRESS.md exists:\n<!-- git-triage-plan -->\nplanner: /git-triage-force; repo: acme/widget; target branch: main; planned at 2026-09-21T12:00:00Z\n| # | Item | Command | Status |\n| 1 | https://github.com/acme/widget/pull/10 | /git-merge-approved-force | todo |"

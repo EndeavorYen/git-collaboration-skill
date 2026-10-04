@@ -1,6 +1,6 @@
 # Pre-submit gate
 
-Read this file for the file pass and the waiver rules. Review reads it with `references/review.md`. Implement, revise, and conflict read it before a source-branch push. Scheduled lifecycle keeps its unattended override in `references/scheduled-automation.md`. When detection says pstack is present and not off, read `references/pstack.md`.
+Read this file for the file pass and the waiver rules. Implement, revise, and conflict read it before a source-branch push. Scheduled lifecycle keeps its unattended override in `references/scheduled-automation.md`. When detection says pstack is present and not off, read `references/pstack.md`.
 
 ## Structured file review
 
@@ -46,7 +46,7 @@ Proof: <command or skill run> -> <observed result>
 Evidence class: live job / real artifact bytes | executable unit tests | source-contract / regex tripwire | docs alignment
 Surface: <verify skill and feature driven> | none: <reason>
 Load-bearing fact: <fact> (level 1-5) | n/a
-Review tier: <light|full> <range>[; <light|full> <range> ...]
+Review tier: <light|full> <base sha>..<head sha>[; <light|full> <sha>..<sha> ...]
 pstack: present [hooks] | absent | off
 ```
 

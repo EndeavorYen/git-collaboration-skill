@@ -23,7 +23,7 @@
     ]
   },
   "self_test": {
-    "pass": "Proof: pytest -> 12 passed\nReview tier: light origin/main..HEAD\nSTATE: n/a\nWRITES:\n- git push -u origin HEAD\nNEXT: none",
+    "pass": "Proof: pytest -> 12 passed\nReview tier: light 1111111..2222222\nSTATE: n/a\nWRITES:\n- git push -u origin HEAD\nNEXT: none",
     "fail": "Review tier: light | full\nSTATE: n/a\nWRITES:\n- none\nNEXT: none"
   }
 }

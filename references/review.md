@@ -12,7 +12,7 @@ When the human names a merged PR/MR, review the merged head SHA in a detached wo
 
 ### `/git-review-pr-force`
 
-Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. File pass: when the Proof record's `Review tier:` ranges chain from the merge-base, the first is full tier, and the last ends at the current head SHA, skip it and say so in the verdict. When the chain ends at an ancestor of the head (`git merge-base --is-ancestor`), run it on `<last reviewed SHA>..<head>` only. Any other case, or no ranges, keeps the full file pass. Proof re-run, Evidence class, CI, discussions, and remaining gates always run. Post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
+Waives the review actor gate (`owned`, `self_authored_head`). The PR/MR must be open or merged. File pass: when the Proof record's `Review tier:` ranges chain from the merge-base, the first is full tier, and the last ends at the current head SHA, skip it and say so in the verdict. When those hold except the chain ends at an ancestor of the head (`git merge-base --is-ancestor`), run it on `<last reviewed SHA>..<head>` only. Any other case, or no ranges, keeps the full file pass. Proof re-run, Evidence class, CI, discussions, and remaining gates always run. Post a visible verdict. Force review does not merge. A `<!-- git-force-review -->` body is not an approving reviewer. Native approval stays absent unless this invocation's `APPROVE` event is accepted.
 
 Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or `reject` as the status.
 
@@ -65,7 +65,7 @@ When the user asks to review a GitHub or GitLab PR/MR, treat that as permission 
 
 For `review again`, if there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
 
-Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree. Do not push review-only branches.
+Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree.
 
 Run the file pass (`open-code-review-delegate`) on that head, except where `/git-review-pr-force` above skips or narrows it; map findings, then continue the layers below.
 

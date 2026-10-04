@@ -140,10 +140,13 @@
     ],
     "reply_must_re": [
       "PROGRESS\\.md"
+    ],
+    "reply_must_not_re": [
+      "next step:\\s*/git-triage-force"
     ]
   },
   "self_test": {
-    "pass": "Wrote PROGRESS.md with 3 rows; review it and run again.\nSTATE: n/a\nWRITES:\n- none\nNEXT: next step: /git-triage-force run",
+    "pass": "Wrote PROGRESS.md with 3 rows; review it and run again.\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
     "fail": "Wrote PROGRESS.md.\nSTATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: next step: none"
   },
   "extra": "Local checkout: on branch main of acme/widget. There is no PROGRESS.md."
