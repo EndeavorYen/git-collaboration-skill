@@ -18,17 +18,18 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Bytes. Caps only go down: lower a cap when a change shrinks a mode.
 MODE_CAPS = {
-    "Review someone else's PR/MR": 44_520,
-    "Plan issue": 31_767,
-    "Implement issue then PR/MR": 39_237,
-    "Reply to issue": 13_003,
-    "Update own PR/MR after review": 27_164,
-    "Fix PR/MR conflicts": 26_116,
-    "Merge approved PR/MR": 31_182,
-    "Request PR/MR review": 20_312,
-    "Focused PR/MR status": 18_628,
-    "Status or triage, including the aggressive run": 23_847,
-    "Scheduled lifecycle or scheduled approved merge": 29_199,
+    "Review someone else's PR/MR": 44_404,
+    "Plan issue": 31_753,
+    "Implement issue then PR/MR": 39_223,
+    "Reply to issue": 12_989,
+    "Update own PR/MR after review": 26_969,
+    "Fix PR/MR conflicts": 26_107,
+    "Merge approved PR/MR": 31_173,
+    "Request PR/MR review": 20_303,
+    "Focused PR/MR status": 18_619,
+    "Status or triage, including the aggressive run": 23_409,
+    "Force triage run": 26_250,
+    "Scheduled lifecycle or scheduled approved merge": 29_190,
 }
 
 LOAD_LINE = re.compile(r"^([A-Z][^|#\n]*?): read (.+)$", re.M)

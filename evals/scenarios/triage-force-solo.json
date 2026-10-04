@@ -1,0 +1,111 @@
+{
+  "id": "triage-force-solo",
+  "why": "/git-triage-force merges an owned PR whose current head has a force verdict, and never merges a foreign PR.",
+  "command": "/git-triage-force",
+  "user": "alice",
+  "snapshot": {
+    "project": "acme/widget",
+    "pull_requests": [
+      {
+        "number": 10,
+        "url": "https://github.com/acme/widget/pull/10",
+        "title": "Retry uploads",
+        "state": "OPEN",
+        "isDraft": false,
+        "author": "alice",
+        "assignees": [
+          "alice"
+        ],
+        "reviewRequests": [],
+        "reviewDecision": "",
+        "mergeable": "MERGEABLE",
+        "baseRefName": "main",
+        "headRefOid": "4444444444444444444444444444444444444444",
+        "commits": [
+          {
+            "oid": "4444444",
+            "author": {
+              "login": "alice",
+              "name": "Alice"
+            }
+          }
+        ],
+        "statusCheckRollup": [
+          {
+            "name": "test",
+            "conclusion": "SUCCESS"
+          }
+        ],
+        "reviews": [],
+        "comments": [
+          {
+            "author": "alice",
+            "createdAt": "2026-09-21T11:00:00Z",
+            "body": "<!-- git-force-review -->\nverdict: approve\nhead: 4444444444444444444444444444444444444444\nforge approval: absent\n\nagree. The author cannot approve their own pull request. File pass found no blocker; test passes on this head."
+          }
+        ]
+      },
+      {
+        "number": 8,
+        "url": "https://github.com/acme/widget/pull/8",
+        "title": "Parse records",
+        "state": "OPEN",
+        "isDraft": false,
+        "author": "bob",
+        "assignees": [
+          "bob"
+        ],
+        "reviewRequests": [],
+        "reviewDecision": "",
+        "mergeable": "MERGEABLE",
+        "baseRefName": "main",
+        "headRefOid": "8888888888888888888888888888888888888888",
+        "commits": [
+          {
+            "oid": "8888888",
+            "author": {
+              "login": "bob",
+              "name": "Bob"
+            }
+          }
+        ],
+        "statusCheckRollup": [
+          {
+            "name": "test",
+            "conclusion": "SUCCESS"
+          }
+        ],
+        "reviews": [
+          {
+            "author": "carol",
+            "state": "APPROVED",
+            "commit": {
+              "oid": "8888888888888888888888888888888888888888"
+            }
+          }
+        ],
+        "comments": []
+      }
+    ],
+    "issues": []
+  },
+  "expect": {
+    "writes_must": [
+      [
+        "gh pr merge 10",
+        "gh pr merge https://github.com/acme/widget/pull/10"
+      ]
+    ],
+    "writes_must_not": [
+      "gh pr merge 8",
+      "gh pr merge https://github.com/acme/widget/pull/8",
+      "gh pr edit 8",
+      "--add-reviewer",
+      "git push"
+    ]
+  },
+  "self_test": {
+    "pass": "1. /git-merge-approved-force https://github.com/acme/widget/pull/10\n2. /git-review-pr https://github.com/acme/widget/pull/8 skipped: carol already approved\nSTATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: next step: none",
+    "fail": "STATE: n/a\nWRITES:\n- gh pr merge 10 --squash\n- gh pr merge 8 --squash\nNEXT: next step: none"
+  }
+}

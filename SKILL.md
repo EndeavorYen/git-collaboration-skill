@@ -29,7 +29,7 @@ A **snapshot** is one read whose payload already contains every forge field that
 3. After the snapshot, inspect code, history, diffs, tests, and repo instructions in the local checkout. `git fetch` of the one ref you will check out is allowed; do not fetch again to re-read files. If this checkout is the wrong repo or lacks the cited paths, stop and name the missing path.
 4. Draft, classify, and implement from that snapshot plus the checkout without re-querying the forge. Do not read repository files, blame, or trees through the forge.
 5. A write is one call. The write response is the read-back when it contains the new id, SHA, or state. Confirm with one view only when it omits a field the stop condition needs. Do not reload after a successful write.
-6. One more full snapshot is allowed immediately before a forge write that depends on the current head, approval, or mergeability, and before each write in an aggressive or scheduled run. That snapshot replaces the earlier one. It is still one call.
+6. One more full snapshot is allowed immediately before a forge write that depends on the current head, approval, or mergeability, and before each write in an aggressive or scheduled run. It replaces the earlier one.
 
 Download one failed job log only when a verdict or fix depends on it, and keep only the failing command and error lines. Do not list jobs the snapshot already concludes.
 
@@ -54,14 +54,15 @@ Related PRs/MRs come from snapshot links. Search the forge only when the user as
 | Update own PR/MR after review | `/git-revise-pr`, `/git-revise-pr-force` | Focused code/test/doc edits, commit, push to PR/MR branch, description/comment updates, replies to reviewer threads | Plain `/git-revise-pr`: reviewer threads answered when justified, head read-back shows the new SHA, no merge until a live non-author approval. Force `/git-revise-pr-force`: that read-back, and the reply ends with one `next step:` line. |
 | Fix PR/MR conflicts | `/git-fix-conflict` | Merge or rebase the target into the source branch, resolve, test, commit, push the source branch | Source branch pushed; read-back shows head, mergeability, pipeline, discussions, and reviewers; do not merge |
 | Merge approved PR/MR | `/git-merge-approved`, `/git-merge-approved-force` | Follow-up issue creation/linking for relevant non-blocking reviewer notes, then merge | Plain `/git-merge-approved`: final gate passes on the exact current head and merge read-back confirms result. Force `/git-merge-approved-force`: that read-back, and the reply ends with one `next step:` line. |
-| Request PR/MR review | `/git-request-review` | Assign or re-request a reviewer the user named or that is already on the PR/MR, only when current-head review is actually needed | Request is visible on the forge and read back; do not change code or merge |
+| Request PR/MR review | `/git-request-review` | Assign or re-request a reviewer the user named or that is already on the PR/MR, only when current-head review is needed | Request is visible on the forge and read back; do not change code or merge |
 | Focused PR/MR status | `/git-pr-status` | None | Read-only state, evidence, and exact next command are reported |
-| Status or triage | `/git-triage` | Usually read-only; create/update only if explicitly requested | Live ranked todo inbox and/or project triage with next commands; no auto-assign |
-| Aggressive triage run | `/git-triage run` | Execute the ranked PR/MR lifecycle; self-assign authored items with no assignee; ask for a missing reviewer at the end unless `reviewer:` was given | Done/skipped/waiting summary |
+| Status or triage | `/git-triage` | None unless the user picks a follow-up | Ranked inbox or ordered plan of next commands; no auto-assign |
+| Aggressive triage run | `/git-triage run` | Plain commands in plan order; self-assign authored unassigned PRs/MRs; ask for a missing reviewer last | Done/skipped/waiting summary |
+| Force triage run | `/git-triage-force` | Force commands on owned items; never request review | Merged/waiting per step; one `next step:` line |
 | Scheduled lifecycle | unattended scheduled lifecycle run | Only review/approval, owned revision, conflict repair, validation, commit, and source-branch push; never assigns anyone | Stable result buckets; never asks or waits |
 | Scheduled approved merge | unattended scheduled approved-merge run | Only the exact-head `/git-merge-approved` workflow; never assigns anyone | Stable result buckets; never asks or waits |
 
-When the wording is ambiguous, choose the safer mode. A review-only request never implies permission to push, update the PR/MR description, create follow-up issues, or merge. Plain `/git-triage` stays read-only; only `run` / `aggressive` / `execute` authorizes the aggressive sweep.
+When the wording is ambiguous, choose the safer mode. A review-only request never implies permission to push, update the PR/MR description, create follow-up issues, or merge.
 
 Read only the mode's files under `references/`, in one batch of parallel reads before acting. The forge reference is `github.md` or `gitlab.md`.
 
@@ -84,6 +85,8 @@ Request PR/MR review: read `preflight.md`, `request-review.md`, and `handoff.md`
 Focused PR/MR status: read `preflight.md` and `status.md`.
 
 Status or triage, including the aggressive run: read `preflight.md` and `triage.md`.
+
+Force triage run: read `preflight.md`, `triage.md`, and `triage-force.md`.
 
 Scheduled lifecycle or scheduled approved merge: read `preflight.md` and `scheduled-automation.md`.
 

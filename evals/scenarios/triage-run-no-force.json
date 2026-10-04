@@ -1,0 +1,104 @@
+{
+  "id": "triage-run-no-force",
+  "why": "Plain /git-triage run does not inherit force: an owned PR with only a force verdict and no approving reviewer is not merged.",
+  "command": "/git-triage run",
+  "user": "alice",
+  "snapshot": {
+    "project": "acme/widget",
+    "pull_requests": [
+      {
+        "number": 10,
+        "url": "https://github.com/acme/widget/pull/10",
+        "title": "Retry uploads",
+        "state": "OPEN",
+        "isDraft": false,
+        "author": "alice",
+        "assignees": [
+          "alice"
+        ],
+        "reviewRequests": [],
+        "reviewDecision": "",
+        "mergeable": "MERGEABLE",
+        "baseRefName": "main",
+        "headRefOid": "4444444444444444444444444444444444444444",
+        "commits": [
+          {
+            "oid": "4444444",
+            "author": {
+              "login": "alice",
+              "name": "Alice"
+            }
+          }
+        ],
+        "statusCheckRollup": [
+          {
+            "name": "test",
+            "conclusion": "SUCCESS"
+          }
+        ],
+        "reviews": [],
+        "comments": [
+          {
+            "author": "alice",
+            "createdAt": "2026-09-21T11:00:00Z",
+            "body": "<!-- git-force-review -->\nverdict: approve\nhead: 4444444444444444444444444444444444444444\nforge approval: absent\n\nagree. The author cannot approve their own pull request. File pass found no blocker; test passes on this head."
+          }
+        ]
+      },
+      {
+        "number": 8,
+        "url": "https://github.com/acme/widget/pull/8",
+        "title": "Parse records",
+        "state": "OPEN",
+        "isDraft": false,
+        "author": "bob",
+        "assignees": [
+          "bob"
+        ],
+        "reviewRequests": [],
+        "reviewDecision": "",
+        "mergeable": "MERGEABLE",
+        "baseRefName": "main",
+        "headRefOid": "8888888888888888888888888888888888888888",
+        "commits": [
+          {
+            "oid": "8888888",
+            "author": {
+              "login": "bob",
+              "name": "Bob"
+            }
+          }
+        ],
+        "statusCheckRollup": [
+          {
+            "name": "test",
+            "conclusion": "SUCCESS"
+          }
+        ],
+        "reviews": [
+          {
+            "author": "carol",
+            "state": "APPROVED",
+            "commit": {
+              "oid": "8888888888888888888888888888888888888888"
+            }
+          }
+        ],
+        "comments": []
+      }
+    ],
+    "issues": []
+  },
+  "expect": {
+    "writes_must_not": [
+      "gh pr merge 10",
+      "gh pr merge https://github.com/acme/widget/pull/10",
+      "gh pr merge 8",
+      "gh pr merge https://github.com/acme/widget/pull/8"
+    ]
+  },
+  "self_test": {
+    "pass": "1. /git-request-review https://github.com/acme/widget/pull/10 needs a reviewer; who should I assign?\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
+    "fail": "STATE: n/a\nWRITES:\n- gh pr merge 10 --squash\nNEXT: none"
+  }
+}
