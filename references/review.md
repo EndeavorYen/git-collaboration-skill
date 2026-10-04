@@ -61,7 +61,7 @@ OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local
 
 ## Review Workflow
 
-When the user asks to review a GitHub or GitLab PR/MR, treat that as permission to post the review result unless repo-local instructions say otherwise. Keep review-only work read-only: do not push, merge, update the description, or create follow-up issues unless the user explicitly asks.
+When the user asks to review a GitHub or GitLab PR/MR, treat that as permission to post the review result unless repo-local instructions say otherwise.
 
 For `review again`, take one new snapshot instead of continuing from the old verdict. If there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
 
@@ -99,14 +99,14 @@ Evidence class. Every approve or block verdict must label the strongest evidence
 
 | Class | Meaning |
 | --- | --- |
-| live job / real artifact bytes | Named live job or inspected artifact bytes |
+| live job / real artifact bytes | Named live job, or artifact content inspected |
 | executable unit tests | Tests that actually run the behavior |
 | source-contract / regex tripwire | String or schema lock, not runtime proof |
 | docs alignment | Text matches intended policy |
 
 Blast-radius level to Evidence class: 5 live job / real artifact bytes, 4 executable unit tests, 2 and 3 source-contract / regex tripwire, 1 no evidence. An unproven load-bearing fact is a remaining gate. Do not write it closed.
 
-Approve must not treat tripwire as live proof. A policy change that keeps old host config must say in the verdict that testing scope shrinks.
+Approve must not treat tripwire as live proof. A live-job claim for a user-visible output whose proof shows only that the output exists, not its content, is an Evidence class mismatch. A policy change that keeps old host config must say in the verdict that testing scope shrinks.
 
 Thorough-review triggers in the user text or invocation arguments include thorough, don't rubber-stamp, 徹底, 抓出來, and 不要放水. Thorough review does not promote style to blocking. It must put remaining gates, policy cost, and the evidence class in the verdict main table, and must not hide remaining gates in a non-blocking note.
 

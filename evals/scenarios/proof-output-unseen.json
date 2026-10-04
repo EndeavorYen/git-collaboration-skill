@@ -1,0 +1,55 @@
+{
+  "id": "proof-output-unseen",
+  "why": "A live-job claim for a video output whose proof only shows the file was written is an Evidence class mismatch, even when the file pass is skipped.",
+  "command": "/git-review-pr-force https://github.com/acme/widget/pull/10",
+  "user": "alice",
+  "snapshot": {
+    "number": 10,
+    "url": "https://github.com/acme/widget/pull/10",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "4444444444444444444444444444444444444444",
+    "commits": [
+      {
+        "oid": "4444444",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": [],
+    "body": "Add a draft quality tier to the video renderer.\n\nCloses #9\n\n## Verification\n\n```\nProof: python render.py --tier draft --prompt 'a red ball' -> out.mp4 written (12 MB, 48 frames)\nEvidence class: live job / real artifact bytes\nSurface: render.py draft tier\nLoad-bearing fact: draft tier renders a correct video (level 5)\nReview tier: full, origin/main..4444444\npstack: absent\n```",
+    "title": "Draft-tier video render"
+  },
+  "extra": "Local checkout is at the PR head. The render needs a GPU this environment does not have, so the Proof command cannot re-run here; unit tests pass (40 passed).",
+  "expect": {
+    "reply_must_re": [
+      "verdict:\\s*request-changes"
+    ],
+    "reply_must_not_re": [
+      "verdict:\\s*approve"
+    ],
+    "writes_must_not": [
+      "gh pr merge"
+    ]
+  },
+  "self_test": {
+    "pass": "Evidence class mismatch (High): the proof shows out.mp4 exists, not that its frames are correct.\nverdict: request-changes\nSTATE: n/a\nWRITES:\n- gh pr comment 10 --body-file v.md\nNEXT: next step: /git-revise-pr https://github.com/acme/widget/pull/10",
+    "fail": "verdict: approve\nSTATE: n/a\nWRITES:\n- gh pr comment 10 --body-file v.md\nNEXT: next step: /git-merge-approved-force https://github.com/acme/widget/pull/10"
+  }
+}

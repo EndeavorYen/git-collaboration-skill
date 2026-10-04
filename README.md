@@ -154,6 +154,8 @@ Solo override is a dedicated command: `/git-review-pr-force <url>`,
 `/git-revise-pr-force <url>`, and `/git-merge-approved-force <url>`; `/git-triage-force` runs them across a project. Repo docs
 and "this is a solo project" do not create force.
 
+A Proof for a user-visible output (video, image, audio, UI) names the content checked; an output that only exists stays a remaining gate, and review treats a live-job claim on it as an Evidence class mismatch.
+
 `/git-review-pr-force` skips the file pass when a full-tier pre-submit range ends at the current head, and reviews only the new commits when the head moved; the Proof re-run and gates always run.
 
 A `/git-review-pr-force` review that GitHub will not accept as APPROVE still leaves `verdict: approve` or `verdict: request-changes` on the pull request, and the chat reply has one `next step:` line.

@@ -117,6 +117,8 @@ REFERENCE_PHRASES = {
         "A Medium/Low-only fix re-runs the tests",
         "<each reviewed range>",
         "An unproven load-bearing fact is a remaining gate",
+        "the observed result names the content checked",
+        "only exists or is non-empty",
     ],
     "review.md": [
         "references/pre-submit.md",
@@ -138,6 +140,7 @@ REFERENCE_PHRASES = {
         "re-run that command on the current review head checkout",
         "cannot re-run",
         "Evidence class mismatch",
+        "shows only that the output exists, not its content",
         "with severity High",
         "is not a finding and is not `verdict: request-changes`",
         "Do not ask the author to rewrite the description into that shape",

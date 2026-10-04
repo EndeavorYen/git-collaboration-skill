@@ -50,7 +50,7 @@ Review tier: light | full, <each reviewed range>
 pstack: present [hooks] | absent | off
 ```
 
-Evidence class values match `references/review.md`. Inconclusive or wrong-surface is not a pass. An unproven load-bearing fact is a remaining gate; do not write it closed. A user-visible change proven only by tests records `Surface: none: <reason>`.
+Evidence class values match `references/review.md`. Inconclusive or wrong-surface is not a pass. An unproven load-bearing fact is a remaining gate; do not write it closed. For a user-visible output (video, image, audio, UI), the observed result names the content checked, such as frames viewed and what they showed. An output that only exists or is non-empty leaves that fact a remaining gate. A user-visible change proven only by tests records `Surface: none: <reason>`.
 
 ### Optional observation
 
@@ -61,7 +61,7 @@ Brief: followed | adjusted: <step ids> | dissent <comment id>
 Executor-model: <id or unknown>
 ```
 
-`Brief:` is one of `followed`, `adjusted: <step ids>`, or `dissent <comment id>`. `Executor-model:` is a model id or `unknown`. Observation only, not a gate. A missing line does not fail the pre-submit gate.
+Observation only, not a gate. A missing line does not fail the pre-submit gate.
 
 | Excuse | Reality |
 | --- | --- |
@@ -69,4 +69,3 @@ Executor-model: <id or unknown>
 | "Tests passed so the diff is fine" | `verification-before-completion` is not the file pass. |
 | "I'll waive this High finding" | Only the human in this conversation waives, with path + issue + reason. |
 | "pstack is not installed, so proof is n/a" | The Proof record is required anyway. pstack only raises the ceiling. |
-| "I will create the verify skill in this PR" | That is its own issue unless this issue asks for it. |
