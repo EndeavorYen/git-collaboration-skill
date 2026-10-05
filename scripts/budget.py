@@ -27,9 +27,9 @@ MODE_CAPS = {
     "Merge approved PR/MR": 30_949,
     "Request PR/MR review": 20_263,
     "Focused PR/MR status": 18_579,
-    "Status or triage, including the aggressive run": 23_343,
+    "Status or triage, including the aggressive run": 23_337,
     # Force triage counts only its own load line; each delegated mode is capped on its own row.
-    "Force triage run": 26_176,
+    "Force triage run": 26_170,
     "Scheduled lifecycle or scheduled approved merge": 29_150,
 }
 
