@@ -4,19 +4,19 @@ Read this file for `/git-triage` and `/git-triage-force`.
 
 ## Status Triage Workflow
 
-No forge write unless the user picks a follow-up. Do not auto-assign issues or PRs/MRs. Never suggest self-assignment only to unlock merge. Never invent a reviewer.
+No forge write unless the user picks a follow-up. Do not auto-assign issues or PRs/MRs. Never suggest self-assignment only to unlock merge.
 
 Mode selection:
 
 - **Todo triage** (default): empty args, or `todo` / `mine` / `inbox`.
 - **Project triage**: `project` / `this repo` / a forge project URL or path.
-- **Issue triage**: args name only issues; also read `references/triage-issues.md`.
+- **Issue triage**: args name only issues; read `references/triage-issues.md`.
 - **Aggressive run**: args contain `run` / `aggressive` / `execute`.
 - With both todo and project markers, prefer project when a concrete project target is present; otherwise todo.
 
 ### Todo triage workflow
 
-Build a forge-global personal inbox from metadata lists only: notifications or todos, PRs/MRs where the user is reviewer, author, or assignee, and open issues assigned to or authored by the user. Context budget defines the fields. Open one trimmed snapshot only for an item you are about to write, or the one item the user named.
+Build a forge-global personal inbox from metadata lists only: notifications or todos, PRs/MRs where the user is reviewer, author, or assignee, and open issues assigned to or authored by the user. Open one trimmed snapshot only for an item you are about to write, or the one item the user named.
 
 Notifications are signals, not source of truth. Another user speaking last is necessary but insufficient to require a reply. Rank from list fields. Snapshot an unclassifiable row only if it may make the top three.
 
@@ -56,7 +56,7 @@ Within a step, oldest first. A PR/MR whose base branch is another open PR/MR's h
 
 1. Resolve the authenticated user. Scope is project triage: the current repo, or a project in arguments. Modifiers: `no-merge`, `merge-only`, `include-drafts`, `with-issues`, and an explicit `reviewer:USERNAME`. `dry-run` means the bare command.
 2. No **Plan file**: write it and stop with no forge write. One from another planner, repo, or target branch: stop and ask before rewriting it.
-3. Otherwise the file is the only target list. Run its rows in file order from the first row not `done`; skip rows the owner deleted or marked `skip`. Do not touch an item missing from the file; report it as **new since plan**. Plain `run` never runs a `*-force` row or auto-posts replies or briefs, outside an issue plan.
+3. Otherwise the file is the only target list. Run its rows in file order from the first row not `done`; skip rows the owner deleted or marked `skip`. Do not touch an item missing from the file; report it as **new since plan**. Plain `run` never runs a `*-force` row or auto-posts replies or briefs. A `scope: issues` plan follows `references/triage-issues.md` over steps 1, 3, and 8.
 4. **Assignee hygiene (early):** assign yourself to planned PRs/MRs you **authored** with **empty assignees**. Never assign yourself elsewhere or replace a non-empty list.
 5. Row commands unless `merge-only`: Ready to review → `/git-review-pr`; owned conflicts → `/git-fix-conflict`; owned revision → `/git-revise-pr`; owned Ready to merge → `/git-merge-approved` (skip on `no-merge`); owned current-head re-request with an existing reviewer → `/git-request-review`.
 6. **Missing reviewers last.** With `reviewer:USERNAME`, assign and request review. Otherwise list those PRs/MRs and **ask who to assign**; wait, do not guess.
