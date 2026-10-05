@@ -1,0 +1,46 @@
+{
+  "id": "triage-issues-decision",
+  "why": "A product decision the user answered is recorded on the plan row, and the next issue-scoped run posts the brief with it.",
+  "command": "/git-triage run",
+  "user": "alice",
+  "snapshot": {
+    "project": "acme/widget",
+    "pull_requests": [],
+    "issues": [
+      {
+        "number": 21,
+        "url": "https://github.com/acme/widget/issues/21",
+        "state": "OPEN",
+        "author": "dave",
+        "assignees": [],
+        "labels": [
+          "enhancement"
+        ],
+        "body": "When a session expires mid-edit, we lose the draft. Either redirect to login and restore the draft afterwards, or show an inline re-login modal that keeps the page. Product has not picked one.",
+        "comments": [
+          {
+            "author": "erin",
+            "body": "I prefer the modal, but the PM wants the redirect. Needs a decision."
+          }
+        ],
+        "linkedPullRequests": []
+      }
+    ]
+  },
+  "extra": "Local checkout evidence (main@abc1234): src/dates.py:14 parse_date builds datetime via timedelta arithmetic from the first of the month, so day overflow rolls into the next month. tests/test_dates.py has test_parse_valid but no invalid-date test. Run tests with `pytest tests/test_dates.py`. src/session.ts:40 clears the editor state on 401. No repo-local instructions. PROGRESS.md exists:\n<!-- git-triage-plan -->\nplanner: /git-triage; scope: issues; repo: acme/widget; target branch: main; planned at 2026-10-05T12:00:00Z\n| # | Item | Command | Status | Evidence |\n| 1 | https://github.com/acme/widget/issues/21 | /git-plan-issue | todo | question: redirect to login or inline re-login modal?; decision: inline re-login modal that keeps the page (user, 2026-10-05) |\nImplementation after a brief is outside this dry run: stop after the brief writes.",
+  "expect": {
+    "writes_must": [
+      [
+        "gh issue comment 21",
+        "/issues/21/comments"
+      ]
+    ],
+    "reply_must_re": [
+      "(?i)modal"
+    ]
+  },
+  "self_test": {
+    "pass": "Brief uses the recorded decision: inline modal.\nSTATE: n/a\nWRITES:\n- gh issue comment 21 --body-file brief.md\nNEXT: next step: /git-issue-pr https://github.com/acme/widget/issues/21",
+    "fail": "Unsettled product decision.\nSTATE: n/a\nWRITES:\n- none\nNEXT: next step: none"
+  }
+}

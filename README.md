@@ -15,7 +15,7 @@ accounts, or a default reviewer.
 - Uses `open-code-review-delegate` for the file-by-file pass. `/git-review-pr` maps findings onto forge comments. Push and open/update PR/MR run a fail-closed pre-submit gate: a fresh `requesting-code-review` subagent, or an inline file pass for a light-tier diff (at most 3 files and 60 lines). After a Critical or High fix, the next pass covers only the fix range; a Medium/Low-only fix re-runs the tests.
 - Plans an issue (`/git-plan-issue`), then implements (`/git-issue-pr`) with
   optional dissent on the issue instead of silently following a weak plan.
-- Project triage writes an ordered plan to an untracked `PROGRESS.md` (merge first, then revise and conflict repair, review, review requests, issues). `run` executes only that file's rows, with plain gates; with no plan file it writes one and stops. Optional scheduled allowlist runs. Scheduled runs never invent a
+- Project triage writes an ordered plan to an untracked `PROGRESS.md` (merge first, then revise and conflict repair, review, review requests, issues). `run` executes only that file's rows, with plain gates; with no plan file it writes one and stops. `/git-triage #12 #13` plans only those issues; its `run` posts settled briefs, records answered decisions on the plan row, and moves each issue on to `/git-issue-pr`. Optional scheduled allowlist runs. Scheduled runs never invent a
   reviewer and never assign anyone.
 
 ## Layout

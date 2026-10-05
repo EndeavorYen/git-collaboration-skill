@@ -1,0 +1,44 @@
+{
+  "id": "triage-project-manual-issues",
+  "why": "A project plan whose only rows are issue briefs marks them manual; plain run makes no write and does not loop the user back to run.",
+  "command": "/git-triage run",
+  "user": "alice",
+  "snapshot": {
+    "project": "acme/widget",
+    "pull_requests": [],
+    "issues": [
+      {
+        "number": 20,
+        "url": "https://github.com/acme/widget/issues/20",
+        "state": "OPEN",
+        "author": "carol",
+        "assignees": [],
+        "labels": [
+          "bug"
+        ],
+        "body": "## Problem\nparse_date('2024-02-30') returns March 1 instead of raising.\n\n## Expected\nInvalid calendar dates raise ValueError.\n\n## Acceptance\n- [ ] parse_date raises ValueError for 2024-02-30\n- [ ] Valid dates still parse",
+        "comments": [],
+        "linkedPullRequests": []
+      }
+    ]
+  },
+  "extra": "Local checkout evidence (main@abc1234): src/dates.py:14 parse_date builds datetime via timedelta arithmetic from the first of the month, so day overflow rolls into the next month. tests/test_dates.py has test_parse_valid but no invalid-date test. Run tests with `pytest tests/test_dates.py`. src/session.ts:40 clears the editor state on 401. No repo-local instructions. PROGRESS.md exists:\n<!-- git-triage-plan -->\nplanner: /git-triage; scope: project; repo: acme/widget; target branch: main; planned at 2026-10-05T12:00:00Z\n| # | Item | Command | Status | Evidence |\n| 1 | https://github.com/acme/widget/issues/20 | /git-plan-issue | manual | no brief yet |",
+  "expect": {
+    "writes_must_not": [
+      "gh issue",
+      "/comments",
+      "gh api",
+      "git push"
+    ],
+    "reply_must_re": [
+      "/git-(plan-issue|triage)\\s+\\S*(issues/20|#20)"
+    ],
+    "reply_must_not_re": [
+      "next step:\\s*/git-triage run"
+    ]
+  },
+  "self_test": {
+    "pass": "Nothing runnable; run /git-plan-issue https://github.com/acme/widget/issues/20 or /git-triage #20.\nSTATE: n/a\nWRITES:\n- none\nNEXT: next step: /git-plan-issue https://github.com/acme/widget/issues/20",
+    "fail": "#20 waiting.\nSTATE: n/a\nWRITES:\n- none\nNEXT: next step: /git-triage run"
+  }
+}

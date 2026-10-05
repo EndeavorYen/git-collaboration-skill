@@ -1,5 +1,5 @@
 ---
-description: Rank or aggressively run a personal GitHub/GitLab todo inbox, issue reply needs, or project PR/MR lifecycle
+description: Rank or aggressively run a personal GitHub/GitLab todo inbox, issue reply needs, named issues, or project PR/MR lifecycle
 ---
 
 Read `references/triage.md` before acting.
