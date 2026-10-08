@@ -1012,6 +1012,7 @@ def validate_dispatch_contract() -> None:
         "grouping": (
             "**Grouping:**",
             "one fresh subagent per PR/MR",
+            "no implementer history",
             "never shared across MRs",
         ),
         "purpose": (
