@@ -1,0 +1,65 @@
+{
+  "id": "triage-note-blocker-unreviewed",
+  "why": "An overview note newer than the head is Ready to revise even when mergeableDiscussionsState is true and the reviewer is UNREVIEWED.",
+  "command": "/git-triage this repo",
+  "user": "alice",
+  "snapshot": {
+    "project": "acme/widget",
+    "merge_requests": [
+      {
+        "iid": 10,
+        "title": "Retry uploads",
+        "url": "https://gitlab.com/acme/widget/-/merge_requests/10",
+        "state": "opened",
+        "draft": false,
+        "author": "alice",
+        "approved": false,
+        "mergeableDiscussionsState": true,
+        "mergeStatusEnum": "MERGEABLE",
+        "headRefOid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "targetBranch": "main",
+        "reviewers": [
+          {
+            "username": "carol",
+            "reviewState": "UNREVIEWED"
+          }
+        ],
+        "latestFeedback": {
+          "author": "carol",
+          "at": "2026-09-22T12:00:00Z",
+          "excerpt": "This still fails closed when the upload is retried. Please change the helper before we can merge."
+        },
+        "authorReplyAt": null,
+        "unresolvedNonAuthor": 0,
+        "latestNonMergeAt": "2026-09-21T10:00:00Z",
+        "reviewRequestAt": null,
+        "discussionsTruncated": false
+      }
+    ]
+  },
+  "expect": {
+    "state": [
+      "Ready to revise"
+    ],
+    "reply_must_re": [
+      "/git-revise-pr\\s+\\S*/-/merge_requests/10\\b"
+    ],
+    "reply_must_not_re": [
+      "Waiting for review"
+    ],
+    "writes_must_not": [
+      "glab mr",
+      "gh pr merge",
+      "gh pr review",
+      "git push",
+      "--method POST",
+      "--method PATCH",
+      "-X POST"
+    ],
+    "next": "none"
+  },
+  "self_test": {
+    "pass": "Overview note from carol is newer than the head and asks for a change.\n/git-revise-pr https://gitlab.com/acme/widget/-/merge_requests/10\nSTATE: Ready to revise\nWRITES:\n- none\nNEXT: none",
+    "fail": "mergeableDiscussionsState is true and carol is UNREVIEWED, so this is Waiting for review.\nSTATE: Waiting for review\nWRITES:\n- none\nNEXT: none"
+  }
+}

@@ -1,6 +1,6 @@
 # GitHub CLI and approval APIs
 
-Prefer `gh` after GitHub is detected. Each command is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. Keep the `--jq`. If it errors, fix the filter once. Do not rerun without it or refetch a field already in the payload. Do not query that object through GitHub MCP or read repository files through the forge.
+Prefer `gh` after GitHub is detected. Each command is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. Keep the `--jq`. If it errors, fix the filter once. Do not rerun without it or refetch a field already in the payload. Do not use the GitHub MCP or read repository files through the forge.
 
 Commands assume the current directory is the repository. `gh pr view "$N"` reads it; pass `--repo owner/name` otherwise.
 
@@ -25,12 +25,11 @@ gh api graphql -f query='query($o:String!,$n:String!,$k:Int!){repository(owner:$
 
 Do not call `issues/${N}/comments` or check-runs when `checks` has the job. `gh search` has no `reviewDecision`, mergeable, or head SHA; snapshot before a merge or review decision.
 
-`https://github.com/owner/name/pull/12` is owner `owner`, repo `name`, number `12`.
-
 Live approval evidence:
 
 - `reviewDecision` of `APPROVED` plus at least one review with `state=APPROVED` from a user who is not the author and has no commits on the current head.
 - `CHANGES_REQUESTED` is `NEEDS_REVISION` when those reviews are still current.
+- An empty `reviewDecision` after a `COMMENTED` review does not prove there is no outstanding feedback.
 - `REVIEW_REQUIRED` with no current-head request is `REVIEW_REQUEST_NEEDED`.
 - Branch protection and required reviewers support the read-back; they do not invent a reviewer name.
 

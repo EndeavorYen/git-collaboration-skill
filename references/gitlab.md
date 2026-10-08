@@ -1,6 +1,6 @@
 # GitLab CLI and approval APIs
 
-Use this file after the main skill has detected GitLab. Prefer `glab`. The GraphQL query plus the `jq` pipe in each section is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. The tool result is the pipe's stdout. If `jq` errors, fix the filter once. Do not drop the pipe or follow it with REST for approvals, commits, discussions, notes, or pipelines the query already returns. Do not query that object through GitLab MCP or read repository files through the forge.
+Use this file after the main skill has detected GitLab. Prefer `glab`. The GraphQL query plus the `jq` pipe in each section is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. The tool result is the pipe's stdout. If `jq` errors, fix the filter once. Do not drop the pipe or follow it with REST for approvals, commits, discussions, notes, or pipelines the query already returns. Do not use GitLab MCP or read repository files through the forge.
 
 URL-encode a path only for REST (`group/sub%2Fproject`). GraphQL `fullPath` stays plain.
 
@@ -12,7 +12,7 @@ Once per invocation:
 glab api user | jq '{id,username,name}'
 ```
 
-Compare stable `id` or exact `username` with MR author and assignees. Display names are not identity. Skip `glab auth status` when this returns the username, and skip project metadata when the URL or `git remote -v` already names the project.
+Compare stable `id` or exact `username` with MR author and assignees. Display names are not identity. Skip `glab auth status` when this returns the username, and skip project metadata when the URL or `git remote -v` names the project.
 
 ## Merge request snapshot
 
@@ -74,7 +74,7 @@ Prefer the instance's native reviewer assignment. The write response is the read
 
 ## Issue snapshot
 
-One GraphQL call. `relatedMergeRequests` is the link already on the issue. Do not search open MRs for the iid.
+One GraphQL call. `relatedMergeRequests` is the issue link. Do not search open MRs for the iid.
 
 ```bash
 glab api graphql -f query='
@@ -115,7 +115,7 @@ Push options may create an MR when the user asked and the instance supports them
 
 ## Inbox lists
 
-One call per relationship. These are lists, not per-item views.
+One call per relationship.
 
 ```bash
 glab api todos | jq '[.[:20][]|{action_name,target_type,target_url,updated_at,body:(.body//"")[0:120]}]'
@@ -128,4 +128,4 @@ Treat `/todos` as signals. These lists are metadata. Do not open every row or fe
 
 ## Conflicts and mergeability
 
-GitLab conflict flags or a merge status that requires target-branch repair is `CONFLICTED`. `mergeableDiscussionsState=false` with actionable unresolved notes is `NEEDS_REVISION`. Read both from the snapshot. REST calls this flag `blocking_discussions_resolved`.
+GitLab conflict flags or a merge status that requires target-branch repair is `CONFLICTED`. `mergeableDiscussionsState=false` with actionable unresolved notes is `NEEDS_REVISION`. `mergeableDiscussionsState=true` does not prove there is no outstanding feedback. Read both from the snapshot. REST calls this flag `blocking_discussions_resolved`.

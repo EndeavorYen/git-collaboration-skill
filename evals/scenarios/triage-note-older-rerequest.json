@@ -1,0 +1,81 @@
+{
+  "id": "triage-note-older-rerequest",
+  "why": "A reviewer note older than the latest non-merge fix, with review re-requested on that head, is Waiting for review.",
+  "command": "/git-triage this repo",
+  "user": "alice",
+  "snapshot": {
+    "project": "acme/widget",
+    "pull_requests": [
+      {
+        "number": 14,
+        "title": "Retry uploads",
+        "url": "https://github.com/acme/widget/pull/14",
+        "state": "OPEN",
+        "isDraft": false,
+        "author": "alice",
+        "reviewDecision": "",
+        "mergeable": "MERGEABLE",
+        "headRefOid": "cccccccccccccccccccccccccccccccccccccccc",
+        "baseRefName": "main",
+        "reviews": [
+          {
+            "author": "carol",
+            "state": "COMMENTED",
+            "submittedAt": "2026-09-21T09:00:00Z",
+            "body": "Please change the retry helper; this still fails closed."
+          }
+        ],
+        "commits": [
+          {
+            "committedDate": "2026-09-20T10:00:00Z",
+            "messageHeadline": "Add the retry helper"
+          },
+          {
+            "committedDate": "2026-09-22T11:00:00Z",
+            "messageHeadline": "Handle the closed upload path"
+          },
+          {
+            "committedDate": "2026-09-22T12:30:00Z",
+            "messageHeadline": "Merge branch 'main' into retry-uploads"
+          }
+        ],
+        "latestFeedback": {
+          "author": "carol",
+          "at": "2026-09-21T09:00:00Z",
+          "excerpt": "Please change the retry helper; this still fails closed."
+        },
+        "authorReplyAt": "2026-09-22T11:05:00Z",
+        "unresolvedNonAuthor": 0,
+        "latestNonMergeAt": "2026-09-22T11:00:00Z",
+        "reviewRequestAt": "2026-09-22T11:10:00Z",
+        "discussionsTruncated": false
+      }
+    ]
+  },
+  "expect": {
+    "state": [
+      "Waiting for review"
+    ],
+    "reply_must_re": [
+      "Waiting for review"
+    ],
+    "reply_must_not_re": [
+      "Ready to revise",
+      "/git-revise-pr"
+    ],
+    "writes_must_not": [
+      "gh pr merge",
+      "gh pr review",
+      "gh pr comment",
+      "git push",
+      "--method POST",
+      "--method PATCH",
+      "-X POST"
+    ],
+    "next": "none"
+  },
+  "self_test": {
+    "pass": "Carol's note is older than the non-merge fix, and review was requested again on that head.\nWaiting for review https://github.com/acme/widget/pull/14\nSTATE: Waiting for review\nWRITES:\n- none\nNEXT: none",
+    "fail": "The note still asks for a change, so this is Ready to revise.\n/git-revise-pr https://github.com/acme/widget/pull/14\nSTATE: Ready to revise\nWRITES:\n- none\nNEXT: none"
+  }
+}

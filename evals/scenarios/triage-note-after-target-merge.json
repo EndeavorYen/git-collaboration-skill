@@ -1,0 +1,75 @@
+{
+  "id": "triage-note-after-target-merge",
+  "why": "A blocking note stays Ready to revise when the only newer commit merges the target branch in.",
+  "command": "/git-triage this repo",
+  "user": "alice",
+  "snapshot": {
+    "project": "acme/widget",
+    "merge_requests": [
+      {
+        "iid": 11,
+        "title": "Retry uploads",
+        "url": "https://gitlab.com/acme/widget/-/merge_requests/11",
+        "state": "opened",
+        "draft": false,
+        "author": "alice",
+        "approved": false,
+        "mergeableDiscussionsState": true,
+        "mergeStatusEnum": "MERGEABLE",
+        "headRefOid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "targetBranch": "main",
+        "reviewers": [
+          {
+            "username": "carol",
+            "reviewState": "UNREVIEWED"
+          }
+        ],
+        "commits": [
+          {
+            "committedDate": "2026-09-21T10:00:00Z",
+            "message": "Retry the last chunk"
+          },
+          {
+            "committedDate": "2026-09-23T08:00:00Z",
+            "message": "Merge branch 'main' into retry-uploads"
+          }
+        ],
+        "latestFeedback": {
+          "author": "carol",
+          "at": "2026-09-22T12:00:00Z",
+          "excerpt": "partial fix, still blocking: the retry path still drops the last chunk."
+        },
+        "authorReplyAt": null,
+        "unresolvedNonAuthor": 0,
+        "latestNonMergeAt": "2026-09-21T10:00:00Z",
+        "reviewRequestAt": null,
+        "discussionsTruncated": false
+      }
+    ]
+  },
+  "expect": {
+    "state": [
+      "Ready to revise"
+    ],
+    "reply_must_re": [
+      "/git-revise-pr\\s+\\S*/-/merge_requests/11\\b"
+    ],
+    "reply_must_not_re": [
+      "Waiting for review"
+    ],
+    "writes_must_not": [
+      "glab mr",
+      "gh pr merge",
+      "gh pr review",
+      "git push",
+      "--method POST",
+      "--method PATCH",
+      "-X POST"
+    ],
+    "next": "none"
+  },
+  "self_test": {
+    "pass": "The note says the partial fix is still blocking, and the newer commit only merges main.\n/git-revise-pr https://gitlab.com/acme/widget/-/merge_requests/11\nSTATE: Ready to revise\nWRITES:\n- none\nNEXT: none",
+    "fail": "The merge commit is newer than the note, so this is Waiting for review.\nSTATE: Waiting for review\nWRITES:\n- none\nNEXT: none"
+  }
+}
