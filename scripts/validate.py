@@ -2,6 +2,7 @@
 """Fail closed on company/personal leaks and missing dual-forge contracts."""
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -235,6 +236,7 @@ REFERENCE_PHRASES = {
         "next step:",
         "A reply response is not resolved.",
         "no reply this round",
+        "stays unresolved",
         "including a reply with no code change",
         "do not report the revision done",
         "Resolved is not approval",
@@ -743,6 +745,121 @@ def validate_brief_profiles() -> None:
             fail(f"references/implement.md step 10 missing {phrase!r}")
 
 
+def _graphql_query(line: str) -> str:
+    marker = "-f query='"
+    start = line.find(marker)
+    if start < 0:
+        return ""
+    rest = line[start + len(marker) :]
+    end = rest.find("'")
+    return rest[:end] if end >= 0 else rest
+
+
+def _selection(compact: str, prefix: str) -> str:
+    at = compact.find(prefix)
+    if at < 0:
+        return ""
+    brace = compact.find("{", at)
+    if brace < 0:
+        return ""
+    depth = 0
+    for index in range(brace, len(compact)):
+        char = compact[index]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return compact[brace : index + 1]
+    return ""
+
+
+def _jq_program(line: str) -> str:
+    marker = "--jq '"
+    start = line.rfind(marker)
+    if start < 0:
+        return ""
+    rest = line[start + len(marker) :]
+    return rest[:-1] if rest.endswith("'") else rest
+
+
+def _check_thread_created_at(program: str) -> None:
+    """The snapshot jq must normalize each thread comment time to UTC Z."""
+    payload = {
+        "data": {
+            "repository": {
+                "pullRequest": {
+                    "reviewThreads": {
+                        "nodes": [
+                            {
+                                "id": "T1",
+                                "isResolved": False,
+                                "path": "a.py",
+                                "line": 4,
+                                "root": {"nodes": [{"databaseId": 9}]},
+                                "comments": {
+                                    "nodes": [
+                                        {
+                                            "author": {"login": "carol"},
+                                            "createdAt": "2026-10-08T14:59:27+11:00",
+                                            "body": "x" * 450,
+                                        },
+                                        {
+                                            "author": {"login": "carol"},
+                                            "createdAt": "2026-10-08T04:01:51.250Z",
+                                            "body": "git-force-review " + ("y" * 450),
+                                        },
+                                        {
+                                            "author": None,
+                                            "createdAt": None,
+                                            "body": "latest",
+                                        },
+                                    ]
+                                },
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+    try:
+        raw = subprocess.check_output(
+            ["jq", program],
+            input=json.dumps(payload),
+            text=True,
+            encoding="utf-8",
+        )
+    except (OSError, subprocess.CalledProcessError) as error:
+        fail(f"references/github.md: thread snapshot jq failed: {error}")
+        return
+    try:
+        rows = json.loads(raw)
+    except json.JSONDecodeError as error:
+        fail(f"references/github.md: thread snapshot jq did not return JSON: {error}")
+        return
+    if len(rows) != 1 or rows[0].get("id") != 9:
+        fail("references/github.md: thread snapshot jq dropped the root databaseId")
+        return
+    comments = rows[0].get("comments") or []
+    if len(comments) != 3:
+        fail("references/github.md: thread snapshot jq dropped a comment")
+        return
+    early, marker, latest = comments
+    if early.get("createdAt") != "2026-10-08T03:59:27Z" or not str(early.get("createdAt")).endswith("Z"):
+        fail("references/github.md: thread comment createdAt was not normalized to UTC Z")
+    if len(early.get("body") or "") != 400:
+        fail("references/github.md: an earlier thread comment was not cut to 400")
+    if early.get("user") != "carol":
+        fail("references/github.md: thread comment user was dropped")
+    if not str(marker.get("createdAt")).endswith("Z") or not str(marker.get("body")).startswith("git-force-review"):
+        fail("references/github.md: marker thread comment lost its time or body")
+    if len(marker.get("body") or "") <= 400:
+        fail("references/github.md: a marker thread comment was cut")
+    if latest.get("createdAt") is not None or latest.get("body") != "latest" or latest.get("user") is not None:
+        fail("references/github.md: a null thread comment time or author broke the filter")
+
+
 def validate_forge_references() -> None:
     github = ROOT / "references" / "github.md"
     gitlab = ROOT / "references" / "gitlab.md"
@@ -765,6 +882,8 @@ def validate_forge_references() -> None:
             "Commands assume the current directory is the repository",
             "repo-local instructions",
             "is owner `owner`, repo `name`, number `12`",
+            "Do not rerun without it",
+            "required reviewers",
         ):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
@@ -778,10 +897,30 @@ def validate_forge_references() -> None:
             fail("references/github.md: PR snapshot missing review thread id or isResolved")
         if "resolveReviewThread" in section:
             fail("references/github.md: resolve write is not a snapshot read")
-        if "comments(last:" not in section or "databaseId" not in section:
-            fail("references/github.md: PR snapshot must keep the root databaseId and the latest comments on each thread")
-        if "comments(first:1)" in section and "comments(last:" not in section:
-            fail("references/github.md: PR snapshot reads only the first comment on a review thread")
+        graphql_lines = [line for line in commands if line.startswith("gh api graphql")]
+        if len(graphql_lines) != 1:
+            fail("references/github.md: PR snapshot must be one GraphQL query")
+        else:
+            query = _graphql_query(graphql_lines[0])
+            compact = re.sub(r"\s+", "", query)
+            root = _selection(compact, "root:comments(first:1)")
+            recent = _selection(compact, "comments(last:")
+            if "databaseId" not in root:
+                fail(
+                    "references/github.md: GraphQL query must select "
+                    "root:comments(first:1){nodes{databaseId}}"
+                )
+            if "databaseId" in _selection(compact.replace("root:", "", 1), "root:comments(first:1)"):
+                fail("references/github.md: databaseId check ignores the root: alias")
+            if "comments(last:" not in compact or not recent:
+                fail("references/github.md: GraphQL query must select comments(last: on each thread")
+            if "createdAt" not in recent:
+                fail("references/github.md: GraphQL query must select createdAt on recent thread comments")
+            program = _jq_program(graphql_lines[0])
+            if "createdAt:" not in program or "todate" not in program:
+                fail("references/github.md: thread comment createdAt must be normalized to UTC")
+            else:
+                _check_thread_created_at(program)
     if gitlab.exists():
         text = gitlab.read_text(encoding="utf-8")
         for phrase in (
@@ -823,6 +962,8 @@ def validate_forge_references() -> None:
             fail("scripts/project-triage-list.sh: MR list must report pageInfo.hasNextPage")
         if "commits(first:30)" not in text:
             fail("scripts/project-triage-list.sh: GitLab commits(first:30) must stay")
+        if "REVIEW_REQUEST_REMOVED_EVENT" not in text or "REVIEW_REQUESTED_EVENT" not in text:
+            fail("scripts/project-triage-list.sh: review-request timeline must include removals")
     jq = ROOT / "scripts" / "project-triage-list.jq"
     if jq.exists():
         text = jq.read_text(encoding="utf-8")
@@ -834,6 +975,8 @@ def validate_forge_references() -> None:
             fail("scripts/project-triage-list.jq: times must be normalized to UTC")
         if "removed review request" not in text:
             fail("scripts/project-triage-list.jq: a removed review request must not stay pending")
+        if "ReviewRequestRemovedEvent" not in text:
+            fail("scripts/project-triage-list.jq: a removed GitHub review request must not stay pending")
 
 
 def validate_project_triage_list() -> None:

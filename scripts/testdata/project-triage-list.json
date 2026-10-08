@@ -553,5 +553,334 @@
       "latestNonMergeAt": "2026-10-03T00:00:00Z",
       "unresolvedNonAuthor": 0
     }
+  },
+  {
+    "id": "string-max-diverges",
+    "kind": "gl",
+    "payload": {
+      "data": {
+        "project": {
+          "mergeRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "iid": "9",
+                "title": "Retry uploads",
+                "webUrl": "https://gitlab.com/acme/widget/-/merge_requests/9",
+                "state": "opened",
+                "draft": false,
+                "author": {
+                  "username": "alice"
+                },
+                "approved": false,
+                "mergeableDiscussionsState": true,
+                "diffHeadSha": "abc",
+                "targetBranch": "main",
+                "mergeStatusEnum": "MERGEABLE",
+                "reviewers": {
+                  "nodes": []
+                },
+                "discussions": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "resolvable": false,
+                      "resolved": null,
+                      "notes": {
+                        "nodes": [
+                          {
+                            "system": false,
+                            "body": "still blocking after the offset commit",
+                            "createdAt": "2026-10-08T04:01:51Z",
+                            "author": {
+                              "username": "carol"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "committedDate": "2026-10-08T14:59:27+11:00",
+                      "message": "handle the closed upload"
+                    },
+                    {
+                      "committedDate": "2026-10-08T04:10:00Z",
+                      "message": "land the retry"
+                    },
+                    {
+                      "committedDate": "2026-10-08T03:00:00Z",
+                      "message": "start the helper"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "latestNonMergeAt": "2026-10-08T04:10:00Z",
+      "authorReplyAt": null,
+      "reviewRequestAt": null,
+      "unresolvedNonAuthor": 0,
+      "latestFeedback": {
+        "author": "carol",
+        "at": "2026-10-08T04:01:51Z",
+        "excerpt_prefix": "still blocking"
+      }
+    }
+  },
+  {
+    "id": "gh-request-removed",
+    "kind": "gh",
+    "payload": {
+      "data": {
+        "repository": {
+          "pullRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "number": 9,
+                "title": "Retry uploads",
+                "url": "https://github.com/acme/widget/pull/9",
+                "state": "OPEN",
+                "isDraft": false,
+                "author": {
+                  "login": "alice"
+                },
+                "reviewDecision": "",
+                "mergeable": "MERGEABLE",
+                "headRefOid": "abc",
+                "baseRefName": "main",
+                "reviewRequests": {
+                  "totalCount": 1
+                },
+                "reviews": {
+                  "nodes": []
+                },
+                "comments": {
+                  "nodes": []
+                },
+                "reviewThreads": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": []
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "commit": {
+                        "committedDate": "2026-09-30T00:00:00Z",
+                        "messageHeadline": "handle empty token"
+                      }
+                    }
+                  ]
+                },
+                "timelineItems": {
+                  "nodes": [
+                    {
+                      "__typename": "ReviewRequestedEvent",
+                      "createdAt": "2026-10-01T00:00:00Z",
+                      "requestedReviewer": {
+                        "login": "alice"
+                      }
+                    },
+                    {
+                      "__typename": "ReviewRequestedEvent",
+                      "createdAt": "2026-10-03T00:00:00Z",
+                      "requestedReviewer": {
+                        "login": "bob"
+                      }
+                    },
+                    {
+                      "__typename": "ReviewRequestRemovedEvent",
+                      "createdAt": "2026-10-04T00:00:00Z",
+                      "requestedReviewer": {
+                        "login": "bob"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "reviewRequestAt": "2026-10-01T00:00:00Z",
+      "latestNonMergeAt": "2026-09-30T00:00:00Z",
+      "unresolvedNonAuthor": 0
+    }
+  },
+  {
+    "id": "gh-request-cleared",
+    "kind": "gh",
+    "payload": {
+      "data": {
+        "repository": {
+          "pullRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "number": 9,
+                "title": "Retry uploads",
+                "url": "https://github.com/acme/widget/pull/9",
+                "state": "OPEN",
+                "isDraft": false,
+                "author": {
+                  "login": "alice"
+                },
+                "reviewDecision": "",
+                "mergeable": "MERGEABLE",
+                "headRefOid": "abc",
+                "baseRefName": "main",
+                "reviewRequests": {
+                  "totalCount": 0
+                },
+                "reviews": {
+                  "nodes": []
+                },
+                "comments": {
+                  "nodes": []
+                },
+                "reviewThreads": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": []
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "commit": {
+                        "committedDate": "2026-09-30T00:00:00Z",
+                        "messageHeadline": "handle empty token"
+                      }
+                    }
+                  ]
+                },
+                "timelineItems": {
+                  "nodes": [
+                    {
+                      "__typename": "ReviewRequestedEvent",
+                      "createdAt": "2026-10-03T00:00:00Z",
+                      "requestedReviewer": {
+                        "login": "bob"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "reviewRequestAt": null,
+      "latestNonMergeAt": "2026-09-30T00:00:00Z",
+      "unresolvedNonAuthor": 0
+    }
+  },
+  {
+    "id": "gh-request-rerequested",
+    "kind": "gh",
+    "payload": {
+      "data": {
+        "repository": {
+          "pullRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "number": 9,
+                "title": "Retry uploads",
+                "url": "https://github.com/acme/widget/pull/9",
+                "state": "OPEN",
+                "isDraft": false,
+                "author": {
+                  "login": "alice"
+                },
+                "reviewDecision": "",
+                "mergeable": "MERGEABLE",
+                "headRefOid": "abc",
+                "baseRefName": "main",
+                "reviewRequests": {
+                  "totalCount": 1
+                },
+                "reviews": {
+                  "nodes": []
+                },
+                "comments": {
+                  "nodes": []
+                },
+                "reviewThreads": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": []
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "commit": {
+                        "committedDate": "2026-09-30T00:00:00Z",
+                        "messageHeadline": "handle empty token"
+                      }
+                    }
+                  ]
+                },
+                "timelineItems": {
+                  "nodes": [
+                    {
+                      "__typename": "ReviewRequestedEvent",
+                      "createdAt": "2026-10-01T00:00:00Z",
+                      "requestedReviewer": {
+                        "login": "carol"
+                      }
+                    },
+                    {
+                      "__typename": "ReviewRequestRemovedEvent",
+                      "createdAt": "2026-10-02T00:00:00Z",
+                      "requestedReviewer": {
+                        "login": "carol"
+                      }
+                    },
+                    {
+                      "__typename": "ReviewRequestedEvent",
+                      "createdAt": "2026-10-03T12:00:00+02:00",
+                      "requestedReviewer": {
+                        "login": "carol"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "reviewRequestAt": "2026-10-03T10:00:00Z",
+      "latestNonMergeAt": "2026-09-30T00:00:00Z",
+      "unresolvedNonAuthor": 0
+    }
   }
 ]
