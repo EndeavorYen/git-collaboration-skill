@@ -1,0 +1,75 @@
+{
+  "id": "revise-followup-unresolved",
+  "why": "A thread whose latest comment is an unaddressed reviewer follow-up stays unresolved. The reply reports not done and does not resolve the thread.",
+  "command": "/git-revise-pr https://github.com/acme/widget/pull/17",
+  "user": "alice",
+  "snapshot": {
+    "number": 17,
+    "url": "https://github.com/acme/widget/pull/17",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": ["alice"],
+    "reviewRequests": [],
+    "reviewDecision": "CHANGES_REQUESTED",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "cccccccccccccccccccccccccccccccccccccccc",
+    "commits": [
+      {
+        "oid": "ccccccc",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [
+      {
+        "author": "carol",
+        "state": "CHANGES_REQUESTED",
+        "commit": "ccccccc",
+        "body": "The latest comment on the open thread is still unaddressed."
+      }
+    ],
+    "comments": [],
+    "reviewThreads": [
+      {
+        "id": "PRRT_a",
+        "isResolved": false,
+        "path": "src/parse.py",
+        "line": 10,
+        "comments": [
+          {
+            "databaseId": 9001,
+            "user": "carol",
+            "body": "Rename parse_x to parse_record."
+          },
+          {
+            "databaseId": 9003,
+            "user": "carol",
+            "body": "still fails"
+          }
+        ]
+      }
+    ]
+  },
+  "extra": "src/parse.py already defines parse_record, so the first comment looks addressed. The latest comment on PRRT_a is the reviewer follow-up \"still fails\", and this round does not address it. No other review thread is open.",
+  "expect": {
+    "state": ["NEEDS_REVISION"],
+    "writes_must_not": ["resolveReviewThread", "resolved=true"],
+    "reply_must": ["still fails"],
+    "reply_must_re": ["(?i)not done"],
+    "reply_must_not": ["revision is done"],
+    "next": "next step: /git-revise-pr-force https://github.com/acme/widget/pull/17"
+  },
+  "self_test": {
+    "pass": "PRRT_a latest comment \"still fails\" is unaddressed: not done. Left unresolved.\nSTATE: NEEDS_REVISION\nWRITES:\n- none\nNEXT: next step: /git-revise-pr-force https://github.com/acme/widget/pull/17",
+    "fail": "revision is done.\nSTATE: NEEDS_REVISION\nWRITES:\n- gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -f id=\"PRRT_a\"\nNEXT: next step: /git-review-pr-force https://github.com/acme/widget/pull/17"
+  }
+}

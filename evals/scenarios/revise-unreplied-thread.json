@@ -1,0 +1,69 @@
+{
+  "id": "revise-unreplied-thread",
+  "why": "An unresolved review thread with no reply this round stays unresolved. The reply says not done and does not report the revise complete.",
+  "command": "/git-revise-pr https://github.com/acme/widget/pull/16",
+  "user": "alice",
+  "snapshot": {
+    "number": 16,
+    "url": "https://github.com/acme/widget/pull/16",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": ["alice"],
+    "reviewRequests": [],
+    "reviewDecision": "CHANGES_REQUESTED",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "commits": [
+      {
+        "oid": "bbbbbbb",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [
+      {
+        "author": "carol",
+        "state": "CHANGES_REQUESTED",
+        "commit": "bbbbbbb",
+        "body": "One review thread is still open."
+      }
+    ],
+    "comments": [],
+    "reviewThreads": [
+      {
+        "id": "PRRT_b",
+        "isResolved": false,
+        "path": "src/cache.py",
+        "line": 4,
+        "comments": [
+          {
+            "databaseId": 9002,
+            "user": "carol",
+            "body": "Please redesign the cache layer."
+          }
+        ]
+      }
+    ]
+  },
+  "extra": "This round posted no reply on review thread PRRT_b, and the diff does not address src/cache.py. No other review thread is open.",
+  "expect": {
+    "state": ["NEEDS_REVISION"],
+    "writes_must_not": ["resolveReviewThread", "resolved=true"],
+    "reply_must_re": ["(?i)not done"],
+    "reply_must_not": ["revision is done"],
+    "next": "next step: /git-revise-pr-force https://github.com/acme/widget/pull/16"
+  },
+  "self_test": {
+    "pass": "PRRT_b: not done (no reply this round). Left unresolved.\nSTATE: NEEDS_REVISION\nWRITES:\n- none\nNEXT: next step: /git-revise-pr-force https://github.com/acme/widget/pull/16",
+    "fail": "revision is done.\nSTATE: NEEDS_REVISION\nWRITES:\n- gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -f id=\"PRRT_b\"\nNEXT: next step: /git-review-pr-force https://github.com/acme/widget/pull/16"
+  }
+}
