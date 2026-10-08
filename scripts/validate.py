@@ -996,6 +996,52 @@ def validate_project_triage_list() -> None:
         fail(f"scripts/test_project_triage_list.py: {detail.splitlines()[0]}")
 
 
+def validate_dispatch_contract() -> None:
+    """Full-tier pre-submit reviewer dispatch is one pre-agreed contract."""
+    path = ROOT / "references" / "pre-submit.md"
+    if not path.exists():
+        return
+    text = path.read_text(encoding="utf-8")
+    start = text.find("**Dispatch contract** (step 2")
+    if start < 0:
+        fail("references/pre-submit.md: missing the full-tier dispatch contract")
+        return
+    end = text.find("\n### ", start)
+    section = text[start:end if end >= 0 else len(text)]
+    required = {
+        "grouping": (
+            "**Grouping:**",
+            "one fresh subagent per PR/MR",
+            "never shared across MRs",
+        ),
+        "purpose": (
+            "**Purpose:**",
+            "merge-base..head",
+            "issue brief or acceptance criteria",
+            "open-code-review-delegate",
+        ),
+        "budget": (
+            "**Budget:**",
+            "only that diff and the call sites it touches",
+            "no forge calls",
+            "no file edits, commits, or pushes",
+        ),
+    }
+    for name, phrases in required.items():
+        for phrase in phrases:
+            if phrase not in section:
+                fail(f"references/pre-submit.md: dispatch contract {name} missing {phrase!r}")
+    if "do not ask when it matches" not in section:
+        fail("references/pre-submit.md: a matching full-tier dispatch must not ask")
+    if "ask first" not in section:
+        fail("references/pre-submit.md: a dispatch outside the contract must still ask first")
+    if "no subagent" not in text:
+        fail("references/pre-submit.md: light tier must review in the main session with no subagent")
+    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8") if (ROOT / "SKILL.md").exists() else ""
+    if "dispatch contract in `references/pre-submit.md`" not in skill:
+        fail("SKILL.md: missing the dispatch-contract pointer")
+
+
 def validate_scheduled_ocr_gate() -> None:
     path = ROOT / "references" / "scheduled-automation.md"
     if not path.exists():
@@ -1525,6 +1571,7 @@ def main() -> int:
     validate_prompts()
     validate_default_prompts_stay_strict()
     validate_reference_phrases()
+    validate_dispatch_contract()
     validate_brief_profiles()
     validate_forge_references()
     validate_project_triage_list()

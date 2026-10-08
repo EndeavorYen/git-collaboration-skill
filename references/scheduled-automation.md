@@ -1,6 +1,6 @@
 # Scheduled GitHub / GitLab automation
 
-This contract applies to both scheduled modes in the git-collaboration skill. It is non-interactive, allowlist-only, and subordinate to the main skill's live-state model and exact-head merge gate.
+This contract applies to both scheduled modes. It is non-interactive, allowlist-only, and subordinate to the main skill's live-state model and exact-head merge gate.
 
 ## Local configuration preflight
 
@@ -57,7 +57,7 @@ After configuration, identity, access, and allowlist checks, enumerate and class
 
 Scheduled lifecycle may only review or approve, revise an owned-or-assigned source branch, repair its conflicts, validate, commit, and push that source branch. It never merges, implements issues, changes target branches, broadens PR/MR scope, or performs assignment writes.
 
-A source-branch push still requires the **pre-submit gate**: a fresh `open-code-review-delegate` file pass on the submit range, always the full review tier. Unattended runs cannot waive Critical/High. Leftover unwaived Critical/High, a failed file pass, or missing `ocr`: do not push; record `failed` or `waiting`. Scheduled pushes fill the Proof record with `pstack: off`.
+A source-branch push still requires the **pre-submit gate**: full review tier, one fresh subagent per PR/MR (`references/pre-submit.md`, no ask) runs `open-code-review-delegate`. Unattended runs cannot waive Critical/High. Leftover unwaived Critical/High, a failed file pass, or missing `ocr`: do not push; record `failed` or `waiting`. Scheduled pushes fill the Proof record with `pstack: off`.
 
 ## Strict review and required test gate
 

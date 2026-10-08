@@ -16,13 +16,13 @@ Resolve the forge before any write. The request URL wins, then `git remote -v`:
 
 If both remotes exist and the request has no URL, ask which forge to use.
 
-In this skill, **PR/MR** means the current forge's change request. Treat `/gitlab-*` and `/github-*` aliases, plus a pasted GitHub or GitLab URL, as the same mode.
+**PR/MR** means this forge's change request. `/gitlab-*`, `/github-*`, and a pasted GitHub or GitLab URL are the same mode.
 
 ## Forge budget
 
-Every `gh` invocation, `glab` invocation, forge REST call, and GitHub or GitLab MCP call counts. Use one client: `gh` on GitHub, `glab` on GitLab. Do not also query that object through MCP.
+Every `gh`, `glab`, forge REST, and GitHub or GitLab MCP call counts. One client: `gh` on GitHub, `glab` on GitLab. Do not also query that object through MCP.
 
-A **snapshot** is one read whose payload already contains every forge field that mode needs. Reuse a snapshot already in this conversation when the user has not said that object changed.
+A **snapshot** is one read with every forge field that mode needs. Reuse a snapshot already in this conversation unless the user says that object changed.
 
 1. Resolve the authenticated user once per invocation and reuse it. Skip an auth-status or repo-metadata call when the snapshot, the URL, or `git remote -v` already answers it.
 2. Read each issue or PR/MR once, with the snapshot command in the forge reference. It is not a menu of extra calls.
@@ -40,8 +40,8 @@ Related PRs/MRs come from snapshot links. Search the forge only when the user as
 - Run the snapshot command in the forge reference with its `--jq` or `jq` pipe. If the filter errors, fix the filter once. Do not rerun without it, and do not page through raw JSON.
 - The issue or PR/MR body stays whole. A comment or review body stays whole when it contains `git-plan-issue`, `git-plan-issue-dissent`, or `git-force-review`, or when it is the latest one. Every other body keeps author, time, id, and the first 400 characters. Also keep review commit OID, discussion resolved state, and commit author login, name, and email. Empty login is not a missing author when name or email is present.
 - List calls return metadata only: number, title, state, updated time, author, assignees, url, and for a PR/MR also draft, `reviewDecision`, mergeable, and head SHA. No comment bodies, review bodies, or check logs.
-- Do not paste the snapshot, this skill, or source listings into a reply, comment, or subagent prompt. The pre-submit subagent gets the submit range and the contract.
-- Search, then open the matching symbol and its test. Do not read a directory, a whole unrelated file, or both forge references into context.
+- Do not paste the snapshot, this skill, or source listings into a reply, comment, or subagent prompt. One pre-submit subagent per MR gets that submit range and the dispatch contract.
+- Search, then open the matching symbol and its test. Do not read a directory, a whole unrelated file, or both forge references.
 
 ## Task Mode Decision
 
@@ -62,7 +62,7 @@ Related PRs/MRs come from snapshot links. Search the forge only when the user as
 | Scheduled lifecycle | unattended scheduled lifecycle run | Only review/approval, owned revision, conflict repair, validation, commit, and source-branch push; never assigns anyone | Stable result buckets; never asks or waits |
 | Scheduled approved merge | unattended scheduled approved-merge run | Only the exact-head `/git-merge-approved` workflow; never assigns anyone | Stable result buckets; never asks or waits |
 
-When the wording is ambiguous, choose the safer mode. A review-only request never implies permission to push, update the PR/MR description, create follow-up issues, or merge.
+When wording is ambiguous, choose the safer mode. Review-only never permits a push, a PR/MR description update, a follow-up issue, or a merge.
 
 Read only the mode's files under `references/`, in one batch of parallel reads before acting. The forge reference is `github.md` or `gitlab.md`.
 
@@ -93,6 +93,8 @@ Scheduled lifecycle or scheduled approved merge: read `preflight.md` and `schedu
 ## Gates
 
 PR/MR modes run `references/preflight.md` before any write. Do not review or approve a PR/MR you own or have commits on, or change a foreign one. There is no default reviewer. Only a `*-force` command the human invokes waives a gate. `next step:` comes from `references/handoff.md`.
+
+Full-tier pre-submit follows the dispatch contract in `references/pre-submit.md`; do not ask when it matches.
 
 ## Safety Defaults
 

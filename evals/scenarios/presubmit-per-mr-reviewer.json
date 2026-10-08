@@ -1,0 +1,45 @@
+{
+  "id": "presubmit-per-mr-reviewer",
+  "why": "A full-tier batch dispatches one reviewer subagent per PR/MR without asking; a cross-MR or parallel dispatch still asks. Light tier stays in the main session.",
+  "command": "/git-issue-pr https://github.com/acme/widget/issues/21 (batch submit of issues 21 and 22; you are at the pre-submit gate for both; commits are made and tests pass)",
+  "user": "alice",
+  "snapshot": {
+    "issues": [
+      {
+        "number": 21,
+        "url": "https://github.com/acme/widget/issues/21",
+        "state": "OPEN",
+        "author": "alice",
+        "assignees": [
+          "alice"
+        ]
+      },
+      {
+        "number": 22,
+        "url": "https://github.com/acme/widget/issues/22",
+        "state": "OPEN",
+        "author": "alice",
+        "assignees": [
+          "alice"
+        ]
+      }
+    ]
+  },
+  "extra": "Both submits are full tier. PR 21 range is merge-base aaa..bbb (8 files, 220 lines). PR 22 range is merge-base ccc..ddd (6 files, 90 lines). Before any reviewer dispatch, print exactly these lines:\nAsk before per-MR reviewer: yes|no\nAsk before cross-MR reviewer: yes|no\nAsk before parallel reviewers: yes|no\nLight-tier subagent: yes|no\nA per-MR reviewer is one fresh subagent for one PR/MR under the dispatch contract. Cross-MR means one subagent reviews both ranges. Parallel means several reviewer subagents at once. Light-tier subagent is whether a 2-file, 20-line range would dispatch a subagent.",
+  "expect": {
+    "reply_must_re": [
+      "^\\s*Ask before per-MR reviewer:\\s*no\\b",
+      "^\\s*Ask before cross-MR reviewer:\\s*yes\\b",
+      "^\\s*Ask before parallel reviewers:\\s*yes\\b",
+      "^\\s*Light-tier subagent:\\s*no\\b"
+    ],
+    "reply_must_not_re": [
+      "^\\s*Ask before per-MR reviewer:\\s*yes\\b",
+      "^\\s*Light-tier subagent:\\s*yes\\b"
+    ]
+  },
+  "self_test": {
+    "pass": "Ask before per-MR reviewer: no\nAsk before cross-MR reviewer: yes\nAsk before parallel reviewers: yes\nLight-tier subagent: no\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
+    "fail": "Ask before per-MR reviewer: yes\nAsk before cross-MR reviewer: no\nAsk before parallel reviewers: no\nLight-tier subagent: yes\nSTATE: n/a\nWRITES:\n- none\nNEXT: none"
+  }
+}
