@@ -228,6 +228,7 @@ REFERENCE_PHRASES = {
         "including a reply with no code change",
         "do not report the revision done",
         "Resolved is not approval",
+        "unaddressed latest reviewer comment",
     ],
     "conflict.md": [
         "CONFLICTED",
@@ -747,6 +748,10 @@ def validate_forge_references() -> None:
             fail("references/github.md: PR snapshot missing review thread id or isResolved")
         if "resolveReviewThread" in section:
             fail("references/github.md: resolve write is not a snapshot read")
+        if "comments(last:" not in section or "databaseId" not in section:
+            fail("references/github.md: PR snapshot must keep the root databaseId and the latest comments on each thread")
+        if "comments(first:1)" in section and "comments(last:" not in section:
+            fail("references/github.md: PR snapshot reads only the first comment on a review thread")
     if gitlab.exists():
         text = gitlab.read_text(encoding="utf-8")
         for phrase in (
