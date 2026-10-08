@@ -19,7 +19,7 @@ reviews(last:8){nodes{author{login} state submittedAt body}}
 comments(last:8){nodes{author{login} createdAt body}}
 reviewThreads(last:40){pageInfo{hasNextPage} nodes{isResolved comments(last:8){nodes{author{login} createdAt body}}}}
 commits(last:15){nodes{commit{committedDate messageHeadline}}}
-timelineItems(last:8,itemTypes:[REVIEW_REQUESTED_EVENT]){nodes{...on ReviewRequestedEvent{createdAt}}}
+timelineItems(last:8,itemTypes:[REVIEW_REQUESTED_EVENT,REVIEW_REQUEST_REMOVED_EVENT]){nodes{__typename ...on ReviewRequestedEvent{createdAt requestedReviewer{...on User{login}...on Bot{login}...on Mannequin{login}...on Team{name}}} ...on ReviewRequestRemovedEvent{createdAt requestedReviewer{...on User{login}...on Bot{login}...on Mannequin{login}...on Team{name}}}}}
 }}}}' | jq --arg kind gh -f "$here/project-triage-list.jq"
     ;;
   gitlab)

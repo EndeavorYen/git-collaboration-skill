@@ -7,6 +7,10 @@
 # (or origin/<target>).
 # Commit and note times are normalized to UTC before max. Every *At value ends in Z.
 # GitLab commits(first:30) is newest-first; the max is still by UTC time.
+# A GitHub review request stays pending only when its latest timeline event in
+# the window is the request. A later ReviewRequestRemovedEvent clears that
+# person. totalCount 0 means none are pending even if the removal is outside
+# the last 8 events.
 def target_merge($base):
   ((. // "") | split("\n")[0]) as $s
   | (($s | startswith("Merge branch ")) or ($s | startswith("Merge remote-tracking branch ")))
@@ -52,6 +56,16 @@ def pending_at:
     [ group_by(.who)[] | sort_by(.t) | last | select(.kind == "request") | .t ]
     | if length == 0 then null else max end
   end;
+def gh_review_events:
+  [ .timelineItems.nodes[]?
+    | (if .__typename == "ReviewRequestedEvent" then "request"
+       elif .__typename == "ReviewRequestRemovedEvent" then "remove"
+       else null end) as $kind
+    | select($kind != null)
+    | (.createdAt | utc) as $t
+    | select($t != null)
+    | {kind: $kind, t: $t, who: (.requestedReviewer.login // .requestedReviewer.name)}
+  ];
 if $kind == "gh" then
   {
     listTruncated: (.data.repository.pullRequests.pageInfo.hasNextPage // false),
@@ -63,11 +77,9 @@ if $kind == "gh" then
       | kept($n | map(select(.a == $p.author.login))) as $m
       | [$p.reviewThreads.nodes[]? | select(.isResolved | not) | select(any(.comments.nodes[]?; (.author.login // "") != "" and .author.login != $p.author.login)) | 1] as $u
       | [$p.commits.nodes[]?.commit | select((.messageHeadline | target_merge($p.baseRefName)) | not) | .committedDate | utc] as $c
-      | [$p.timelineItems.nodes[]?.createdAt | utc | select(. != null)] as $k
+      | (if ($p.reviewRequests.totalCount // 0) > 0 then ($p | gh_review_events | pending_at) else null end) as $req
       | {number, title, url, state, isDraft, author: $p.author.login, reviewDecision, mergeable, headRefOid, baseRefName}
-        + pack($o; $m; $u; $c;
-            (if (($p.reviewRequests.totalCount // 0) > 0) and ($k | length) > 0 then $k | max else null end);
-            ($p.reviewThreads.pageInfo.hasNextPage // false))]
+        + pack($o; $m; $u; $c; $req; ($p.reviewThreads.pageInfo.hasNextPage // false))]
   }
 elif $kind == "gl" then
   {

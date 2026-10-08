@@ -66,13 +66,35 @@ def check(case: dict) -> list[str]:
             banned = want.get("excerpt_not")
             if banned and banned in str(feedback.get("excerpt") or ""):
                 errors.append(f"{case['id']}: excerpt contains {banned!r}")
+    errors.extend(shape_errors(case))
+    return errors
+
+
+def shape_errors(case: dict) -> list[str]:
+    """Lock fixtures whose string max and UTC max must not be the same commit."""
+    if case.get("id") != "string-max-diverges":
+        return []
+    nodes = case["payload"]["data"]["project"]["mergeRequests"]["nodes"]
+    commits = nodes[0]["commits"]["nodes"]
+    raw = [node["committedDate"] for node in commits if not str(node["message"]).startswith("Merge ")]
+    errors: list[str] = []
+    if max(raw) != "2026-10-08T14:59:27+11:00":
+        errors.append(f"{case['id']}: string max is not the +11 commit")
+    expect = case["expect"]
+    wrong = "2026-10-08T03:59:27Z"
+    right = expect.get("latestNonMergeAt")
+    note = (expect.get("latestFeedback") or {}).get("at")
+    if right == wrong:
+        errors.append(f"{case['id']}: expected UTC max equals string-max then utc")
+    if not (isinstance(note, str) and isinstance(right, str) and wrong < note < right):
+        errors.append(f"{case['id']}: note must sit between the wrong UTC time and the real max")
     return errors
 
 
 def main() -> int:
     cases = json.loads(FIXTURES.read_text(encoding="utf-8"))
     ids = [case["id"] for case in cases]
-    for required in ("follow-up", "mixed-timezone"):
+    for required in ("follow-up", "mixed-timezone", "string-max-diverges", "gh-request-removed"):
         if required not in ids:
             print(f"missing fixture {required}", file=sys.stderr)
             return 1
