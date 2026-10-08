@@ -4,7 +4,7 @@ Read this file for `/git-triage` and `/git-triage-force`.
 
 ## Status Triage Workflow
 
-No forge write unless the user picks a follow-up. Do not auto-assign issues or PRs/MRs. Never suggest self-assignment only to unlock merge.
+No forge write unless the user picks a follow-up. Do not auto-assign issues or PRs/MRs. Never self-assign only to unlock merge.
 
 Mode selection:
 
@@ -12,23 +12,23 @@ Mode selection:
 - **Project triage**: `project` / `this repo` / a forge project URL or path.
 - **Issue triage**: args name only issues; read `references/triage-issues.md`.
 - **Aggressive run**: args contain `run` / `aggressive` / `execute`.
-- With both todo and project markers, prefer project when a concrete project target is present; otherwise todo.
+- With both markers, prefer project when a project target is present; otherwise todo.
 
 ### Todo triage workflow
 
-Build a forge-global inbox from metadata lists only: notifications or todos; PRs/MRs where the user is reviewer, author, or assignee; open issues assigned to or authored by the user. Open one trimmed snapshot only to write, or for the one item the user named.
+Build a forge-global inbox from metadata lists only: notifications or todos; PRs/MRs where the user is reviewer, author, or assignee; open issues assigned to or authored by the user. Open one trimmed snapshot only to write or for that item.
 
 Notifications are signals, not source of truth. Another user speaking last is necessary but insufficient to require a reply. Rank from list fields. Snapshot an unclassifiable row only if it may make the top three.
 
 Classify into Ready to review, Ready to fix conflicts, Ready to revise, Ready to merge, Merge handoff needed, Ready to reply, Acknowledge or route, No reply needed, Needs semantic review, Ready to implement, Review request needed, and Waiting or blocked. A named foreign conflicted PR/MR is `WRITE_NOT_AUTHORIZED`, not ready to fix.
 
-Ready to implement: an open issue assigned to me, not blocked, not covered by an active PR/MR, with a current `<!-- git-plan-issue -->` brief whose Goal, Recommended change, Out of scope, and Acceptance criteria hold no unsettled product decision. Otherwise `/git-plan-issue` with the exact issue URL. An unresolved `<!-- git-plan-issue-dissent -->` waits for a human decision.
+Ready to implement: an open issue assigned to me, not blocked, not covered by an active PR/MR, with a current `<!-- git-plan-issue -->` brief whose Goal, Recommended change, Out of scope, and Acceptance criteria hold no unsettled product decision. Otherwise `/git-plan-issue` with the issue URL. An unresolved `<!-- git-plan-issue-dissent -->` waits for a human.
 
-Report each actionable item with reason, evidence, remaining gate, and next command. End with a top three and ask which to handle next.
+Report each item with reason, evidence, gate, and next command, then a top three.
 
 ### Project triage workflow
 
-Scope to the current repository's forge project, or the project URL/path in arguments. One PR/MR list (**Project list**) and one metadata issue list; do not open each row. Include sibling repositories only when repo instructions or the user name them.
+Scope to the current repository's forge project, or the project URL/path in arguments. One PR/MR list (**Project list**) and one metadata issue list; do not open each row. Include a sibling only when instructions or the user name it.
 
 Add **Needs reviewer** and **Needs assignee**. Prefer `/git-request-review` when the user owns the PR/MR; otherwise report who should request review. Recommend `/git-issue-pr` only after a trimmed snapshot shows a settled current brief and clear ownership; until then `/git-plan-issue` with the exact issue URL.
 
@@ -36,7 +36,7 @@ Write actionable items to the **Plan file** in **Plan order**. Issue rows and **
 
 ### Plan file
 
-`PROGRESS.md` at the main checkout root, added to `.git/info/exclude`, never committed. First line `<!-- git-triage-plan -->`; never overwrite a `PROGRESS.md` without it, stop and ask. Header: planner (`/git-triage` or `/git-triage-force`), repo, target branch, planned-at time. One row: URL, next command, status (`todo` / `done` / `waiting` / `skip` / `manual`), evidence. Todo triage writes no file.
+`PROGRESS.md` at the main checkout root, added to `.git/info/exclude`, never committed. First line `<!-- git-triage-plan -->`; never overwrite a `PROGRESS.md` without it, stop and ask. Header: planner, repo, target branch, time. One row: URL, command, status (`todo` / `done` / `waiting` / `skip` / `manual`), evidence. Todo triage writes no file.
 
 ### Plan order
 
@@ -48,13 +48,13 @@ Merging moves the target branch, so:
 4. Owned Review request needed.
 5. Issues: `/git-plan-issue` before `/git-issue-pr`.
 
-Within a step, oldest first. A PR/MR whose base is another open PR/MR's head, or that says it depends on one, comes after it. Mark a PR/MR that touches the same files as an earlier step **may conflict after #N**.
+Within a step, oldest first. A PR/MR based on another open PR/MR, or that depends on one, comes after it. One that touches the same files **may conflict after #N**.
 
 ## Project list
 
-`scripts/project-triage-list.sh` is the one PR/MR list (`gh api graphql` or `glab api graphql`). Do not open a row. The issue list stays the metadata list in the forge. Todo triage keeps inbox lists. Notes use `comments(last:` / `notes(last:`. The latest non-author note is the latest comment, not the first. A reviewer follow-up that is the latest comment stays visible.
+`scripts/project-triage-list.sh` is the one PR/MR list. The issue list stays the metadata list in the forge. Todo triage keeps inbox lists. Notes use `comments(last:` / `notes(last:`. The latest non-author note is the latest comment, not the first. A reviewer follow-up that is the latest comment stays visible.
 
-`latestFeedback` is that note (`author`, `at`, first 160 characters). `authorReplyAt` is the author's latest note. `unresolvedNonAuthor` counts unresolved resolvable discussions with a non-author comment on that latest page. `latestNonMergeAt` skips a commit that only merges the target branch in. `reviewRequestAt` is a pending review request; `UNREVIEWED` is not one. `discussionsTruncated` is not a zero count.
+`latestFeedback` is that note (`author`, `at`, first 160 characters). `authorReplyAt` is the author's latest note. `unresolvedNonAuthor` counts unresolved resolvable discussions with a non-author comment on that latest page. `latestNonMergeAt` skips a commit that only merges the target branch in. Times end in `Z`. `reviewRequestAt` is a pending review request; a later removal note clears that person, and `UNREVIEWED` is not one. If `discussionsTruncated` is true, a request or removal outside the last 40 discussions may be missing, so null `reviewRequestAt` does not prove none were requested. `discussionsTruncated` is not a zero count. When `listTruncated` is true, the run says the open PR/MR list was truncated.
 
 `mergeableDiscussionsState=true` does not prove there is no outstanding feedback. Neither does `approved=false`, an empty `reviewDecision` after a `COMMENTED` review, or `UNREVIEWED`.
 

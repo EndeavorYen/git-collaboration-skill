@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# One project-triage PR/MR list. Stdout is one JSON array of rows.
+# One project-triage PR/MR list. Stdout is {listTruncated, rows}.
+# GraphQL variables are bound with -f; the query text stays single-quoted.
+# shellcheck disable=SC2016
 # Usage: project-triage-list.sh github OWNER REPO
 #        project-triage-list.sh gitlab PROJECT
 set -euo pipefail
@@ -10,7 +12,7 @@ case "$kind" in
     owner="${2:?owner}"
     name="${3:?repo}"
     gh api graphql -f owner="$owner" -f name="$name" -f query='
-query($owner:String!,$name:String!){repository(owner:$owner,name:$name){pullRequests(states:[OPEN],first:30){nodes{
+query($owner:String!,$name:String!){repository(owner:$owner,name:$name){pullRequests(states:[OPEN],first:30,orderBy:{field:UPDATED_AT,direction:DESC}){pageInfo{hasNextPage} nodes{
 number title state isDraft url author{login} reviewDecision mergeable headRefOid baseRefName
 reviewRequests(first:5){totalCount}
 reviews(last:8){nodes{author{login} state submittedAt body}}
@@ -23,7 +25,7 @@ timelineItems(last:8,itemTypes:[REVIEW_REQUESTED_EVENT]){nodes{...on ReviewReque
   gitlab)
     project="${2:?project}"
     glab api graphql -f path="$project" -f query='
-query($path:ID!){project(fullPath:$path){mergeRequests(state:opened,first:30,sort:UPDATED_DESC){nodes{
+query($path:ID!){project(fullPath:$path){mergeRequests(state:opened,first:30,sort:UPDATED_DESC){pageInfo{hasNextPage} nodes{
 iid title state draft webUrl author{username} approved mergeableDiscussionsState diffHeadSha targetBranch mergeStatusEnum
 reviewers(first:10){nodes{username mergeRequestInteraction{reviewState}}}
 discussions(last:40){pageInfo{hasNextPage} nodes{resolvable resolved notes(last:8){nodes{system body createdAt author{username}}}}}

@@ -1,6 +1,6 @@
 # GitHub CLI and approval APIs
 
-Prefer `gh` after GitHub is detected. Each command is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. Keep the `--jq`. If it errors, fix the filter once. Do not rerun without it or refetch a field already in the payload. Do not use the GitHub MCP or read repository files through the forge.
+Prefer `gh` after GitHub is detected. Each command is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. Keep the `--jq`. If it errors, fix the filter once. Do not rerun it or refetch a field already in the payload. Do not use GitHub MCP or read repository files through the forge.
 
 Commands assume the current directory is the repository. `gh pr view "$N"` reads it; pass `--repo owner/name` otherwise.
 
@@ -16,7 +16,7 @@ Compare `login` or numeric `id` with PR author and assignees. Display names are 
 
 ## Pull request snapshot
 
-These two commands are the snapshot. The `--jq` drops commit messages, check annotations, and reactions. It keeps the PR body, review commit OID, thread id, `isResolved`, the root `databaseId`, the last 5 inline comments, and commit author login, name, and email. Empty `login` falls through to `name`. The latest review, the latest conversation comment, and each thread's latest inline comment stay whole, as do `CHANGES_REQUESTED` and marker bodies. Earlier of those 5 are cut to 400.
+These two commands are the snapshot. The `--jq` drops commit messages, annotations and reactions. It keeps the PR body, review commit OID, thread id, `isResolved`, the root `databaseId`, the last 5 inline comments, and commit author login, name, and email. Empty `login` falls through to `name`. The latest review, the latest conversation comment, and each thread's latest inline comment stay whole, as do `CHANGES_REQUESTED` and marker bodies. Earlier ones are cut to 400.
 
 ```bash
 gh pr view "$N" --json number,url,title,body,state,isDraft,headRefName,baseRefName,headRefOid,author,assignees,reviewRequests,reviews,reviewDecision,mergeStateStatus,mergeable,statusCheckRollup,commits,comments,files --jq '{number,url,title,body,state,isDraft,headRefName,baseRefName,headRefOid,author:.author.login,assignees:[.assignees[].login],reviewRequests:[.reviewRequests[]|{login:(if (.login//"") != "" then .login else .name end)}],reviewDecision,mergeStateStatus,mergeable,files:[.files[].path],commits:[.commits[]|{oid,authors:[.authors[]|{login,name,email}]}],checks:[.statusCheckRollup[]?|{name:(.name // .context // .workflowName),status,conclusion:(.conclusion // .state)}],reviews:((.reviews//[]) as $r|($r|length) as $n|[$r|to_entries[]|.key as $i|.value|{id,author:.author.login,state,submittedAt,oid:.commit.oid,body:(if ($i==($n-1) or .state=="CHANGES_REQUESTED" or ((.body//"")|test("git-force-review"))) then .body else (.body//"")[0:400] end)}]),comments:(((.comments//[])|.[-20:]) as $w|($w|length) as $n|[$w|to_entries[]|.key as $i|.value|{id,author:.author.login,createdAt,body:(if ($i==($n-1) or ((.body//"")|test("git-plan-issue|git-force-review"))) then .body else (.body//"")[0:400] end)}])}'
@@ -25,13 +25,15 @@ gh api graphql -f query='query($o:String!,$n:String!,$k:Int!){repository(owner:$
 
 Do not call `issues/${N}/comments` or check-runs when `checks` has the job. `gh search` has no `reviewDecision`, mergeable, or head SHA; snapshot before a merge or review decision.
 
+`https://github.com/owner/name/pull/12` is owner `owner`, repo `name`, number `12`.
+
 Live approval evidence:
 
 - `reviewDecision` of `APPROVED` plus at least one review with `state=APPROVED` from a user who is not the author and has no commits on the current head.
 - `CHANGES_REQUESTED` is `NEEDS_REVISION` when those reviews are still current.
 - An empty `reviewDecision` after a `COMMENTED` review does not prove there is no outstanding feedback.
 - `REVIEW_REQUIRED` with no current-head request is `REVIEW_REQUEST_NEEDED`.
-- Branch protection and required reviewers support the read-back; they do not invent a reviewer name.
+- Branch protection supports the read-back and does not invent a reviewer name.
 
 Diffs come from one local `git fetch` of `headRefOid`. Do not use `gh pr diff` or the contents API.
 
@@ -54,7 +56,7 @@ gh pr review "$N" --request-changes --body "$BODY"
 gh pr review "$N" --comment --body "$BODY"
 ```
 
-Inline comments use the pull-comment API on the changed line. The review write response is the read-back for `headRefOid`, `reviewDecision`, and the new review. Confirm once only when it omits the head SHA or approval state.
+Inline comments use the pull-comment API on the changed line. The review write response is the read-back for `headRefOid`, `reviewDecision`, and the new review. Confirm once if the head SHA or approval state is omitted.
 
 ## Resolve a review thread
 
@@ -95,7 +97,7 @@ gh pr merge "$N" --match-head-commit "$HEAD" --admin
 
 ## Inbox lists
 
-One call per relationship, metadata only. Do not add `comments`, `reviews`, or `statusCheckRollup`. Rank with `reviewDecision` on `gh pr list`. Snapshot a row only to write it or when the user named it.
+One call per relationship. Do not add `comments`, `reviews`, or `statusCheckRollup`. Rank with `reviewDecision` on `gh pr list`. Snapshot a row only to write it or when named.
 
 ```bash
 gh search prs --review-requested=@me --state open --limit 20 --json number,title,repository,url,updatedAt,state

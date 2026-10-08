@@ -1,0 +1,557 @@
+[
+  {
+    "id": "follow-up",
+    "kind": "gh",
+    "payload": {
+      "data": {
+        "repository": {
+          "pullRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "number": 3,
+                "title": "Retry uploads",
+                "url": "https://github.com/acme/widget/pull/3",
+                "state": "OPEN",
+                "isDraft": false,
+                "author": {
+                  "login": "alice"
+                },
+                "reviewDecision": "",
+                "mergeable": "MERGEABLE",
+                "headRefOid": "abc",
+                "baseRefName": "main",
+                "reviewRequests": {
+                  "totalCount": 0
+                },
+                "reviews": {
+                  "nodes": []
+                },
+                "comments": {
+                  "nodes": []
+                },
+                "reviewThreads": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "isResolved": false,
+                      "comments": {
+                        "nodes": [
+                          {
+                            "author": {
+                              "login": "alice"
+                            },
+                            "createdAt": "2026-10-01T00:00:00Z",
+                            "body": "I think this helper is fine"
+                          },
+                          {
+                            "author": {
+                              "login": "carol"
+                            },
+                            "createdAt": "2026-10-03T00:00:00Z",
+                            "body": "follow-up: this still fails closed. not resolving yet."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "commit": {
+                        "committedDate": "2026-10-02T00:00:00Z",
+                        "messageHeadline": "rename helper"
+                      }
+                    }
+                  ]
+                },
+                "timelineItems": {
+                  "nodes": []
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "listTruncated": false,
+      "unresolvedNonAuthor": 1,
+      "latestNonMergeAt": "2026-10-02T00:00:00Z",
+      "authorReplyAt": "2026-10-01T00:00:00Z",
+      "reviewRequestAt": null,
+      "latestFeedback": {
+        "author": "carol",
+        "at": "2026-10-03T00:00:00Z",
+        "excerpt_prefix": "follow-up",
+        "excerpt_not": "I think this helper is fine"
+      }
+    }
+  },
+  {
+    "id": "mixed-timezone",
+    "kind": "gl",
+    "payload": {
+      "data": {
+        "project": {
+          "mergeRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "iid": "8",
+                "title": "Retry uploads",
+                "webUrl": "https://gitlab.com/acme/widget/-/merge_requests/8",
+                "state": "opened",
+                "draft": false,
+                "author": {
+                  "username": "alice"
+                },
+                "approved": false,
+                "mergeableDiscussionsState": true,
+                "diffHeadSha": "abc",
+                "targetBranch": "main",
+                "mergeStatusEnum": "MERGEABLE",
+                "reviewers": {
+                  "nodes": [
+                    {
+                      "username": "carol",
+                      "mergeRequestInteraction": {
+                        "reviewState": "UNREVIEWED"
+                      }
+                    }
+                  ]
+                },
+                "discussions": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "resolvable": false,
+                      "resolved": null,
+                      "notes": {
+                        "nodes": [
+                          {
+                            "system": false,
+                            "body": "still blocking after the offset commit",
+                            "createdAt": "2026-10-08T04:01:51Z",
+                            "author": {
+                              "username": "carol"
+                            }
+                          },
+                          {
+                            "system": false,
+                            "body": "pushed a partial fix",
+                            "createdAt": "2026-10-08T00:00:00-04:00",
+                            "author": {
+                              "username": "alice"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "committedDate": "2026-10-08T14:59:27+11:00",
+                      "message": "handle the closed upload"
+                    },
+                    {
+                      "committedDate": "2026-10-08T10:00:00+10:00",
+                      "message": "start the retry helper"
+                    },
+                    {
+                      "committedDate": "2026-10-07T20:00:00-04:00",
+                      "message": "add the upload path"
+                    },
+                    {
+                      "committedDate": "2026-10-08T03:00:00Z",
+                      "message": "Merge branch 'main' into retry-uploads"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "latestNonMergeAt": "2026-10-08T03:59:27Z",
+      "authorReplyAt": "2026-10-08T04:00:00Z",
+      "reviewRequestAt": null,
+      "unresolvedNonAuthor": 0,
+      "latestFeedback": {
+        "author": "carol",
+        "at": "2026-10-08T04:01:51Z",
+        "excerpt_prefix": "still blocking"
+      }
+    }
+  },
+  {
+    "id": "review-request-removed",
+    "kind": "gl",
+    "payload": {
+      "data": {
+        "project": {
+          "mergeRequests": {
+            "pageInfo": {
+              "hasNextPage": true
+            },
+            "nodes": [
+              {
+                "iid": "1",
+                "title": "Retry uploads",
+                "webUrl": "https://gitlab.com/acme/widget/-/merge_requests/1",
+                "state": "opened",
+                "draft": false,
+                "author": {
+                  "username": "alice"
+                },
+                "approved": false,
+                "mergeableDiscussionsState": true,
+                "diffHeadSha": "abc",
+                "targetBranch": "main",
+                "mergeStatusEnum": "MERGEABLE",
+                "reviewers": {
+                  "nodes": [
+                    {
+                      "username": "carol",
+                      "mergeRequestInteraction": {
+                        "reviewState": "UNREVIEWED"
+                      }
+                    }
+                  ]
+                },
+                "discussions": {
+                  "pageInfo": {
+                    "hasNextPage": true
+                  },
+                  "nodes": [
+                    {
+                      "resolvable": false,
+                      "resolved": null,
+                      "notes": {
+                        "nodes": [
+                          {
+                            "system": true,
+                            "body": "requested review from @carol",
+                            "createdAt": "2026-10-01T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          },
+                          {
+                            "system": true,
+                            "body": "removed review request for @carol",
+                            "createdAt": "2026-10-02T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "committedDate": "2026-10-03T00:00:00Z",
+                      "message": "handle empty token"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "listTruncated": true,
+      "discussionsTruncated": true,
+      "reviewRequestAt": null,
+      "latestNonMergeAt": "2026-10-03T00:00:00Z",
+      "unresolvedNonAuthor": 0
+    }
+  },
+  {
+    "id": "review-request-kept",
+    "kind": "gl",
+    "payload": {
+      "data": {
+        "project": {
+          "mergeRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "iid": "1",
+                "title": "Retry uploads",
+                "webUrl": "https://gitlab.com/acme/widget/-/merge_requests/1",
+                "state": "opened",
+                "draft": false,
+                "author": {
+                  "username": "alice"
+                },
+                "approved": false,
+                "mergeableDiscussionsState": true,
+                "diffHeadSha": "abc",
+                "targetBranch": "main",
+                "mergeStatusEnum": "MERGEABLE",
+                "reviewers": {
+                  "nodes": [
+                    {
+                      "username": "carol",
+                      "mergeRequestInteraction": {
+                        "reviewState": "UNREVIEWED"
+                      }
+                    }
+                  ]
+                },
+                "discussions": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "resolvable": false,
+                      "resolved": null,
+                      "notes": {
+                        "nodes": [
+                          {
+                            "system": true,
+                            "body": "requested review from @carol",
+                            "createdAt": "2026-10-01T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          },
+                          {
+                            "system": true,
+                            "body": "removed review request for @bob",
+                            "createdAt": "2026-10-02T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "committedDate": "2026-09-30T00:00:00Z",
+                      "message": "handle empty token"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "reviewRequestAt": "2026-10-01T00:00:00Z",
+      "latestNonMergeAt": "2026-09-30T00:00:00Z",
+      "unresolvedNonAuthor": 0
+    }
+  },
+  {
+    "id": "target-merge-commit",
+    "kind": "gl",
+    "payload": {
+      "data": {
+        "project": {
+          "mergeRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "iid": "1",
+                "title": "Retry uploads",
+                "webUrl": "https://gitlab.com/acme/widget/-/merge_requests/1",
+                "state": "opened",
+                "draft": false,
+                "author": {
+                  "username": "alice"
+                },
+                "approved": false,
+                "mergeableDiscussionsState": true,
+                "diffHeadSha": "abc",
+                "targetBranch": "main",
+                "mergeStatusEnum": "MERGEABLE",
+                "reviewers": {
+                  "nodes": [
+                    {
+                      "username": "carol",
+                      "mergeRequestInteraction": {
+                        "reviewState": "UNREVIEWED"
+                      }
+                    }
+                  ]
+                },
+                "discussions": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "resolvable": false,
+                      "resolved": null,
+                      "notes": {
+                        "nodes": [
+                          {
+                            "system": false,
+                            "body": "partial fix, still blocking: empty token still returns 200.",
+                            "createdAt": "2026-10-02T12:00:00Z",
+                            "author": {
+                              "username": "carol"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "committedDate": "2026-10-04T10:00:00Z",
+                      "message": "Merge branch 'main' into retry-uploads"
+                    },
+                    {
+                      "committedDate": "2026-10-01T10:00:00Z",
+                      "message": "handle empty token"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "latestNonMergeAt": "2026-10-01T10:00:00Z",
+      "authorReplyAt": null,
+      "reviewRequestAt": null,
+      "latestFeedback": {
+        "author": "carol",
+        "at": "2026-10-02T12:00:00Z",
+        "excerpt_prefix": "partial fix"
+      }
+    }
+  },
+  {
+    "id": "review-request-rerequested",
+    "kind": "gl",
+    "payload": {
+      "data": {
+        "project": {
+          "mergeRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "iid": "1",
+                "title": "Retry uploads",
+                "webUrl": "https://gitlab.com/acme/widget/-/merge_requests/1",
+                "state": "opened",
+                "draft": false,
+                "author": {
+                  "username": "alice"
+                },
+                "approved": false,
+                "mergeableDiscussionsState": true,
+                "diffHeadSha": "abc",
+                "targetBranch": "main",
+                "mergeStatusEnum": "MERGEABLE",
+                "reviewers": {
+                  "nodes": [
+                    {
+                      "username": "carol",
+                      "mergeRequestInteraction": {
+                        "reviewState": "UNREVIEWED"
+                      }
+                    }
+                  ]
+                },
+                "discussions": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "resolvable": false,
+                      "resolved": null,
+                      "notes": {
+                        "nodes": [
+                          {
+                            "system": true,
+                            "body": "requested review from @carol",
+                            "createdAt": "2026-10-01T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          },
+                          {
+                            "system": true,
+                            "body": "removed review request for @carol",
+                            "createdAt": "2026-10-02T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          },
+                          {
+                            "system": true,
+                            "body": "requested review from @carol",
+                            "createdAt": "2026-10-03T12:00:00+02:00",
+                            "author": {
+                              "username": "alice"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "committedDate": "2026-10-03T00:00:00Z",
+                      "message": "handle empty token"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "listTruncated": false,
+      "discussionsTruncated": false,
+      "reviewRequestAt": "2026-10-03T10:00:00Z",
+      "latestNonMergeAt": "2026-10-03T00:00:00Z",
+      "unresolvedNonAuthor": 0
+    }
+  }
+]

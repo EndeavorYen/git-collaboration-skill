@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -57,6 +58,8 @@ REQUIRED_FILES = [
     ROOT / "prompts" / "git-revise-pr-force.md",
     ROOT / "scripts" / "project-triage-list.sh",
     ROOT / "scripts" / "project-triage-list.jq",
+    ROOT / "scripts" / "test_project_triage_list.py",
+    ROOT / "scripts" / "testdata" / "project-triage-list.json",
 ]
 
 SKILL_PHRASES = [
@@ -91,6 +94,11 @@ PREFLIGHT_PHRASES = [
     "/git-review-pr-force",
     "/git-merge-approved-force",
     "/git-revise-pr-force",
+    "has no commits on this PR/MR",
+    "ask the user in this conversation",
+    "change or decision",
+    "The human in this conversation",
+    "required information is missing",
 ]
 
 SKILL_BYTE_LIMIT = 10_240
@@ -276,6 +284,10 @@ REFERENCE_PHRASES = {
         "Ready to revise",
         "Needs semantic review",
         "Waiting for review",
+        "listTruncated",
+        "the run says the open PR/MR list was truncated",
+        "later removal note",
+        "last 40 discussions",
     ],
     "triage-force.md": [
         "`owned`",
@@ -752,6 +764,7 @@ def validate_forge_references() -> None:
             "does not prove there is no outstanding feedback",
             "Commands assume the current directory is the repository",
             "repo-local instructions",
+            "is owner `owner`, repo `name`, number `12`",
         ):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
@@ -802,6 +815,14 @@ def validate_forge_references() -> None:
         for banned in ("comments(first:", "notes(first:"):
             if banned in text:
                 fail(f"scripts/project-triage-list.sh: {banned} drops later replies")
+        if "orderBy:{field:UPDATED_AT,direction:DESC}" not in text:
+            fail("scripts/project-triage-list.sh: open PR list must order by UPDATED_AT descending")
+        if "pullRequests(states:[OPEN],first:30,orderBy:{field:UPDATED_AT,direction:DESC}){pageInfo{hasNextPage}" not in text:
+            fail("scripts/project-triage-list.sh: PR list must report pageInfo.hasNextPage")
+        if "mergeRequests(state:opened,first:30,sort:UPDATED_DESC){pageInfo{hasNextPage}" not in text:
+            fail("scripts/project-triage-list.sh: MR list must report pageInfo.hasNextPage")
+        if "commits(first:30)" not in text:
+            fail("scripts/project-triage-list.sh: GitLab commits(first:30) must stay")
     jq = ROOT / "scripts" / "project-triage-list.jq"
     if jq.exists():
         text = jq.read_text(encoding="utf-8")
@@ -809,6 +830,27 @@ def validate_forge_references() -> None:
             fail("scripts/project-triage-list.jq: latest note must be max_by time")
         if ".comments.nodes[0]" in text or ".notes.nodes[0]" in text:
             fail("scripts/project-triage-list.jq: must not treat the first comment as the latest note")
+        if "def utc:" not in text or "| utc" not in text:
+            fail("scripts/project-triage-list.jq: times must be normalized to UTC")
+        if "removed review request" not in text:
+            fail("scripts/project-triage-list.jq: a removed review request must not stay pending")
+
+
+def validate_project_triage_list() -> None:
+    script = ROOT / "scripts" / "test_project_triage_list.py"
+    if not script.exists():
+        fail("scripts/test_project_triage_list.py: missing")
+        return
+    done = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    if done.returncode != 0:
+        detail = (done.stderr or done.stdout or "fixture test failed").strip()
+        fail(f"scripts/test_project_triage_list.py: {detail.splitlines()[0]}")
 
 
 def validate_scheduled_ocr_gate() -> None:
@@ -1342,6 +1384,7 @@ def main() -> int:
     validate_reference_phrases()
     validate_brief_profiles()
     validate_forge_references()
+    validate_project_triage_list()
     validate_scheduled_ocr_gate()
     validate_implement_profile()
     validate_pstack()

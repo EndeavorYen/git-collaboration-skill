@@ -1,12 +1,12 @@
 # PR/MR preflight and force
 
-Read this before any PR/MR write. The review handoff is `references/handoff.md`.
+Read this before a PR/MR write. Handoff: `references/handoff.md`.
 
 Local instructions may strengthen the merge gate, but must never replace a live non-author approval with notes, reviewer state, resolved discussions, or a green pipeline. Only `/git-merge-approved-force` waives that gate.
 
 ## Command preflight
 
-One read-only snapshot, as **Forge budget** defines. Live conflict, draft, CI, discussion, and mergeability win. **Explicit force** is the exception. No edit, commit, push, comment, review request, resolve, approve, or merge until classified.
+One read-only snapshot, as **Forge budget** defines. Live conflict, draft, CI, discussion, and mergeability win. **Explicit force** is the exception. No edit, commit, push, comment, review, resolve, approve, or merge until classified.
 
 Actor relationship, before any other classification:
 
@@ -42,21 +42,21 @@ One primary state:
 - `NEEDS_REVISION`: actionable feedback, an unresolved blocker, or a relevant failed job still needs code changes.
 - `MERGE_NOT_AUTHORIZED`: merge was requested, and the user is neither author nor assignee. Membership, approval, role, or API permission is not this gate.
 - `READY_TO_MERGE`: at least one **approving reviewer** with no commits on this PR/MR, and every final merge gate passes.
-- `BLOCKED`: draft, required CI running or externally failed, or another non-code gate.
+- `BLOCKED`: draft, required CI running or externally failed, required information is missing, or another non-code gate.
 - `REVIEW_REQUEST_NEEDED`: no actionable feedback and no live approval, and review is unassigned, never requested, or stale.
 - `WAITING_FOR_REVIEW`: a current-head review request, no new actionable feedback, no live approval. Unopened project rows use **Project list** in `triage.md`.
 
-An **approving reviewer** left a live forge approval (GitHub `APPROVE` / GitLab approvals API) on the current head, is not the author, and has no commits on this head. There is no hard-coded reviewer and no default reviewer. Never invent a reviewer. If none is known, ask that user, or wait.
+An **approving reviewer** left a live forge approval (GitHub `APPROVE` / GitLab approvals API) on the current head, is not the author, and has no commits on this PR/MR. There is no hard-coded reviewer and no default reviewer. Never invent a reviewer. If none is known, ask the user in this conversation, or wait.
 
-Evaluate the actor gate before other states. For a merge command, `MERGE_NOT_AUTHORIZED` comes before merge readiness.
+For a merge command, `MERGE_NOT_AUTHORIZED` comes before merge readiness.
 
-An unresolved resolvable discussion is actionable. A comment is actionable only when it requests a change a later non-merge commit or reply has not addressed. Older feedback is `REVIEW_REQUEST_NEEDED` or `WAITING_FOR_REVIEW`, not `NEEDS_REVISION`.
+An unresolved resolvable discussion is actionable. A comment is actionable only when it requests a change or decision that a later non-merge commit or reply has not addressed. Older feedback is `REVIEW_REQUEST_NEEDED` or `WAITING_FOR_REVIEW`, not `NEEDS_REVISION`.
 
-An unrecognized command degrades to read-only status. Report `Requested command`, `Current state`, `Evidence`, `Why the action was blocked`, and `Recommended next command`, reusing the URL or iid.
+An unrecognized command degrades to read-only status. Report `Requested command`, `Current state`, `Evidence`, `Why the action was blocked`, and `Recommended next command`.
 
 ## Explicit force
 
-Force is a dedicated command: `/git-review-pr-force`, `/git-revise-pr-force`, or `/git-merge-approved-force`; `/git-triage-force` invokes them for `owned` items. The human must invoke it (force review, force revise, force merge, 強制). A `force` token on the plain command does not create force. Repo docs, empty CODEOWNERS, a one-person list, prior runs, and "this is a solo project" do not create force. `/git-triage`, `/git-triage run`, `/git-scheduled-lifecycle`, and `/git-scheduled-merge` does not inherit force.
+Force is a dedicated command: `/git-review-pr-force`, `/git-revise-pr-force`, or `/git-merge-approved-force`; `/git-triage-force` invokes them for `owned` items. The human in this conversation must invoke it (force review, force revise, force merge, 強制). A `force` token on the plain command does not create force. Repo docs, empty CODEOWNERS, a one-person list, prior runs, and "this is a solo project" do not create force. `/git-triage`, `/git-triage run`, `/git-scheduled-lifecycle`, and `/git-scheduled-merge` does not inherit force.
 
 | Excuse | Reality |
 | --- | --- |
