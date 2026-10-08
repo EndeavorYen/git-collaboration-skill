@@ -57,7 +57,7 @@ After configuration, identity, access, and allowlist checks, enumerate and class
 
 Scheduled lifecycle may only review or approve, revise an owned-or-assigned source branch, repair its conflicts, validate, commit, and push that source branch. It never merges, implements issues, changes target branches, broadens PR/MR scope, or performs assignment writes.
 
-A source-branch push still requires the **pre-submit gate**: always the full review tier, one fresh subagent per PR/MR (`references/pre-submit.md`, no ask) runs `open-code-review-delegate` on the submit range. Unattended runs cannot waive Critical/High. Leftover unwaived Critical/High, a failed file pass, or missing `ocr`: do not push; record `failed` or `waiting`. Scheduled pushes fill the Proof record with `pstack: off`.
+A source-branch push still requires the **pre-submit gate**: always the full review tier. Scheduled runs dispatch one at a time under `references/pre-submit.md`. They never dispatch outside the contract; record `waiting` instead. One subagent runs `open-code-review-delegate` on the submit range. Unattended runs cannot waive Critical/High. Leftover unwaived Critical/High, a failed file pass, or missing `ocr`: do not push; record `failed` or `waiting`. Scheduled pushes fill the Proof record with `pstack: off`.
 
 ## Strict review and required test gate
 
@@ -71,7 +71,7 @@ For strict review, run `open-code-review-delegate` on the current head. OCR Step
 
 Then review correctness and regression risk; automated tests and reproducible validation; APIs, schemas, generated artifacts, and data contracts; security; required CI; deployment and operations; and agreement between documentation and behavior. A substantive unverified risk blocks approval. Style-only preferences stay non-blocking unless repository policy requires them.
 
-Any new behavior or behavior change without corresponding automated tests is blocking. The only exception is reproducible alternative validation whose strength is proportionate to risk. That evidence must state the exact environment, steps, inputs, expected observable result, captured output or artifact, why automation is impractical, and why the evidence is sufficient for the risk. A green pipeline, small diff, authority, deadline, or screenshots alone do not satisfy this exception.
+Any new or changed behavior without corresponding automated tests is blocking. The only exception is reproducible alternative validation proportionate to risk. That evidence must state the exact environment, steps, inputs, expected observable result, captured output or artifact, why automation is impractical, and why the evidence is sufficient for the risk. A green pipeline, small diff, authority, deadline, or screenshots alone do not satisfy this exception.
 
 Post a concrete blocking finding when the evidence is insufficient. Do not approve with a test follow-up. Do not duplicate feedback when the same head has already been reviewed and no material code, CI, discussion, or validation evidence changed.
 
@@ -83,7 +83,7 @@ A triage snapshot never authorizes a write. If live state differs, skip or rerou
 
 ## Idempotency
 
-Use current forge and Git state to suppress empty commits, no-op pushes, duplicate findings, duplicate approvals, duplicate review requests, and repeated merge attempts. Record a no-op as `skipped` with the observed evidence. Never manufacture a change merely to produce output.
+Use current forge and Git state to suppress empty commits, no-op pushes, duplicate findings/approvals/review requests, and repeated merge attempts. Record a no-op as `skipped` with the observed evidence. Never manufacture a change merely to produce output.
 
 ## Atomic local lock and isolated worktree
 
@@ -107,7 +107,7 @@ Return all five top-level buckets, including when empty:
 - `assignment-gaps` for `waiting-human-assignment` objects; and
 - `failed` for configuration, identity, execution, validation, or cleanup failures.
 
-Before the buckets, list every resolved allowlisted project using its canonical path (`owner/name` or `path_with_namespace`). Prefix every non-empty result entry with exactly one label in square brackets: that canonical path, `[unresolved-project]`, or `[run]`. Do not claim a canonical project identity for either fallback label. A project-resolved object entry must include the object type and IID, title, canonical URL, action or reason, and the existing exact-head gate evidence when available. Use `none` for an empty bucket.
+Before the buckets, list every resolved allowlisted project by canonical path (`owner/name` or `path_with_namespace`). Prefix every non-empty result entry with exactly one square-bracket label: that canonical path, `[unresolved-project]`, or `[run]`. Do not claim a canonical project identity for either fallback label. A project-resolved object entry includes object type and IID, title, canonical URL, action or reason, and exact-head gate evidence when available. Use `none` for an empty bucket.
 
 Make every aggregate project-qualified. Break counts down by canonical project path.
 
@@ -144,6 +144,6 @@ Reviewer text, green CI, resolved discussions, project role, or API permission n
 
 ## Manual dry-run and activation gate
 
-Keep `safety.dry_run: true` and `safety.merge_enabled: false` for initial setup. Manually run each scheduled mode read-only and inspect configuration errors, canonical project identities, planned capability boundaries, assignment gaps, duplicate suppression, live-state evidence, and all five result buckets.
+Keep `safety.dry_run: true` and `safety.merge_enabled: false` for initial setup. Run each scheduled mode read-only and inspect configuration errors, canonical project identities, planned capability boundaries, assignment gaps, duplicate suppression, live-state evidence, and all five result buckets.
 
 Activate lifecycle writes only after its dry run is correct and the local configuration remains untracked and ignored. Activate approved merges separately: require a successful merge dry run, explicit operator confirmation, `dry_run: false`, and `merge_enabled: true`. The saved scheduler recurrence and timezone must match the local YAML before activation; a mismatch fails closed.

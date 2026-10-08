@@ -1014,16 +1014,21 @@ def validate_dispatch_contract() -> None:
             "one fresh subagent per PR/MR",
             "no implementer history",
             "never shared across MRs",
+            "a new fresh subagent for the same PR/MR, one at a time",
         ),
         "purpose": (
             "**Purpose:**",
-            "merge-base..head",
+            "merge-base..head, or the step 6 fix range `<last reviewed SHA>..<new head>`",
+            "exact base and head SHAs",
+            "Review tier:",
             "issue brief or acceptance criteria",
             "open-code-review-delegate",
         ),
         "budget": (
             "**Budget:**",
+            "read-only",
             "only that diff and the call sites it touches",
+            "no commands other than `ocr` and git reads",
             "no forge calls",
             "no file edits, commits, or pushes",
         ),
@@ -1055,6 +1060,8 @@ def validate_scheduled_ocr_gate() -> None:
         "full review tier",
         "do not push",
         "does not inherit force",
+        "Scheduled runs dispatch one at a time",
+        "They never dispatch outside the contract; record `waiting` instead.",
     ):
         if phrase not in text:
             fail(f"references/scheduled-automation.md: missing {phrase!r}")
