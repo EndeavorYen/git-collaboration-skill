@@ -1,0 +1,83 @@
+{
+  "id": "revise-resolve-replied",
+  "why": "After a revise reply on one review thread, that thread is resolved by the forge resolve write. The reply response is not resolved. The unreplied thread stays open, and the reply does not report the revision done.",
+  "command": "/git-revise-pr https://github.com/acme/widget/pull/15",
+  "user": "alice",
+  "snapshot": {
+    "number": 15,
+    "url": "https://github.com/acme/widget/pull/15",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": ["alice"],
+    "reviewRequests": [],
+    "reviewDecision": "CHANGES_REQUESTED",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "commits": [
+      {
+        "oid": "aaaaaaa",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [
+      {
+        "author": "carol",
+        "state": "CHANGES_REQUESTED",
+        "commit": "aaaaaaa",
+        "body": "Two review threads are open."
+      }
+    ],
+    "comments": [],
+    "reviewThreads": [
+      {
+        "id": "PRRT_a",
+        "isResolved": false,
+        "path": "src/parse.py",
+        "line": 10,
+        "comments": [
+          {
+            "databaseId": 9001,
+            "user": "carol",
+            "body": "Rename parse_x to parse_record."
+          }
+        ]
+      },
+      {
+        "id": "PRRT_b",
+        "isResolved": false,
+        "path": "src/cache.py",
+        "line": 4,
+        "comments": [
+          {
+            "databaseId": 9002,
+            "user": "carol",
+            "body": "Please redesign the cache layer."
+          }
+        ]
+      }
+    ]
+  },
+  "extra": "Local checkout: src/parse.py defines parse_record and tests/test_parse.py covers it. This round replies on review thread PRRT_a. It posts no reply on PRRT_b and does not change src/cache.py. Conversation comments are empty.",
+  "expect": {
+    "state": ["NEEDS_REVISION"],
+    "writes_must": ["comments/9001/replies", "resolveReviewThread"],
+    "writes_must_not": ["PRRT_b"],
+    "reply_must_re": ["(?i)not done"],
+    "reply_must_not": ["revision is done"],
+    "next": "next step: /git-revise-pr-force https://github.com/acme/widget/pull/15"
+  },
+  "self_test": {
+    "pass": "PRRT_a resolved by the resolve write (isResolved true). PRRT_b: not done (no reply this round).\nSTATE: NEEDS_REVISION\nWRITES:\n- gh api --method POST \"repos/acme/widget/pulls/15/comments/9001/replies\" --field body=\"Renamed to parse_record; tests/test_parse.py covers it.\"\n- gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -f id=\"PRRT_a\"\nNEXT: next step: /git-revise-pr-force https://github.com/acme/widget/pull/15",
+    "fail": "revision is done. The reply API response is the resolved read-back.\nSTATE: NEEDS_REVISION\nWRITES:\n- gh api --method POST \"repos/acme/widget/pulls/15/comments/9001/replies\" --field body=\"Renamed.\"\nNEXT: next step: /git-review-pr-force https://github.com/acme/widget/pull/15"
+  }
+}

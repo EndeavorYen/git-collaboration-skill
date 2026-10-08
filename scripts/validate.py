@@ -151,6 +151,7 @@ REFERENCE_PHRASES = {
         "Do not ask the author to rewrite the description into that shape",
         "A missing class label is not a mismatch",
         "rerunning a protected live job",
+        "Do not resolve a blocker based only on the author's explanation.",
     ],
     "plan-issue.md": [
         "<!-- git-plan-issue -->",
@@ -222,6 +223,11 @@ REFERENCE_PHRASES = {
         "pre-submit gate",
         "references/pre-submit.md",
         "next step:",
+        "A reply response is not resolved.",
+        "no reply this round",
+        "including a reply with no code change",
+        "do not report the revision done",
+        "Resolved is not approval",
     ],
     "conflict.md": [
         "CONFLICTED",
@@ -716,14 +722,49 @@ def validate_forge_references() -> None:
     gitlab = ROOT / "references" / "gitlab.md"
     if github.exists():
         text = github.read_text(encoding="utf-8")
-        for phrase in ("gh pr", "gh issue", "reviewDecision", "requested_reviewers", "--admin", "--jq"):
+        for phrase in (
+            "gh pr",
+            "gh issue",
+            "reviewDecision",
+            "requested_reviewers",
+            "--admin",
+            "--jq",
+            "These two commands are the snapshot",
+            "reviewThreads",
+            "isResolved",
+            "resolveReviewThread",
+            "The resolve write response is the read-back for resolved.",
+        ):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
+        start = text.find("## Pull request snapshot")
+        end = text.find("## Request review")
+        section = text[start:end] if start >= 0 and end > start else ""
+        commands = [line for line in section.splitlines() if line.startswith("gh ")]
+        if len(commands) != 2:
+            fail(f"references/github.md: PR snapshot has {len(commands)} commands, expected 2")
+        if "reviewThreads" not in section or "isResolved" not in section:
+            fail("references/github.md: PR snapshot missing review thread id or isResolved")
+        if "resolveReviewThread" in section:
+            fail("references/github.md: resolve write is not a snapshot read")
     if gitlab.exists():
         text = gitlab.read_text(encoding="utf-8")
-        for phrase in ("glab api", "merge_requests", "approved_by", "force merge"):
+        for phrase in (
+            "glab api",
+            "merge_requests",
+            "approved_by",
+            "force merge",
+            "discussionToggleResolve",
+            "resolved=true",
+            "The resolve write response is the read-back for resolved.",
+        ):
             if phrase not in text:
                 fail(f"references/gitlab.md: missing {phrase!r}")
+    revise = ROOT / "references" / "revise.md"
+    if revise.exists():
+        text = revise.read_text(encoding="utf-8")
+        if "Resolve a thread only after the new code actually addresses it." in text:
+            fail("references/revise.md: a reply with no code change this round still resolves that thread")
 
 
 def validate_scheduled_ocr_gate() -> None:

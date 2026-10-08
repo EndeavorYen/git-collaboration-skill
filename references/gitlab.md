@@ -1,8 +1,8 @@
 # GitLab CLI and approval APIs
 
-Use this file after the main skill has detected GitLab. Prefer `glab`. The GraphQL query plus the `jq` pipe in each section is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. The tool result is the pipe's stdout. If `jq` errors, fix the filter once. Do not drop the pipe. Do not follow it with REST calls for approvals, commits, discussions, notes, or pipelines that the query already returns. Do not also query the same object through GitLab MCP. Do not read repository files, blame, or trees through the forge; that work stays in the local checkout.
+Use this file after the main skill has detected GitLab. Prefer `glab`. The GraphQL query plus the `jq` pipe in each section is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. The tool result is the pipe's stdout. If `jq` errors, fix the filter once. Do not drop the pipe or follow it with REST for approvals, commits, discussions, notes, or pipelines the query already returns. Do not query that object through GitLab MCP or read repository files through the forge.
 
-URL-encode project paths (`group/sub%2Fproject`) only for a REST fallback. GraphQL `fullPath` uses the plain path.
+URL-encode a path only for REST (`group/sub%2Fproject`). GraphQL `fullPath` stays plain.
 
 ## Auth and identity
 
@@ -12,7 +12,7 @@ Once per invocation:
 glab api user | jq '{id,username,name}'
 ```
 
-Compare stable `id` or exact `username` with MR author and assignees. Display names are not identity. Skip `glab auth status` when this call returns the username. Skip the project metadata call when the URL or `git remote -v` already names the project.
+Compare stable `id` or exact `username` with MR author and assignees. Display names are not identity. Skip `glab auth status` when this returns the username, and skip project metadata when the URL or `git remote -v` already names the project.
 
 ## Merge request snapshot
 
@@ -48,7 +48,7 @@ glab api "projects/${PROJECT}/merge_requests/${IID}" | jq '{iid,title,state,draf
 
 That fallback has no `approved_by`, commits, or discussions. Do not approve or merge from it.
 
-Add a second call only for the single missing field the gate needs. Do not fan out across approvals, commits, discussions, notes, and pipelines.
+Add one call only for a single missing gate field. Do not fan out.
 
 Live approval evidence:
 
@@ -56,13 +56,21 @@ Live approval evidence:
 - Approval-rule zeroes (`approvals_left == 0`) support the read-back; they must not override `approved=false` or an empty `approvedBy`.
 - There is no default reviewer. `approvedBy` is observed live state, not a name to invent.
 
-Diffs and file contents come from the local checkout after one `git fetch` of `diffHeadSha`.
+Diffs come from the local checkout after one `git fetch` of `diffHeadSha`.
+
+## Resolve a discussion
+
+One write per discussion replied on this round. Pass the snapshot `discussionId`. The write sets `resolved=true`. The resolve write response is the read-back for resolved.
+
+```bash
+glab api graphql -f query='mutation($id:DiscussionID!){discussionToggleResolve(input:{id:$id,resolve:true}){discussion{resolved}}}' -f id="$DISCUSSION_ID"
+```
 
 ## Request review
 
-Never invent a reviewer. Use an explicit `reviewer:USERNAME` or a reviewer already assigned on the MR. If none exists, ask who to assign.
+Never invent a reviewer. Use `reviewer:USERNAME` or a reviewer already on the MR. If none exists, ask who to assign.
 
-Prefer the GitLab instance's native request-review or reviewer-assignment operation. The write response is the read-back for reviewers, current head SHA, approval state, and discussions.
+Prefer the instance's native reviewer assignment. The write response is the read-back for reviewers, head SHA, approval, and discussions.
 
 ## Issue snapshot
 
@@ -84,7 +92,7 @@ query($path: ID!, $iid: String!) {
 }' -f path="$PROJECT" -f iid="$IID" | jq '.data.project.issue | {iid,title,state,description,webUrl,author:.author.username,assignees:[.assignees.nodes[].username],labels:[.labels.nodes[].title],links:[.relatedMergeRequests.nodes[]|{iid,state,webUrl}],hasNextPage:.notes.pageInfo.hasNextPage,noteCount:([.notes.nodes[]|select(.system|not)]|length),notes:([.notes.nodes[]|select(.system|not)] as $c|($c|length) as $n|[$c|to_entries[]|select(((.value.body//"")|test("git-plan-issue")) or (.key>=($n-20)))|.key as $i|.value|{id,author:.author.username,createdAt,body:(if ($i==($n-1) or ((.body//"")|test("git-plan-issue"))) then .body else (.body//"")[0:400] end)}])}'
 ```
 
-The description stays whole. Marker notes stay whole. Skip system notes. If `pageInfo.hasNextPage` is true and a marker note is missing, fetch one more page through the same pipe. Post, then stop. The POST response is the read-back:
+The description and marker notes stay whole. Skip system notes. If `pageInfo.hasNextPage` is true and a marker is missing, fetch one more page through the same pipe. Post, then stop. The POST response is the read-back:
 
 ```bash
 glab api --method POST "projects/${PROJECT}/issues/${IID}/notes" --field body="$BODY"
@@ -101,7 +109,7 @@ glab api --method PUT "projects/${PROJECT}/merge_requests/${IID}/merge" \
   --field sha="${HEAD_SHA}"
 ```
 
-Push options may create an MR when the user asked for a push/MR and the GitLab instance supports them. Creating an MR is not permission to merge it. The create or merge command result is the read-back.
+Push options may create an MR when the user asked and the instance supports them. Creating an MR is not permission to merge it. The create or merge result is the read-back.
 
 `/git-merge-approved-force` uses the same exact-head merge field. If approval rules reject the force merge, report the forge error. Do not push the source branch into the target locally.
 
@@ -116,7 +124,7 @@ glab api "merge_requests?scope=all&state=opened&author_username=${USER}&per_page
 glab api "issues?scope=all&state=opened&assignee_username=${USER}&per_page=20" | jq '[.[]|{iid,title,state,updated_at,web_url,author:.author.username}]'
 ```
 
-Treat `/todos` as notification signals. These lists are metadata. The next command takes the snapshot. Do not open every row during ranking, and do not fetch notes for projects you are only ranking.
+Treat `/todos` as signals. These lists are metadata. Do not open every row or fetch notes while ranking.
 
 ## Conflicts and mergeability
 
