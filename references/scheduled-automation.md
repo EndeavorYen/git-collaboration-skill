@@ -1,12 +1,12 @@
 # Scheduled GitHub / GitLab automation
 
-This contract applies to both scheduled modes. It is non-interactive, allowlist-only, and subordinate to the main skill's live-state model and exact-head merge gate.
+This contract applies to both scheduled modes: non-interactive, allowlist-only, and subordinate to the main skill's live-state model and exact-head merge gate.
 
 ## Local configuration preflight
 
-Load `.git-scheduled-automation.yml` from the repository root before any write. The machine owns this file: keep it untracked and exclude it locally with `.git/info/exclude`; do not change the repository `.gitignore`. Exclude the configured state directory locally as well.
+Load `.git-scheduled-automation.yml` from the repo root before any write. The machine owns this file: keep it untracked and exclude it locally with `.git/info/exclude`; do not change the repo `.gitignore`. Exclude the configured state directory locally, too.
 
-The tracked schema example is deliberately empty and contains no real project or personal path:
+The tracked schema example is deliberately empty, with no real project or personal path:
 
 ```yaml
 version: 1
@@ -23,14 +23,14 @@ state_dir: .git-scheduled-state
 projects: []
 ```
 
-Set `timezone` to the operator's timezone. Each `projects` entry contains `url` and may contain `checkout_path`. The local file must contain canonical HTTPS GitHub or GitLab project URLs, no duplicates, and no credentials.
+Set `timezone` to the operator's timezone. Each `projects` entry contains `url` and may contain `checkout_path`. The local file must contain canonical HTTPS GitHub or GitLab project URLs, no duplicates or credentials.
 
 A write-enabled run fails closed unless all of these checks pass:
 
 - the file exists, parses, uses version `1`, contains a timezone, both schedule entries, and both safety flags;
 - `projects` is non-empty and duplicate-free;
 - Git reports the file as untracked; and
-- when the file is inside the repository, `git check-ignore` proves that `.git/info/exclude` ignores it.
+- when the file is inside the repository, `git check-ignore` proves `.git/info/exclude` ignores it.
 
 A read-only dry run reports all configuration errors. Any failed preflight puts the run in `failed` before a forge or branch write.
 
@@ -44,7 +44,7 @@ If `checkout_path` is present, verify its remote resolves to that same allowlist
 
 The scheduled profile overrides interactive aggressive triage: it never writes reviewer or assignee fields, including author self-assignment. A PR/MR missing a reviewer or assignee, or an issue missing an assignee, is `waiting-human-assignment`. Never invent a reviewer.
 
-Record each gap under `assignment-gaps` with project, object type, IID, title, URL, missing role, and suggested human next action. Continue independent eligible work. End without asking a question or waiting for input.
+Record each gap under `assignment-gaps` with project, object type, IID, title, URL, missing role, and suggested human next action. Continue independent eligible work. End without a question or waiting for input.
 
 ## Lifecycle order and write boundary
 
@@ -57,7 +57,7 @@ After configuration, identity, access, and allowlist checks, enumerate and class
 
 Scheduled lifecycle may only review or approve, revise an owned-or-assigned source branch, repair its conflicts, validate, commit, and push that source branch. It never merges, implements issues, changes target branches, broadens PR/MR scope, or performs assignment writes.
 
-A source-branch push still requires the **pre-submit gate**: always the full review tier. Scheduled runs dispatch one at a time under `references/pre-submit.md`. They never dispatch outside the contract; record `waiting` instead. One subagent runs `open-code-review-delegate` on the submit range. Unattended runs cannot waive Critical/High. Leftover unwaived Critical/High, a failed file pass, or missing `ocr`: do not push; record `failed` or `waiting`. Scheduled pushes fill the Proof record with `pstack: off`.
+A source-branch push still requires the **pre-submit gate**: always the full review tier. Scheduled runs dispatch one at a time under `references/pre-submit.md`. They never dispatch outside the contract; record `waiting` instead. One subagent runs `open-code-review-delegate` on the submit range. A fix re-review starts a new fresh subagent, one at a time. Unattended runs cannot waive Critical/High. Leftover unwaived Critical/High, a failed file pass, or missing `ocr`: do not push; record `failed` or `waiting`. Scheduled pushes fill the Proof record with `pstack: off`.
 
 ## Strict review and required test gate
 
@@ -73,11 +73,11 @@ Then review correctness and regression risk; automated tests and reproducible va
 
 Any new or changed behavior without corresponding automated tests is blocking. The only exception is reproducible alternative validation proportionate to risk. That evidence must state the exact environment, steps, inputs, expected observable result, captured output or artifact, why automation is impractical, and why the evidence is sufficient for the risk. A green pipeline, small diff, authority, deadline, or screenshots alone do not satisfy this exception.
 
-Post a concrete blocking finding when the evidence is insufficient. Do not approve with a test follow-up. Do not duplicate feedback when the same head has already been reviewed and no material code, CI, discussion, or validation evidence changed.
+Post a concrete blocking finding when the evidence is insufficient. Do not approve with a test follow-up. Do not duplicate feedback when the same head was already reviewed and no material code, CI, discussion, or validation evidence changed.
 
 ## Per-write allowlist and live-state preflight
 
-Before every forge or branch write, reload the configured project allowlist and re-resolve the candidate's stable project ID and canonical URL. Then take one Forge-budget snapshot of the PR/MR and rerun the main skill's PR/MR command preflight. That one payload covers the current head, actor relationship, live approval, pipeline and required jobs, discussions, draft state, conflicts, mergeability, source and target branches, and assignment state. Do not issue a call per field.
+Before every forge or branch write, reload the configured project allowlist and re-resolve the candidate's stable project ID and canonical URL. Take one Forge-budget snapshot of the PR/MR and rerun the main skill's PR/MR command preflight. That one payload covers the current head, actor relationship, live approval, pipeline and required jobs, discussions, draft state, conflicts, mergeability, source and target branches, and assignment state. Do not issue a call per field.
 
 A triage snapshot never authorizes a write. If live state differs, skip or reroute only within the current scheduled mode's capability boundary. Validation belongs to the exact head being written; evidence for an earlier head is stale.
 
@@ -91,7 +91,7 @@ Before modifying a source branch, acquire an atomic local lock keyed by stable p
 
 If another live run owns the lock, report the PR/MR as `waiting` and do not modify the branch. Never break, replace, or remove an uncertain or apparently stale lock during an unattended run. Report its metadata for human inspection and recovery.
 
-Use an isolated worktree for source changes. Verify the allowlisted remote before fetching or checking out. Never reuse or alter unrelated dirty work, an existing user worktree, or another run's temporary resources. Release only locks and temporary resources that the current run provably owns, and only when safe.
+Use an isolated worktree for source changes. Verify the allowlisted remote before fetching or checking out. Never reuse or alter unrelated dirty work, an existing user worktree, or another run's temporary resources. Release only locks and temporary resources the current run provably owns, and only when safe.
 
 ## Failure isolation
 

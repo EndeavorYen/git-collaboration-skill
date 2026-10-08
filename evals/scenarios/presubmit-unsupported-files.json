@@ -1,0 +1,49 @@
+{
+  "id": "presubmit-unsupported-files",
+  "why": "Files the OCR tool does not support stay in the file pass. A docs-only diff is read by hand; 0/N reviewable alone is not a completed file pass.",
+  "command": "/git-review-pr https://github.com/acme/widget/pull/12",
+  "user": "dave",
+  "snapshot": {
+    "number": 12,
+    "url": "https://github.com/acme/widget/pull/12",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "alice"
+    ],
+    "reviewRequests": [],
+    "reviewDecision": "",
+    "mergeable": "MERGEABLE",
+    "headRefOid": "4444444444444444444444444444444444444444",
+    "commits": [
+      {
+        "oid": "4444444",
+        "author": {
+          "login": "alice",
+          "name": "Alice"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "name": "test",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "reviews": [],
+    "comments": []
+  },
+  "extra": "Docs-only diff origin/main..4444444 changes README.md and docs/guide.md. ocr returned reviewable_files: [] because both Markdown files are unsupported. Before the verdict, print one line `File pass:` that accounts for every changed file.",
+  "expect": {
+    "reply_must_re": [
+      "README\\.md",
+      "docs/guide\\.md",
+      "(?i)manually reviewed"
+    ]
+  },
+  "self_test": {
+    "pass": "File pass: 0/2 reviewable; README.md and docs/guide.md manually reviewed by reading the diff, no findings.\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
+    "fail": "File pass: 0/2 reviewable\nSTATE: n/a\nWRITES:\n- none\nNEXT: none"
+  }
+}

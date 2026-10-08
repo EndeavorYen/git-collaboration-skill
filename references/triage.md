@@ -8,10 +8,10 @@ No forge write unless the user picks a follow-up. Do not auto-assign issues or P
 
 Mode selection:
 
-- **Todo triage** (default): empty args, or `todo` / `mine` / `inbox`.
-- **Project triage**: `project` / `this repo` / a forge project URL or path.
+- **Todo triage** (default): empty args, or `todo`/`mine`/`inbox`.
+- **Project triage**: `project`/`this repo`/a forge project URL or path.
 - **Issue triage**: args name only issues; read `references/triage-issues.md`.
-- **Aggressive run**: args contain `run` / `aggressive` / `execute`.
+- **Aggressive run**: args contain `run`/`aggressive`/`execute`.
 - With both markers, prefer project when a project target is present; otherwise todo.
 
 ### Todo triage workflow
@@ -36,7 +36,7 @@ Write actionable items to the **Plan file** in **Plan order**. Issue rows and **
 
 ### Plan file
 
-`PROGRESS.md` at the main checkout root, added to `.git/info/exclude`, never committed. First line `<!-- git-triage-plan -->`; never overwrite a `PROGRESS.md` without it, stop and ask. Header: planner, repo, target branch, time. One row: URL, command, status (`todo` / `done` / `waiting` / `skip` / `manual`), evidence. Todo triage writes no file.
+`PROGRESS.md` at the main checkout root, added to `.git/info/exclude`, never committed. First line `<!-- git-triage-plan -->`; never overwrite a `PROGRESS.md` without it, stop and ask. Header: planner, repo, target branch, time. One row: URL, command, status (`todo`/`done`/`waiting`/`skip`/`manual`), evidence. Todo triage writes no file.
 
 ### Plan order
 
@@ -48,17 +48,17 @@ Merging moves the target branch, so:
 4. Owned Review request needed.
 5. Issues: `/git-plan-issue` before `/git-issue-pr`.
 
-Within a step, oldest first. A PR/MR based on another open PR/MR, or that depends on one, comes after it. One that touches the same files **may conflict after #N**.
+Within a step oldest first. A PR/MR based on another open PR/MR, or that depends on one, comes after it. One that touches the same files **may conflict after #N**.
 
 ## Project list
 
-`scripts/project-triage-list.sh` is the one PR/MR list. The issue list stays the metadata list in the forge. Todo triage keeps inbox lists. Notes use `comments(last:` / `notes(last:`. The latest non-author note is the latest comment, not the first. A reviewer follow-up that is the latest comment stays visible.
+`scripts/project-triage-list.sh` is the one PR/MR list. The issue list stays the forge metadata list. Todo triage keeps inbox lists. Notes use `comments(last:`/`notes(last:`. The latest non-author note is the latest comment, not the first. A reviewer follow-up that is the latest comment stays visible.
 
 `latestFeedback` is that note (`author`, `at`, first 160). `authorReplyAt` is the author's latest note. `unresolvedNonAuthor` counts unresolved resolvable discussions with a non-author comment on that latest page. `latestNonMergeAt` skips a commit that only merges the target branch in. Times end in `Z`. `reviewRequestAt` is a pending review request; a later removal note or GitHub event clears that person, and `UNREVIEWED` is not one. A request or removal outside the last 40 discussions (when `discussionsTruncated`) or the last 8 GitHub events may be missing, so null `reviewRequestAt` does not prove none were requested. `discussionsTruncated` is not a zero count. When `listTruncated` is true, the run says the open PR/MR list was truncated.
 
 `mergeableDiscussionsState=true` does not prove there is no outstanding feedback. Neither does `approved=false`, an empty `reviewDecision` after a `COMMENTED` review, or `UNREVIEWED`.
 
-- A reviewer note or review newer than the latest non-merge commit, with no later author reply: **Ready to revise** (`/git-revise-pr`) when the excerpt reads as blocking, otherwise **Needs semantic review**. Never **Waiting for review**. Blocking: it asks for a change or says the work still fails.
+- A reviewer note or review newer than the latest non-merge commit, with no later author reply: **Ready to revise** (`/git-revise-pr`) when the excerpt reads as blocking, otherwise **Needs semantic review**. Never **Waiting for review**. Blocking: it asks for a change or says the work still fails. If unsure, **Needs semantic review**.
 - Any unresolved non-author resolvable discussion, or `discussionsTruncated`: not **Waiting for review**. Use the bullet above when the time test matches; otherwise **Needs semantic review**.
 - **Waiting for review** requires a current-head review request (`reviewRequestAt` not older than `latestNonMergeAt`) and no reviewer note newer than the latest non-merge commit.
 
@@ -79,5 +79,5 @@ scripts/project-triage-list.sh gitlab "$PROJECT"
 6. **Missing reviewers last.** With `reviewer:USERNAME`, assign and request review. Otherwise list those PRs/MRs and **ask who to assign**; wait, do not guess.
 7. Before every write, take one new snapshot and re-run preflight. Live state overrides the row: reroute within that item or mark it `waiting`.
 8. Do not auto-implement issues unless `with-issues` is present.
-9. After each command, write status and evidence to its row. If the next command is runnable, set it and go on.
+9. After each command, write status and evidence to its row. If the next is runnable, set it and go on.
 10. Skip an unchanged `waiting` row. No `todo` left: say what each needs; do not suggest `run`.

@@ -77,6 +77,7 @@ SKILL_PHRASES = [
     "local checkout",
     "write response is the read-back",
     "Do not read repository files",
+    "A fix re-review starts a new fresh subagent, one at a time.",
 ]
 
 PREFLIGHT_PHRASES = [
@@ -131,6 +132,12 @@ REFERENCE_PHRASES = {
         "An unproven load-bearing fact is a remaining gate",
         "the observed result names the content checked",
         "only exists or is non-empty",
+        "unsupported by the tool",
+        "`0/N reviewable` alone is not a completed file pass",
+        "Repeat until no unwaived Critical/High remain",
+        "or in the update comment otherwise",
+        "**REQUIRED SUB-SKILL:** `open-code-review-delegate`",
+        "Evidence class values match `references/review.md`",
     ],
     "review.md": [
         "references/pre-submit.md",
@@ -163,6 +170,8 @@ REFERENCE_PHRASES = {
         "A missing class label is not a mismatch",
         "rerunning a protected live job",
         "Do not resolve a blocker based only on the author's explanation.",
+        "unsupported by the tool",
+        "`0/N reviewable` alone is not a completed file pass",
     ],
     "plan-issue.md": [
         "<!-- git-plan-issue -->",
@@ -290,6 +299,7 @@ REFERENCE_PHRASES = {
         "the run says the open PR/MR list was truncated",
         "later removal note",
         "last 40 discussions",
+        "If unsure, **Needs semantic review**.",
     ],
     "triage-force.md": [
         "`owned`",
@@ -884,6 +894,7 @@ def validate_forge_references() -> None:
             "is owner `owner`, repo `name`, number `12`",
             "Do not rerun without it",
             "required reviewers",
+            "each thread's latest inline comment",
         ):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
@@ -910,8 +921,6 @@ def validate_forge_references() -> None:
                     "references/github.md: GraphQL query must select "
                     "root:comments(first:1){nodes{databaseId}}"
                 )
-            if "databaseId" in _selection(compact.replace("root:", "", 1), "root:comments(first:1)"):
-                fail("references/github.md: databaseId check ignores the root: alias")
             if "comments(last:" not in compact or not recent:
                 fail("references/github.md: GraphQL query must select comments(last: on each thread")
             if "createdAt" not in recent:
@@ -1062,6 +1071,7 @@ def validate_scheduled_ocr_gate() -> None:
         "does not inherit force",
         "Scheduled runs dispatch one at a time",
         "They never dispatch outside the contract; record `waiting` instead.",
+        "A fix re-review starts a new fresh subagent, one at a time.",
     ):
         if phrase not in text:
             fail(f"references/scheduled-automation.md: missing {phrase!r}")

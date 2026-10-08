@@ -2,13 +2,13 @@
 
 Read this file for `/git-review-pr` and `/git-review-pr-force`. File pass: `references/pre-submit.md`. Also read one of `references/github.md` or `references/gitlab.md`. Do not read other mode files.
 
-When `/git-review-pr` is closed unmerged or is `REVIEW_NOT_AUTHORIZED`, stop without posting review feedback. Do not approve. The reply uses the review handoff in `references/handoff.md`.
+When `/git-review-pr` is closed unmerged or is `REVIEW_NOT_AUTHORIZED`, stop without posting feedback. Do not approve. The reply uses the review handoff in `references/handoff.md`.
 
 When `/git-review-pr-force` is closed unmerged, stop without posting.
 
 ### Post-merge review
 
-When the human names a merged PR/MR, review the merged head SHA in a detached worktree: file pass, Proof re-run, Evidence class. Post one comment, no native review event or inline discussion. It opens with `<!-- git-post-merge-review -->`, `head: <full sha>`, and `verdict: approve` or `verdict: request-changes`. Each blocker names the follow-up fix; create no issue unless asked. Reply: the `verdict:` line and `next step: none`. Triage and scheduled runs skip merged items.
+When the human names a merged PR/MR, review the merged head SHA in a detached worktree: file pass, Proof re-run, Evidence class. Post one comment, no native review event or inline discussion. Opens with `<!-- git-post-merge-review -->`, `head: <full sha>`, and `verdict: approve` or `verdict: request-changes`. Each blocker names the follow-up fix; no issue unless asked. Reply: the `verdict:` line and `next step: none`. Triage and scheduled runs skip merged items.
 
 ### `/git-review-pr-force`
 
@@ -19,7 +19,7 @@ Verdict is exactly one of these tokens. Do not print `approved`, `APPROVED`, or 
 - `verdict: approve` — file pass done or skipped as above, no unresolved blocker, relevant CI is not failed or unknown.
 - `verdict: request-changes` — any remaining blocker, including a failed file pass.
 
-Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines below. Do not also post a comment. If the forge rejects that native event (`APPROVE` or `REQUEST_CHANGES`), post one current-head comment that starts with the same lines. A comment never sets `forge approval: present`.
+Try one native review event on the reviewed SHA: `APPROVE` when the verdict is approve, `REQUEST_CHANGES` when the verdict is request-changes. If the forge accepts it, the review body starts with the opening lines. Do not also post a comment. If the forge rejects that native event (`APPROVE` or `REQUEST_CHANGES`), post one current-head comment starting with the same lines. A comment never sets `forge approval: present`.
 
 Opening lines:
 
@@ -32,7 +32,7 @@ forge approval: absent
 
 Use `verdict: request-changes` on the second line when that is the result. Use `forge approval: present` only when this invocation's native `APPROVE` was accepted.
 
-The first visible sentence after the opening lines states the verdict. When the PR/MR language is Chinese, that sentence is `同意` for `verdict: approve` and `不同意` for `verdict: request-changes`. When the language is English, use agree or disagree: `agree` for `verdict: approve` and `disagree` for `verdict: request-changes`. When the native event was rejected, the following sentence names that rejection. For a rejected GitHub `APPROVE` that sentence is: the author cannot approve their own pull request. For a rejected GitHub `REQUEST_CHANGES` that sentence is: the author cannot request changes on their own pull request. Evidence follows those sentences.
+The first visible sentence after the opening lines states the verdict. When the PR/MR language is Chinese, that sentence is `同意` for `verdict: approve` and `不同意` for `verdict: request-changes`. When the language is English, use agree or disagree: `agree` for `verdict: approve` and `disagree` for `verdict: request-changes`. When the native event was rejected, the next sentence names that rejection. For a rejected GitHub `APPROVE` that sentence is: the author cannot approve their own pull request. For a rejected GitHub `REQUEST_CHANGES` that sentence is: the author cannot request changes on their own pull request. Evidence follows.
 
 The operator reply prints the verdict line, the `forge approval:` line, and exactly one `next step:` line. Do not print the Solo override block. No second command.
 
@@ -57,41 +57,41 @@ The current reviewer runs the file pass on this checkout after the actor gate. D
 | medium | Blocking when the finding is correctness, security, a broken contract, or missing required validation; otherwise a non-blocking follow-up comment |
 | low | Omit unless thorough-review is on |
 
-OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local workflow stays read-only except forge review writes. OCR findings do not by themselves approve or request changes. Continue CI, evidence-class, remaining-gate, and verdict rules after the file pass. A failed file pass: post no approve; treat the coverage failure as a blocker.
+OCR coverage belongs in the review evidence. **OCR Step 7 Fix stays off.** Local workflow stays read-only except forge review writes. OCR findings do not by themselves approve or request changes. Continue CI, evidence-class, remaining-gate, and verdict rules after the file pass. A failed file pass: post no approve; the coverage failure is a blocker.
 
 ## Review Workflow
 
-When the user asks to review a GitHub or GitLab PR/MR, treat that as permission to post the review result unless repo-local instructions say otherwise.
+A request to review a GitHub or GitLab PR/MR is permission to post the review result unless repo-local instructions say otherwise.
 
-For `review again`, if there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of manufacturing a fresh verdict.
+For `review again`, if there is no new head or no relevant new evidence after a prior blocker, report that the PR/MR is still waiting on the same blocker instead of a new verdict.
 
 Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree.
 
-Run the file pass (`open-code-review-delegate`) on that head, except where `/git-review-pr-force` above skips or narrows it; map findings, then continue the layers below.
+Run the file pass (`open-code-review-delegate`) on that head, except where `/git-review-pr-force` above skips or narrows it; map findings, then continue the layers below. A changed file outside `reviewable_files` is unsupported by the tool: read its diff, name the file and the result, never silently. `0/N reviewable` alone is not a completed file pass.
 
 Review in this order:
 
-1. Code behavior and user-visible/API behavior.
+1. Code and user-visible/API behavior.
 2. Tests and missing coverage for changed behavior.
 3. Docs, generated types, schemas, and frontend/backend contracts.
-4. CI, pipeline artifacts, deployment, and environment risks. Separate required PR/MR jobs from a named live job. Agents must not treat a generic verify job as named live-job success.
+4. CI, pipeline artifacts, deployment, and environment risks. Separate required PR/MR jobs from a named live job. Do not treat a generic verify job as named live-job success.
 
-For forge-facing review text, match the issue/PR language or the repo's documented language.
+For forge-facing review text, match the issue/PR language or repo's documented language.
 
-Each finding names the problem or open question, its impact and whether it blocks merge, the fix direction or decision needed, and the evidence required before re-review. For several findings, use bullets or an `Item` / `Impact` / `Required action` / `Validation` table.
+Each finding names problem or open question, its impact and whether it blocks merge, fix direction or decision needed, and evidence required before re-review. Several findings use bullets or an `Item`/`Impact`/`Required action`/`Validation` table.
 
 Blocking versus non-blocking:
 
 - Block for regressions, broken contracts, misleading docs about active behavior, missing required validation, unresolved prior blockers, failed relevant CI, or risks that can affect correctness, security, deployment, or operations.
 - Do not block for cleanup-only, style-only, or backlog-level suggestions unless the user asks.
 - Put blockers in unresolved inline diff discussions on the exact changed line when possible.
-- Put non-blocking findings in a concise PR/MR comment marked as follow-up or optional.
+- Put non-blocking findings in a PR/MR comment marked as follow-up or optional.
 
 Proof re-run. Both review commands run it. After the file pass and OCR mapping, and before the verdict, read claimed validation from the PR/MR body and the latest validation comment in any heading or prose. A `## Verification` block and its labeled lines are one optional shape. Missing, renamed, reordered, or prose-only validation is not a finding and is not `verdict: request-changes`. Do not ask the author to rewrite the description into that shape.
 
-When the author stated a command and a result, re-run that command on the current review head checkout. Record the actual result when it can run. A result that contradicts the stated result is an Evidence class mismatch.
+When the author stated a command and a result, re-run that command on the current review head checkout. Record the actual result when it can run. A result contradicting the stated result is an Evidence class mismatch.
 
-If no command was stated, or the command cannot re-run, write the reason in the verdict and continue the other gates. It cannot re-run when no command was stated, the environment is missing, the command is non-deterministic, a secret is required, or the job is a protected live job. Never pretend the command ran. Judge that job from the snapshot and the checkout.
+If no command was stated, or the command cannot re-run, write the reason in the verdict and continue the other gates. It cannot re-run when no command was stated, the environment is missing, the command is non-deterministic, a secret is required, or the job is a protected live job. Never pretend the command ran. Judge that job from the snapshot and checkout.
 
 Name the strongest class you actually used, from the table below. A stated class stronger than the evidence is an Evidence class mismatch. A missing class label is not a mismatch. An Evidence class mismatch is `verdict: request-changes` with severity High. When inline rules allow a comment on the changed line, post that High finding as a blocking inline discussion. Otherwise put High on the verdict main table.
 
@@ -108,13 +108,13 @@ Blast-radius level to Evidence class: 5 live job / real artifact bytes, 4 execut
 
 Approve must not treat tripwire as live proof. A live-job claim for a user-visible output whose proof shows only that the output exists, not its content, is an Evidence class mismatch. A policy change that keeps old host config must say in the verdict that testing scope shrinks.
 
-Thorough-review triggers in the user text or invocation arguments include thorough, don't rubber-stamp, 徹底, 抓出來, and 不要放水. Thorough review does not promote style to blocking. It must put remaining gates, policy cost, and the evidence class in the verdict main table, and must not hide remaining gates in a non-blocking note.
+Thorough-review triggers in user text or invocation arguments include thorough, don't rubber-stamp, 徹底, 抓出來, and 不要放水. Thorough review does not promote style to blocking. It must put remaining gates, policy cost, and the evidence class in the verdict main table, and must not hide remaining gates in a non-blocking note.
 
 A regex tripwire on an install or deploy command is not package-manager or runtime proof; a named live job that actually performs that step remains a remaining gate.
 
 Approval rules:
 
-- Never approve from a snapshot taken before the file pass or its skip check. Immediately before approve, one snapshot must show the same head SHA you reviewed. Approve only that SHA.
+- Never approve from a snapshot taken before the file pass or its skip check. Immediately before approve, one snapshot must show the same reviewed head SHA. Approve only that SHA.
 - Do not approve if the PR/MR is `owned` or `self_authored_head`, except under `/git-review-pr-force`.
 - Do not approve if any active blocker remains unresolved, blocking discussions are unresolved, or relevant CI is failed/unknown without a clear non-code explanation.
 - An approve or block note must list the claimed live job and whether it appeared on the current head pipeline. If it did not run, the verdict must name the remaining gate and must not write the defect as closed.
@@ -124,7 +124,7 @@ For re-review, take one new snapshot of head SHA, discussions, approvals, and pi
 
 When the PR/MR claims to fix a named failed job or issue, also walk that job's remaining path. Checking previously posted blockers is not enough to approve.
 
-1. Download the claimed failed job's log once. Keep the failing command and the error lines, then walk the script locally. Do not keep the rest of the log.
+1. Download the claimed failed job's log once. Keep the failing command and error lines, then walk the script locally. Drop the rest.
 2. From the failing line, walk the remaining job script and its adjacent layers.
 3. If the new commit changed only one layer, still check N-1 / N+1 on the same path.
 4. If those adjacent layers of the claimed failed job script have not been walked, must not approve.
@@ -135,5 +135,5 @@ After posting blockers or approval, the write response is the read-back. Report 
 
 For failing CI:
 
-- Use check conclusions already in the snapshot. Download one log for the failing job, keep the failing command and the error lines, and drop the rest.
+- Use check conclusions already in the snapshot. Download one log for the failing job, keep the failing command and error lines, and drop the rest.
 - Do not install forge tooling with system package managers unless the user asks.

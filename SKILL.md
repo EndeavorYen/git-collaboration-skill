@@ -22,10 +22,10 @@ If both remotes exist and the request has no URL, ask which forge to use.
 
 Every `gh`, `glab`, forge REST, and GitHub or GitLab MCP call counts. One client: `gh` on GitHub, `glab` on GitLab. Do not also query that object through MCP.
 
-A **snapshot** is one read whose payload already contains every forge field that mode needs. Reuse a snapshot already in this conversation unless the user says that object changed.
+A **snapshot** is one read whose payload already holds every forge field that mode needs. Reuse a snapshot already in this conversation unless the user says it changed.
 
-1. Resolve the authenticated user once per invocation and reuse it. Skip an auth-status or repo-metadata call when the snapshot, the URL, or `git remote -v` already answers it.
-2. Read each issue or PR/MR once, with the snapshot command in the forge reference. It is not a menu of extra calls.
+1. Resolve the authenticated user once per invocation and reuse it. Skip an auth-status or repo-metadata call when the snapshot, the URL or `git remote -v` already answers it.
+2. Read each issue or PR/MR once, with the snapshot command in the forge reference. Not a menu of extra calls.
 3. After the snapshot, inspect code, history, diffs, tests, and repo instructions in the local checkout. `git fetch` of the one ref you will check out is allowed; do not fetch again to re-read files. If this checkout is the wrong repo or lacks the cited paths, stop and name the missing path.
 4. Draft, classify, and implement from that snapshot plus the checkout without re-querying the forge. Do not read repository files, blame, or trees through the forge.
 5. A write is one call. The write response is the read-back when it contains the new id, SHA, or state. Confirm with one view only when it omits a field the stop condition needs. Do not reload after a successful write.
@@ -37,10 +37,10 @@ Related PRs/MRs come from snapshot links. Search the forge only when the user as
 
 ## Context budget
 
-- Run the snapshot command in the forge reference with its `--jq` or `jq` pipe. If the filter errors, fix the filter once. Do not rerun without it, and do not page through raw JSON.
+- Run the snapshot command in the forge reference with its `--jq` or `jq` pipe. If the filter errors, fix the filter once. Do not rerun without it or page through raw JSON.
 - The issue or PR/MR body stays whole. A comment or review body stays whole when it contains `git-plan-issue`, `git-plan-issue-dissent`, or `git-force-review`, or when it is the latest one. Every other body keeps author, time, id, and the first 400 characters. Also keep review commit OID, discussion resolved state, and commit author login, name, and email. Empty login is not a missing author when name or email is present.
 - List calls return metadata only: number, title, state, updated time, author, assignees, url, and for a PR/MR also draft, `reviewDecision`, mergeable, and head SHA. No comment bodies, review bodies, or check logs.
-- Do not paste the snapshot, this skill, or source listings into a reply, comment, or subagent prompt. One pre-submit subagent per MR gets that submit range and the dispatch contract.
+- Do not paste the snapshot, this skill, or source listings into a reply, comment, or subagent prompt. One pre-submit subagent per MR gets that submit range and the dispatch contract. A fix re-review starts a new fresh subagent, one at a time.
 - Search, then open the matching symbol and its test. Do not read a directory, a whole unrelated file, or both forge references into context.
 
 ## Task Mode Decision
@@ -92,16 +92,16 @@ Scheduled lifecycle or scheduled approved merge: read `preflight.md` and `schedu
 
 ## Gates
 
-PR/MR modes run `references/preflight.md` before any write. Do not review or approve a PR/MR you own or have commits on, or change a foreign one. There is no default reviewer. Only a `*-force` command the human invokes waives a gate. `next step:` comes from `references/handoff.md`.
+PR/MR modes run `references/preflight.md` before any write. Do not review or approve a PR/MR you own or have commits on, or change a foreign one. No default reviewer. Only a `*-force` command the human invokes waives a gate. `next step:` comes from `references/handoff.md`.
 
 Full-tier pre-submit: dispatch contract in `references/pre-submit.md`.
 
 ## Safety Defaults
 
-- Inspect `git status --short --branch` before making commits, pushes, or PR/MR changes.
-- Treat a dirty worktree as user-owned; do not revert changes you did not make.
+- Inspect `git status --short --branch` before commits, pushes, or PR/MR changes.
+- Treat a dirty worktree as user-owned; do not revert others' changes.
 - Do not push, open/update PRs/MRs, close issues, or comment unless the user asks or the request clearly requires it.
 - Do not target `main` or `master` for feature work unless the user explicitly says so. Prefer the repo's documented development branch, then the default branch.
-- Never store forge tokens in the repo, docs, or shell history.
-- Before a write, verify auth for the detected forge. If it is missing or the wrong account, ask the user to authenticate.
+- Never store forge tokens in the repo, docs or shell history.
+- Before a write, verify auth for the detected forge. If missing or the wrong account, ask the user to authenticate.
 

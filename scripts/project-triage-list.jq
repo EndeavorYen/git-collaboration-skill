@@ -10,7 +10,8 @@
 # A GitHub review request stays pending only when its latest timeline event in
 # the window is the request. A later ReviewRequestRemovedEvent clears that
 # person. totalCount 0 means none are pending even if the removal is outside
-# the last 8 events.
+# the last 8 events. An event with no login and no name does not share a
+# person key, so it cannot clear another request.
 def target_merge($base):
   ((. // "") | split("\n")[0]) as $s
   | (($s | startswith("Merge branch ")) or ($s | startswith("Merge remote-tracking branch ")))
@@ -57,14 +58,16 @@ def pending_at:
     | if length == 0 then null else max end
   end;
 def gh_review_events:
-  [ .timelineItems.nodes[]?
+  [ (.timelineItems.nodes // []) | to_entries[]
+    | .key as $i | .value
     | (if .__typename == "ReviewRequestedEvent" then "request"
        elif .__typename == "ReviewRequestRemovedEvent" then "remove"
        else null end) as $kind
     | select($kind != null)
     | (.createdAt | utc) as $t
     | select($t != null)
-    | {kind: $kind, t: $t, who: (.requestedReviewer.login // .requestedReviewer.name)}
+    | (.requestedReviewer.login // .requestedReviewer.name // "") as $who
+    | {kind: $kind, t: $t, who: (if $who != "" then $who else "\u0000" + ($i | tostring) end)}
   ];
 if $kind == "gh" then
   {
