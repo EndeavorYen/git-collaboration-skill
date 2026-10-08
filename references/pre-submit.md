@@ -1,6 +1,6 @@
 # Pre-submit gate
 
-**REQUIRED SUB-SKILL:** `open-code-review-delegate` owns preview, rules, diffs, coverage, and finding shape. This file holds the file pass and the waiver rules. Implement, revise, and conflict read it before a source-branch push. Review reads it. When pstack is present and not off, read `references/pstack.md`.
+**REQUIRED SUB-SKILL:** `open-code-review-delegate` owns preview, rules, diffs, coverage, and finding shape. This file holds the file pass and the waiver rules. Review reads it. When pstack is present and not off, read `references/pstack.md`.
 
 ### File pass
 
@@ -11,9 +11,9 @@ After the actor gate and current-head checkout (or intended local submit range),
 Before push or PR/MR open/update on `/git-issue-pr`, `/git-revise-pr`, `/git-revise-pr-force`, `/git-fix-conflict`, and scheduled lifecycle source-branch push:
 
 1. Finish `verification-before-completion`.
-2. Run the file pass per **Review tier**. Full tier: dispatch its contract. Light tier: main session, same range; no subagent.
+2. Run the file pass per **Review tier**. Full tier: dispatch the contract under **Full tier**. Light tier: the main session runs `open-code-review-delegate` on the same range; no subagent.
 3. Critical and High findings are submit blockers until each is fixed in the tree or waived.
-4. A waiver is valid only when the **human in this conversation** names path, issue, and reason. **Blanket ship language is not a waiver.** Agent does not waive. Unattended scheduled runs cannot waive.
+4. A waiver is valid only when the **human in this conversation** names path, issue, and reason. **Blanket ship language is not a waiver.** Unattended scheduled runs cannot waive.
 5. Record each waiver in commit body or PR/MR description.
 6. Only a Critical or High fix starts another file pass. Commit the fix; the pass covers the fix range, `<last reviewed SHA>..<new head>` plus callers the diff touches; recompute the tier on that range. Repeat until no unwaived Critical/High remain. A Medium/Low-only fix re-runs the tests, not the file pass.
 7. Failed file pass, leftover unwaived Critical/High, missing waiver record or Proof record → do not push, do not open or update the PR/MR.
@@ -59,7 +59,7 @@ Missing line does not fail the pre-submit gate. Observation only, not a gate.
 
 | Excuse | Reality |
 | --- | --- |
-| "review diff myself" | OCR coverage via `open-code-review-delegate`. |
-| "tests passed, diff is fine" | `verification-before-completion` is not the file pass. |
-| "waive this High" | Only the human in this conversation: path + issue + reason. |
-| "pstack missing, proof n/a" | Proof record required. pstack only raises the ceiling. |
+| "I'll review the diff myself" | File pass is OCR coverage via `open-code-review-delegate`. |
+| "Tests passed so the diff is fine" | `verification-before-completion` is not the file pass. |
+| "I'll waive this High finding" | Only the human in this conversation waives, with path + issue + reason. |
+| "pstack is not installed, so proof is n/a" | The Proof record is required anyway. pstack only raises the ceiling. |
