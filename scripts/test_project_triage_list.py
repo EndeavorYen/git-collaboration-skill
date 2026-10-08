@@ -94,7 +94,7 @@ def shape_errors(case: dict) -> list[str]:
 def main() -> int:
     cases = json.loads(FIXTURES.read_text(encoding="utf-8"))
     ids = [case["id"] for case in cases]
-    for required in ("follow-up", "mixed-timezone", "string-max-diverges", "gh-request-removed"):
+    for required in ("follow-up", "mixed-timezone", "string-max-diverges", "gh-request-removed", "gh-unidentified-reviewer"):
         if required not in ids:
             print(f"missing fixture {required}", file=sys.stderr)
             return 1

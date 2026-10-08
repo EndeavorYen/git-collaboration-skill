@@ -1,7 +1,5 @@
 # PR/MR preflight and force
 
-Read this before a PR/MR write. Handoff: `references/handoff.md`.
-
 Local instructions may strengthen the merge gate, but must never replace a live non-author approval with notes, reviewer state, resolved discussions, or a green pipeline. Only `/git-merge-approved-force` waives that gate.
 
 ## Command preflight
