@@ -1,6 +1,6 @@
 # GitLab CLI and approval APIs
 
-Use this file after the main skill has detected GitLab. Prefer `glab`. The GraphQL query plus the `jq` pipe in each section is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. The tool result is the pipe's stdout. If `jq` errors, fix the filter once. Do not drop the pipe or follow it with REST for approvals, commits, discussions, notes, or pipelines the query already returns. Do not use GitLab MCP or read repository files through the forge.
+Use this file after the main skill has detected GitLab. Prefer `glab`. The tool result is the pipe's stdout. If `jq` errors, fix the filter once. Do not drop the pipe or follow it with REST for approvals, commits, discussions, notes, or pipelines the query already returns.
 
 URL-encode a path only for REST (`group/sub%2Fproject`). GraphQL `fullPath` stays plain.
 
@@ -109,7 +109,7 @@ glab api --method PUT "projects/${PROJECT}/merge_requests/${IID}/merge" \
   --field sha="${HEAD_SHA}"
 ```
 
-Push options may create an MR when the user asked and the instance supports them. Creating an MR is not permission to merge it. The create or merge result is the read-back.
+Push options may create an MR when the user asked and the instance supports them. Creating an MR is not permission to merge it. When assignees are empty, set the authenticated author as the sole assignee. Never assign yourself elsewhere or replace a non-empty list. The create or merge result is the read-back, including assignees.
 
 `/git-merge-approved-force` uses the same exact-head merge field. If approval rules reject the force merge, report the forge error. Do not push the source branch into the target locally.
 

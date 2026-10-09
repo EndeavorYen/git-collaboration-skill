@@ -1,6 +1,6 @@
 # Pre-submit gate
 
-**REQUIRED SUB-SKILL:** `open-code-review-delegate` owns preview, rules, diffs, coverage, and finding shape. This file holds the file pass and the waiver rules. Review reads it. When pstack is present and not off, read `references/pstack.md`.
+**REQUIRED SUB-SKILL:** `open-code-review-delegate` owns preview, rules, diffs, coverage, and finding shape. When pstack is present and not off, read `references/pstack.md`.
 
 ### File pass
 
@@ -40,7 +40,7 @@ Proof: <command or skill> -> <observed result>
 Evidence class: live job / real artifact bytes|executable unit tests|source-contract / regex tripwire|docs alignment
 Surface: <verify skill and feature driven>|none: <reason>
 Load-bearing fact: <fact> (level 1-5)|n/a
-Review tier: <light|full> <base sha>..<head sha>[; <light|full> <sha>..<sha> ...]
+Review tier: <light|full> <base sha>..<head sha>[; <light|full> <sha>..<sha> ...][; unsupported: <file> <result>]
 pstack: present [hooks]|absent|off
 ```
 
@@ -59,7 +59,7 @@ Missing line does not fail the pre-submit gate. Observation only, not a gate.
 
 | Excuse | Reality |
 | --- | --- |
-| "I'll review the diff myself" | File pass is OCR coverage via `open-code-review-delegate`. |
+| "I'll review the diff myself" | File pass is OCR coverage via `open-code-review-delegate`. Unsupported files are read manually. |
 | "Tests passed so the diff is fine" | `verification-before-completion` is not the file pass. |
 | "I'll waive this High finding" | Only the human in this conversation waives, with path + issue + reason. |
 | "pstack is not installed, so proof is n/a" | The Proof record is required anyway. pstack only raises the ceiling. |

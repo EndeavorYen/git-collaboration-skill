@@ -1,0 +1,32 @@
+{
+  "id": "update-keeps-assignees",
+  "why": "Updating a PR/MR that already has assignees leaves that list unchanged.",
+  "command": "/git-issue-pr https://github.com/acme/widget/issues/83",
+  "user": "alice",
+  "snapshot": {
+    "number": 90,
+    "url": "https://github.com/acme/widget/pull/90",
+    "title": "Set the author as assignee on create",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [
+      "bob"
+    ],
+    "headRefOid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "comments": []
+  },
+  "extra": "The PR already exists. Update the description only. Assignees are already bob. Leave that list unchanged.",
+  "expect": {
+    "writes_must_not": [
+      "assignee"
+    ],
+    "reply_must_re": [
+      "\\bbob\\b"
+    ]
+  },
+  "self_test": {
+    "pass": "Assignees stay bob.\nSTATE: n/a\nWRITES:\n- gh pr edit 90 --body \"$BODY\"\nNEXT: none",
+    "fail": "Replace the assignee list with alice.\nSTATE: n/a\nWRITES:\n- gh pr edit 90 --body \"$BODY\" --add-assignee alice\nNEXT: none"
+  }
+}

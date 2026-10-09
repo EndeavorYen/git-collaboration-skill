@@ -134,6 +134,8 @@ REFERENCE_PHRASES = {
         "only exists or is non-empty",
         "unsupported by the tool",
         "`0/N reviewable` alone is not a completed file pass",
+        "unsupported: <file> <result>",
+        "Unsupported files are read manually",
         "Repeat until no unwaived Critical/High remain",
         "or in the update comment otherwise",
         "**REQUIRED SUB-SKILL:** `open-code-review-delegate`",
@@ -237,6 +239,9 @@ REFERENCE_PHRASES = {
         "Stop and dissent when",
         "every brief Test case",
         "do not revert them",
+        "When assignees are empty, set the authenticated author as the sole assignee.",
+        "Never assign yourself elsewhere or replace a non-empty list.",
+        "reviewer/assignee state",
     ],
     "revise.md": [
         "NEEDS_REVISION",
@@ -895,6 +900,9 @@ def validate_forge_references() -> None:
             "Do not rerun without it",
             "required reviewers",
             "each thread's latest inline comment",
+            "When assignees are empty, set the authenticated author as the sole assignee.",
+            "Never assign yourself elsewhere or replace a non-empty list.",
+            "including assignees",
         ):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
@@ -944,6 +952,9 @@ def validate_forge_references() -> None:
             "does not prove there is no outstanding feedback",
             "notes(first: 20)",
             "notes(first: 100)",
+            "When assignees are empty, set the authenticated author as the sole assignee.",
+            "Never assign yourself elsewhere or replace a non-empty list.",
+            "including assignees",
         ):
             if phrase not in text:
                 fail(f"references/gitlab.md: missing {phrase!r}")
@@ -1072,6 +1083,8 @@ def validate_scheduled_ocr_gate() -> None:
         "Scheduled runs dispatch one at a time",
         "They never dispatch outside the contract; record `waiting` instead.",
         "A fix re-review starts a new fresh subagent, one at a time.",
+        "never writes reviewer or assignee fields",
+        "including author self-assignment",
     ):
         if phrase not in text:
             fail(f"references/scheduled-automation.md: missing {phrase!r}")

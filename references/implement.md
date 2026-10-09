@@ -61,10 +61,10 @@ Use the compatible default link type for that forge. If blocker link types exist
 
 - Do not open or update PRs/MRs unless requested.
 - For issue implementation work, after the fix is implemented, validated, and committed on a dedicated branch, pushing and opening/updating the PR/MR is part of the requested workflow unless repo-local instructions say otherwise.
+- When assignees are empty, set the authenticated author as the sole assignee. Never assign yourself elsewhere or replace a non-empty list.
 - Creating or updating a PR/MR is not permission to merge it.
 - Preserve existing description content; append concise sections rather than replacing useful reviewer context.
 - Known limitations should be explicit.
-- Opening or updating a PR/MR, and any source-branch push from `/git-issue-pr`, `/git-revise-pr`, `/git-revise-pr-force`, `/git-fix-conflict`, or scheduled lifecycle, requires the pre-submit gate in `references/pre-submit.md`.
 
 ## Commits
 

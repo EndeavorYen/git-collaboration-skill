@@ -1,6 +1,6 @@
 # GitHub CLI and approval APIs
 
-Prefer `gh` after GitHub is detected. Each command is the **snapshot** from **Forge budget** and **Context budget** in `SKILL.md`. Keep the `--jq`. If it errors, fix the filter once. Do not rerun without it or refetch a field already in the payload. Do not use GitHub MCP or read repository files through the forge.
+Prefer `gh` after GitHub is detected. Keep the `--jq`. If it errors, fix the filter once. Do not rerun without it or refetch a field already in the payload.
 
 Commands assume the current directory is the repository. `gh pr view "$N"` reads it; pass `--repo owner/name` otherwise.
 
@@ -87,7 +87,7 @@ gh pr create --base "$TARGET" --head "$SOURCE" --title "$TITLE" --body "$BODY"
 gh pr merge "$N" --match-head-commit "$HEAD"
 ```
 
-Use `--merge`, `--squash`, or `--rebase` only when repo-local instructions or the user name that strategy. `--match-head-commit` keeps the exact reviewed head. The create or merge result is the read-back.
+Use `--merge`, `--squash`, or `--rebase` only when repo-local instructions or the user name that strategy. `--match-head-commit` keeps the exact reviewed head. When assignees are empty, set the authenticated author as the sole assignee. Never assign yourself elsewhere or replace a non-empty list. The create or merge result is the read-back, including assignees.
 
 `/git-merge-approved-force` uses this exact-head merge. If required reviews reject it, report that error. Add `--admin` only when this invocation contains `admin`:
 

@@ -1,0 +1,29 @@
+{
+  "id": "scheduled-no-assignee",
+  "why": "Scheduled automation never writes assignee fields, including author self-assignment when the list is empty.",
+  "command": "unattended scheduled lifecycle run",
+  "user": "alice",
+  "snapshot": {
+    "number": 90,
+    "url": "https://github.com/acme/widget/pull/90",
+    "title": "Retry uploads",
+    "state": "OPEN",
+    "isDraft": false,
+    "author": "alice",
+    "assignees": [],
+    "headRefOid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "extra": "This is the scheduled profile, not interactive triage. The authored PR has an empty assignee list. Do not assign anyone.",
+  "expect": {
+    "writes_must_not": [
+      "assignee"
+    ],
+    "reply_must_re": [
+      "waiting-human-assignment"
+    ]
+  },
+  "self_test": {
+    "pass": "assignment-gaps: waiting-human-assignment for PR 90.\nSTATE: n/a\nWRITES:\n- none\nNEXT: none",
+    "fail": "Self-assign the author.\nSTATE: n/a\nWRITES:\n- gh pr edit 90 --add-assignee alice\nNEXT: none"
+  }
+}

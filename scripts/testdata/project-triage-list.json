@@ -974,5 +974,100 @@
       "latestNonMergeAt": "2026-09-30T00:00:00Z",
       "unresolvedNonAuthor": 0
     }
+  },
+  {
+    "id": "gl-unidentified-reviewer",
+    "kind": "gl",
+    "payload": {
+      "data": {
+        "project": {
+          "mergeRequests": {
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "iid": "11",
+                "title": "Retry uploads",
+                "webUrl": "https://gitlab.com/acme/widget/-/merge_requests/11",
+                "state": "opened",
+                "draft": false,
+                "author": {
+                  "username": "alice"
+                },
+                "approved": false,
+                "mergeableDiscussionsState": true,
+                "diffHeadSha": "abc",
+                "targetBranch": "main",
+                "mergeStatusEnum": "MERGEABLE",
+                "reviewers": {
+                  "nodes": []
+                },
+                "discussions": {
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "resolvable": false,
+                      "resolved": null,
+                      "notes": {
+                        "nodes": [
+                          {
+                            "system": true,
+                            "body": "requested review from",
+                            "createdAt": "2026-10-02T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          },
+                          {
+                            "system": true,
+                            "body": "removed review request",
+                            "createdAt": "2026-10-03T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          },
+                          {
+                            "system": true,
+                            "body": "requested review from @bob",
+                            "createdAt": "2026-10-05T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          },
+                          {
+                            "system": true,
+                            "body": "removed review request for @bob",
+                            "createdAt": "2026-10-06T00:00:00Z",
+                            "author": {
+                              "username": "alice"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "nodes": [
+                    {
+                      "committedDate": "2026-09-30T00:00:00Z",
+                      "message": "handle empty token"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "expect": {
+      "reviewRequestAt": "2026-10-02T00:00:00Z",
+      "latestNonMergeAt": "2026-09-30T00:00:00Z",
+      "unresolvedNonAuthor": 0
+    }
   }
 ]

@@ -1,0 +1,37 @@
+{
+  "id": "create-empty-assignee",
+  "why": "Opening a PR/MR with an empty assignee list sets the authenticated author as the sole assignee.",
+  "command": "/git-issue-pr https://github.com/acme/widget/issues/83",
+  "user": "alice",
+  "snapshot": {
+    "number": 83,
+    "url": "https://github.com/acme/widget/issues/83",
+    "title": "Set the author as assignee on create",
+    "state": "OPEN",
+    "author": "alice",
+    "assignees": [],
+    "comments": [
+      {
+        "author": "alice",
+        "createdAt": "2026-10-08T00:00:00Z",
+        "body": "<!-- git-plan-issue -->\n**Goal:** empty assignee list gets the author\n**Recommended change:** set the authenticated author when creating the PR\n**Out of scope:** replacing a non-empty assignee list\n**Acceptance criteria:** the author is the sole assignee after create"
+      }
+    ]
+  },
+  "extra": "No PR/MR exists yet. The branch is already pushed. Open the PR/MR now. The assignee list is empty. The authenticated user alice is the author.",
+  "expect": {
+    "writes_must": [
+      [
+        "--assignee alice",
+        "--assignee @me"
+      ]
+    ],
+    "writes_must_not": [
+      "--assignee bob"
+    ]
+  },
+  "self_test": {
+    "pass": "Create the PR with alice as the sole assignee.\nSTATE: n/a\nWRITES:\n- gh pr create --base main --head feature/widget --title t --body b --assignee alice\nNEXT: next step: /git-review-pr-force https://github.com/acme/widget/pull/90",
+    "fail": "Create the PR and leave assignees empty.\nSTATE: n/a\nWRITES:\n- gh pr create --base main --head feature/widget --title t --body b\nNEXT: none"
+  }
+}
