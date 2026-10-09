@@ -239,7 +239,7 @@ REFERENCE_PHRASES = {
         "Stop and dissent when",
         "every brief Test case",
         "do not revert them",
-        "When assignees are empty, set the authenticated author as the sole assignee.",
+        "Empty assignees get the authenticated author as sole assignee.",
         "Never assign yourself elsewhere or replace a non-empty list.",
         "reviewer/assignee state",
     ],
@@ -900,9 +900,7 @@ def validate_forge_references() -> None:
             "Do not rerun without it",
             "required reviewers",
             "each thread's latest inline comment",
-            "When assignees are empty, set the authenticated author as the sole assignee.",
-            "Never assign yourself elsewhere or replace a non-empty list.",
-            "including assignees",
+            "Empty assignees on create: see implement.md.",
         ):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
@@ -952,9 +950,7 @@ def validate_forge_references() -> None:
             "does not prove there is no outstanding feedback",
             "notes(first: 20)",
             "notes(first: 100)",
-            "When assignees are empty, set the authenticated author as the sole assignee.",
-            "Never assign yourself elsewhere or replace a non-empty list.",
-            "including assignees",
+            "Empty assignees on create: see implement.md.",
         ):
             if phrase not in text:
                 fail(f"references/gitlab.md: missing {phrase!r}")

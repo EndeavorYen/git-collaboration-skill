@@ -1,6 +1,6 @@
 # Pre-submit gate
 
-**REQUIRED SUB-SKILL:** `open-code-review-delegate` owns preview, rules, diffs, coverage, and finding shape. When pstack is present and not off, read `references/pstack.md`.
+**REQUIRED SUB-SKILL:** `open-code-review-delegate` owns preview, rules, diffs, coverage, and finding shape. This file holds the file pass and the waiver rules. Review reads it. When pstack is present and not off, read `references/pstack.md`.
 
 ### File pass
 
