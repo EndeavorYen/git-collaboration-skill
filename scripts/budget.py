@@ -18,12 +18,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Bytes. Caps only go down: lower a cap when a change shrinks a mode.
 MODE_CAPS = {
-    "Review someone else's PR/MR": 42_462,
+    "Review someone else's PR/MR": 42_442,
     "Plan issue": 31_596,
-    "Implement issue then PR/MR": 38_812,
+    "Implement issue then PR/MR": 38_648,
     "Reply to issue": 12_950,
-    "Update own PR/MR after review": 25_131,
-    "Fix PR/MR conflicts": 24_268,
+    "Update own PR/MR after review": 25_101,
+    "Fix PR/MR conflicts": 24_238,
     "Merge approved PR/MR": 29_097,
     "Request PR/MR review": 18_474,
     "Focused PR/MR status": 16_790,

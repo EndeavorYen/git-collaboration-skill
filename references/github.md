@@ -87,7 +87,7 @@ gh pr create --base "$TARGET" --head "$SOURCE" --title "$TITLE" --body "$BODY"
 gh pr merge "$N" --match-head-commit "$HEAD"
 ```
 
-Use `--merge`, `--squash`, or `--rebase` only when repo-local instructions or the user name that strategy. `--match-head-commit` keeps the exact reviewed head. Empty assignees on create: see implement.md. The create or merge result is the read-back.
+Use `--merge`, `--squash`, or `--rebase` only when repo-local instructions or the user name that strategy. `--match-head-commit` keeps the exact reviewed head. The create or merge result is the read-back.
 
 `/git-merge-approved-force` uses this exact-head merge. If required reviews reject it, report that error. Add `--admin` only when this invocation contains `admin`:
 

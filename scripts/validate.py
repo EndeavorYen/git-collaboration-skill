@@ -133,9 +133,9 @@ REFERENCE_PHRASES = {
         "the observed result names the content checked",
         "only exists or is non-empty",
         "unsupported by the tool",
+        "name file and result on `Review tier:`",
         "`0/N reviewable` alone is not a completed file pass",
-        "unsupported: <file> <result>",
-        "Unsupported files are read manually",
+        "Read unsupported files manually",
         "Repeat until no unwaived Critical/High remain",
         "or in the update comment otherwise",
         "**REQUIRED SUB-SKILL:** `open-code-review-delegate`",
@@ -173,7 +173,6 @@ REFERENCE_PHRASES = {
         "rerunning a protected live job",
         "Do not resolve a blocker based only on the author's explanation.",
         "unsupported by the tool",
-        "`0/N reviewable` alone is not a completed file pass",
     ],
     "plan-issue.md": [
         "<!-- git-plan-issue -->",
@@ -239,8 +238,7 @@ REFERENCE_PHRASES = {
         "Stop and dissent when",
         "every brief Test case",
         "do not revert them",
-        "Empty assignees get the authenticated author as sole assignee.",
-        "Never assign yourself elsewhere or replace a non-empty list.",
+        "Empty assignees on create: add the authenticated author; never replace a non-empty list.",
         "reviewer/assignee state",
     ],
     "revise.md": [
@@ -900,7 +898,6 @@ def validate_forge_references() -> None:
             "Do not rerun without it",
             "required reviewers",
             "each thread's latest inline comment",
-            "Empty assignees on create: see implement.md.",
         ):
             if phrase not in text:
                 fail(f"references/github.md: missing {phrase!r}")
@@ -950,7 +947,6 @@ def validate_forge_references() -> None:
             "does not prove there is no outstanding feedback",
             "notes(first: 20)",
             "notes(first: 100)",
-            "Empty assignees on create: see implement.md.",
         ):
             if phrase not in text:
                 fail(f"references/gitlab.md: missing {phrase!r}")

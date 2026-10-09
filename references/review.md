@@ -67,7 +67,7 @@ For `review again`, if there is no new head or no relevant new evidence after a 
 
 Use the current head, not remembered diffs. If the main checkout is dirty, behind, or belongs to a different repo, review in a temporary clone or detached worktree.
 
-Run the file pass (`open-code-review-delegate`) on that head, except where `/git-review-pr-force` above skips or narrows it; map findings, then continue the layers below. A changed file outside `reviewable_files` is unsupported by the tool: read its diff, name the file and the result, never silently. `0/N reviewable` alone is not a completed file pass.
+Run the file pass (`open-code-review-delegate`) on that head, except where `/git-review-pr-force` above skips or narrows it; map findings, then continue the layers below. A changed file outside `reviewable_files` is unsupported by the tool: read its diff, name the file and the result, never silently.
 
 Review in this order:
 
