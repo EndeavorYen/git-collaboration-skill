@@ -59,7 +59,7 @@ Missing line does not fail the pre-submit gate. Observation only, not a gate.
 
 | Excuse | Reality |
 | --- | --- |
-| "I'll review the diff myself" | File pass is OCR coverage via `open-code-review-delegate`. |
+| "I'll review the diff myself" | File pass is OCR coverage via `open-code-review-delegate`. Read unsupported files manually. |
 | "Tests passed so the diff is fine" | `verification-before-completion` is not the file pass. |
 | "I'll waive this High finding" | Only the human in this conversation waives, with path + issue + reason. |
 | "pstack is not installed, so proof is n/a" | The Proof record is required anyway. pstack only raises the ceiling. |

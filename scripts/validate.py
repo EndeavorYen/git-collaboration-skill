@@ -133,7 +133,9 @@ REFERENCE_PHRASES = {
         "the observed result names the content checked",
         "only exists or is non-empty",
         "unsupported by the tool",
+        "name file and result on `Review tier:`",
         "`0/N reviewable` alone is not a completed file pass",
+        "Read unsupported files manually",
         "Repeat until no unwaived Critical/High remain",
         "or in the update comment otherwise",
         "**REQUIRED SUB-SKILL:** `open-code-review-delegate`",
@@ -171,7 +173,6 @@ REFERENCE_PHRASES = {
         "rerunning a protected live job",
         "Do not resolve a blocker based only on the author's explanation.",
         "unsupported by the tool",
-        "`0/N reviewable` alone is not a completed file pass",
     ],
     "plan-issue.md": [
         "<!-- git-plan-issue -->",
@@ -237,6 +238,8 @@ REFERENCE_PHRASES = {
         "Stop and dissent when",
         "every brief Test case",
         "do not revert them",
+        "Empty assignees on create: add the authenticated author; never replace a non-empty list.",
+        "reviewer/assignee state",
     ],
     "revise.md": [
         "NEEDS_REVISION",
@@ -1072,6 +1075,8 @@ def validate_scheduled_ocr_gate() -> None:
         "Scheduled runs dispatch one at a time",
         "They never dispatch outside the contract; record `waiting` instead.",
         "A fix re-review starts a new fresh subagent, one at a time.",
+        "never writes reviewer or assignee fields",
+        "including author self-assignment",
     ):
         if phrase not in text:
             fail(f"references/scheduled-automation.md: missing {phrase!r}")

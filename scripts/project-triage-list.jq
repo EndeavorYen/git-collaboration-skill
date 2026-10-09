@@ -11,7 +11,8 @@
 # the window is the request. A later ReviewRequestRemovedEvent clears that
 # person. totalCount 0 means none are pending even if the removal is outside
 # the last 8 events. An event with no login and no name does not share a
-# person key, so it cannot clear another request.
+# person key, so it cannot clear another request. A GitLab system note with
+# no @mention does not share a person key either.
 def target_merge($base):
   ((. // "") | split("\n")[0]) as $s
   | (($s | startswith("Merge branch ")) or ($s | startswith("Merge remote-tracking branch ")))
@@ -41,14 +42,16 @@ def note_kind($b):
   elif ($b | contains("requested review from")) then "request"
   else null end;
 def review_events:
-  [ .discussions.nodes[]?.notes.nodes[]?
-    | select(.system == true)
+  [ [.discussions.nodes[]?.notes.nodes[]? | select(.system == true)]
+    | to_entries[]
+    | .key as $i
+    | .value
     | (note_kind(.body // "")) as $kind
     | select($kind != null)
     | (.createdAt | utc) as $t
     | select($t != null)
     | ([.body | scan("@([A-Za-z0-9_.-]+)") | .[0]]) as $who
-    | (if ($who | length) == 0 then [{kind: $kind, t: $t, who: null}]
+    | (if ($who | length) == 0 then [{kind: $kind, t: $t, who: ("\u0000" + ($i | tostring))}]
        else [$who[] | {kind: $kind, t: $t, who: .}] end)[]
   ];
 def pending_at:
